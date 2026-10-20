@@ -80,7 +80,7 @@ func _island_mesh(sub_seed: int, R: float) -> ArrayMesh:
 			var ty := top_h * (1.0 - pow(rho, 2.0)) + noise.get_noise_2d(x * 0.35, z * 0.35) * top_h * 0.3 * (1.0 - rho * 0.5)
 			var by := -depth * (1.0 - pow(rho, 1.15)) * (1.0 + 0.3 * noise.get_noise_2d(x * 0.5 + 40.0, z * 0.5)) - R * 0.12 * float(rho >= 0.99)
 			trow.append(Vector3(x, ty, z))
-			brow.append(Vector3(x, by - (1.0 if r == rings else 0.0) * 0.0, z))
+			brow.append(Vector3(x, by, z))
 		top.append(trow)
 		bot.append(brow)
 	# dessus

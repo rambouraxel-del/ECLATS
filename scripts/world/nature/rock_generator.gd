@@ -98,16 +98,15 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 	if not ground.is_empty():
 		_plug(vol, lo, pl, ground, pal, tone_ids, seed)
 	# mousse sur les faces supérieures exposées (déterministe)
-	if pl["family"] != "ruin" or true:
-		for z in vol.size.z:
-			for x in vol.size.x:
-				for y in range(vol.size.y - 1, -1, -1):
-					if vol.get_voxel(x, y, z) != 0:
-						if y + 1 >= vol.size.y or vol.get_voxel(x, y + 1, z) == 0:
-							var yy := lo.y + float(y) * C
-							if yy > -0.05 and VoxelGrid.hash01(x, z, 17, seed) < 0.42 and nz.get_noise_3d(float(x) * 2.0, 0.0, float(z) * 2.0) > -0.2:
-								vol.set_voxel(x, y, z, moss)
-						break
+	for z in vol.size.z:
+		for x in vol.size.x:
+			for y in range(vol.size.y - 1, -1, -1):
+				if vol.get_voxel(x, y, z) != 0:
+					if y + 1 >= vol.size.y or vol.get_voxel(x, y + 1, z) == 0:
+						var yy := lo.y + float(y) * C
+						if yy > -0.05 and VoxelGrid.hash01(x, z, 17, seed) < 0.42 and nz.get_noise_3d(float(x) * 2.0, 0.0, float(z) * 2.0) > -0.2:
+							vol.set_voxel(x, y, z, moss)
+					break
 	var removed := VoxelShapes.keep_anchored(vol, int((0.05 - lo.y) / C))
 	var b := VoxelShapes.bounds(vol)
 	return {"volume": vol, "origin": lo, "plan": pl, "stats": {"cells": vol.count_solid(), "floating_removed": removed, "bounds": b}}
@@ -142,8 +141,7 @@ static func _boulder(vol: VoxelVolume, lo: Vector3, pl: Dictionary, pal: VoxelPa
 	var pick := func(x: int, y: int, z: int, d: float) -> int:
 		var yy: float = lo.y + float(y) * C
 		var wob := nz.get_noise_3d(float(x) * 0.7, float(y) * 0.7, float(z) * 0.7) * 0.28
-		var flat := 0.0 if yy > 0.0 else clampf(-yy * 1.0, 0.0, 0.5) * 0.0
-		if d + wob > 1.0 - flat:
+		if d + wob > 1.0:
 			return 0
 		return _mat_for_height(tone_ids, yy, seed, band_h, warp)
 	VoxelShapes.ellipsoid_pick(vol, lo, C, c, radii, pick)

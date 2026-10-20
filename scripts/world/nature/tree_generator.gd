@@ -228,7 +228,7 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 		VoxelShapes.capsule(wood, lo, C, s["a"], s["b"], s["r0"], s["r1"], bark_id)
 	# empattement et socle : le tronc plonge sous le sol jusqu'à son point le plus bas
 	var plug_bottom := min_ground - 0.5
-	VoxelShapes.capsule(wood, lo, C, Vector3(0, plug_bottom, 0), Vector3(0, 0.15, 0), r_base * 1.05, r_base * 1.05, bark_id)
+	VoxelShapes.capsule(wood, lo, C, Vector3(0, plug_bottom, 0), Vector3(0, 0.15, 0), r_base * 1.05 + 0.07, r_base * 1.05 + 0.07, bark_id)
 	VoxelShapes.capsule(wood, lo, C, Vector3(0, 0.55, 0), Vector3(0, -0.1, 0), r_base * 0.95, r_base * 1.4, bark_id)
 	# racines de surface : de l'empattement vers le point du sol le plus proche, plongeantes
 	var nroots := rng.randi_range(3, 5)

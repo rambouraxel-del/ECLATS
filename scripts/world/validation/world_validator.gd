@@ -156,7 +156,7 @@ func _items() -> void:
 	var floating := 0
 	for it in items:
 		var spec: PlacementSpec = it["spec"]
-		if spec.support == "none" or spec.allows_exception("overhang_void") and false:
+		if spec.support == "none":
 			continue
 		var s := _recomputed_support(it)
 		if s["cols"] == 0:

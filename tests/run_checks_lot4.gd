@@ -249,6 +249,22 @@ func _check_nature() -> void:
 	var pl2 := TreeGenerator.plan("oak", 4)
 	var m2 := TreeGenerator.rasterize(pl2, slope)
 	check(TreeGenerator.check(m2, slope).is_empty(), "arbre sur pente : pied enraciné jusqu'au sol le plus bas (aucun jour sous le tronc)")
+	# régression : toutes les espèces, plusieurs graines et trois inclinaisons de sol (un jour d'une colonne sous un bouleau
+	# a été trouvé par le validateur sur une île complète)
+	var tree_defects := 0
+	var tree_count := 0
+	for sl in [0.0, 0.2, 0.4]:
+		var g := {"half": 2.0, "step": 0.2, "n": 21, "h": PackedFloat32Array()}
+		g["h"].resize(21 * 21)
+		for iz in 21:
+			for ix in 21:
+				g["h"][ix + iz * 21] = (float(ix) - 10.0) * 0.1 * sl + (float(iz) - 10.0) * 0.05 * sl
+		for sp in TreeGenerator.SPECIES.keys():
+			for sd in range(1, 4):
+				tree_count += 1
+				if not TreeGenerator.check(TreeGenerator.rasterize(TreeGenerator.plan(sp, sd * 17), g), g).is_empty():
+					tree_defects += 1
+	check(tree_defects == 0, "%d arbres (7 espèces × 3 graines × 3 pentes) : aucun défaut d'ancrage" % tree_count)
 	check(TreeGenerator.rasterize(TreeGenerator.plan("pine", 3), flat)["wood"].checksum() == TreeGenerator.rasterize(TreeGenerator.plan("pine", 3), flat)["wood"].checksum(), "arbre déterministe")
 	for fam in RockGenerator.families():
 		for seed in [1, 2, 3]:

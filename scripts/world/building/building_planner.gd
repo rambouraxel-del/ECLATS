@@ -17,9 +17,7 @@ static func plan(type: String, seed: int) -> BuildingPlan:
 	p.D = _even(rng.randi_range(int(arch["d"][0]), int(arch["d"][1])))
 	_style(p, rng, arch)
 	var has_annex := rng.randf() < float(arch["annex_chance"])
-	var annex_side := 1 if rng.randf() < 0.5 else -1
-	if type == "house_small" or type == "workshop" or type == "community_hall" or type == "shop" or type == "house_large":
-		pass
+	var annex_side := 1 if rng.randf() < 0.5 else -1       # (tirage conservé : il fixe la suite du flux de la graine)
 	# Le foyer est contre le pignon ouest ; l'annexe est du côté opposé (est) par défaut.
 	annex_side = 1
 	var annex_w := 0
@@ -323,8 +321,6 @@ static func _try_window(p: BuildingPlan, rng: RandomNumberGenerator, r: Building
 			cands.append("W")
 		if r.x1 == wi - BuildingPlan.WALL - 1 and p.annexes.is_empty():
 			cands.append("E")
-		elif r.x1 == wi - BuildingPlan.WALL - 1 and not p.annexes.is_empty():
-			pass
 	else:
 		cands = ["N", "E"]
 	if cands.is_empty():
