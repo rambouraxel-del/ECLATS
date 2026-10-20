@@ -11,8 +11,8 @@ const SHADER := preload("res://materials/soft_clouds.gdshader")
 const LAYERS := [
 	{"name": "sea", "y": -34.0, "cover": 0.62, "scale": 0.011, "opacity": 0.95, "far": 700.0, "near": 12.0, "stretch": Vector2(1.0, 1.0), "soft": 0.3},
 	{"name": "sea_low", "y": -52.0, "cover": 0.7, "scale": 0.007, "opacity": 0.85, "far": 900.0, "near": 12.0, "stretch": Vector2(1.0, 1.0), "soft": 0.35},
-	{"name": "mid", "y": 38.0, "cover": 0.5, "scale": 0.009, "opacity": 0.55, "far": 600.0, "near": 25.0, "stretch": Vector2(1.0, 0.8), "soft": 0.3},
-	{"name": "high", "y": 120.0, "cover": 0.45, "scale": 0.004, "opacity": 0.4, "far": 1100.0, "near": 60.0, "stretch": Vector2(0.5, 1.6), "soft": 0.32},
+	{"name": "mid", "y": 66.0, "cover": 0.5, "scale": 0.009, "opacity": 0.55, "far": 600.0, "near": 25.0, "stretch": Vector2(1.0, 0.8), "soft": 0.3},
+	{"name": "high", "y": 150.0, "cover": 0.45, "scale": 0.004, "opacity": 0.4, "far": 1100.0, "near": 60.0, "stretch": Vector2(0.5, 1.6), "soft": 0.32},
 ]
 
 var materials: Array[ShaderMaterial] = []

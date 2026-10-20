@@ -201,27 +201,39 @@ static func _formation(vol: VoxelVolume, lo: Vector3, pl: Dictionary, pal: Voxel
 		var rad: float = col["rad"]
 		var h: float = col["h"]
 		var sides: int = col["sides"]
-		for z in vol.size.z:
-			for x in vol.size.x:
-				var px := lo.x + (float(x) + 0.5) * C
+		var lean: Vector2 = col["lean"]
+		# boîte englobante de la colonne (inclinaison comprise) : on ne parcourt que les cellules utiles
+		var reach := rad * 1.3 + absf(lean.x) * h + absf(lean.y) * h + 0.1
+		var x0 := maxi(int(floor((cx - reach - lo.x) / C)), 0)
+		var x1 := mini(int(ceil((cx + reach - lo.x) / C)), vol.size.x - 1)
+		var z0 := maxi(int(floor((cz - reach - lo.z) / C)), 0)
+		var z1 := mini(int(ceil((cz + reach - lo.z) / C)), vol.size.z - 1)
+		var y0 := maxi(int(floor((-0.2 - lo.y) / C)), 0)
+		var y1 := mini(int(ceil((h - lo.y) / C)), vol.size.y - 1)
+		for y in range(y0, y1 + 1):
+			var yy := lo.y + float(y) * C
+			if yy < -0.2 or yy > h:
+				continue
+			var t := clampf(yy / h, 0.0, 1.0)
+			var lx: float = cx + lean.x * yy
+			var lz: float = cz + lean.y * yy
+			var r_here := rad * lerpf(1.1, 0.8, t)
+			var mat := _mat_for_height(tone_ids, yy, seed, band_h, warp)
+			for z in range(z0, z1 + 1):
 				var pz := lo.z + (float(z) + 0.5) * C
-				for y in vol.size.y:
-					var yy := lo.y + float(y) * C
-					if yy < -0.2 or yy > h:
-						continue
-					var t := clampf(yy / h, 0.0, 1.0)
-					var lx: float = cx + (col["lean"] as Vector2).x * yy
-					var lz: float = cz + (col["lean"] as Vector2).y * yy
+				var dz := pz - lz
+				for x in range(x0, x1 + 1):
+					var px := lo.x + (float(x) + 0.5) * C
 					var dx := px - lx
-					var dz := pz - lz
+					var rr0 := Vector2(dx, dz).length()
+					if rr0 > rad * 1.3:
+						continue
 					var ang := atan2(dz, dx)
 					var poly := cos(PI / float(sides)) / cos(fposmod(ang, TAU / float(sides)) - PI / float(sides))
-					var rr := Vector2(dx, dz).length() * poly
-					var r_here := rad * lerpf(1.1, 0.8, t)
 					# sommet incliné : facettes
 					var cap := h - 0.25 * (dx * 1.0 + 0.5 * dz) / maxf(rad, 0.1)
-					if rr <= r_here and yy <= cap:
-						vol.set_voxel(x, y, z, _mat_for_height(tone_ids, yy, seed, band_h, warp))
+					if rr0 * poly <= r_here and yy <= cap:
+						vol.set_voxel(x, y, z, mat)
 	# massif de liaison à la base
 	var base_pick := func(x: int, y: int, z: int, d: float) -> int:
 		var yy: float = lo.y + float(y) * C
