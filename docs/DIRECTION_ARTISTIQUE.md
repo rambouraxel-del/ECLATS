@@ -86,11 +86,26 @@ Les personnages jouables feront environ 1,80 m.
 - Les détails fins se concentrent aux **points de contact** (assemblages, serrures, poignées) ;
   les grandes faces restent calmes pour que l'œil respire.
 
+## 5 bis. Règle des pixels de 2 cm (Lot 3, impérative)
+
+Toutes les surfaces sont dessinées en **pixels de 2 cm, une seule couleur plate par pixel**.
+Pas de texture image, pas de dégradé, pas de détail plus fin que le pixel. La richesse vient de la
+**variation de nuance d'un pixel à l'autre** (bois veiné, pierre mouchetée, pavés, strates…), jamais
+d'un aplat uni ni d'une image plaquée.
+
+- Un voxel de terrain (20 cm) = 10 × 10 pixels ; un voxel de bâtiment (10 cm) = 5 × 5 ; un microvoxel d'objet (2 cm) = 1 pixel.
+- Les motifs sont calculés par le shader avec des fonctions de hachage entières, au pixel près : mêmes
+  résultats sur toutes les machines, aucune dépendance à des fichiers d'image.
+- Les nuances sont quantifiées en 3 à 5 tons francs (esprit pixel-art) ; à grande distance elles
+  s'estompent vers la teinte moyenne pour éviter le scintillement.
+- Une matière est décrite par une couleur de base + un `style` + une `usure` (`config/palette.json`).
+  Ne jamais créer de matière « unique » pour un objet : réutiliser et nuancer.
+
 ## 6. Rendu (shader `voxel_stylized.gdshader`)
 
 - **Aucun contour entre faces coplanaires** : le maillage fusionne les faces identiques.
-- **Aucune variation de couleur par cellule** : les nuances viennent du shader, en continu
-  dans l'espace monde (zones de quelques mètres) + un grain très discret.
+- **Aucune variation de couleur par cellule de voxel** : les nuances viennent du shader, par
+  pixels de 2 cm (voir §5 bis) et par grandes zones de plusieurs mètres.
 - Herbe : plaques plus sèches par zones ; les flancs des voxels d'herbe passent à la terre avec
   une lisière irrégulière (transition herbe/terre/roche douce).
 - Pierre : strates ; bois : fibres ; tissu : trame fine ; cristal : cœur lumineux renforcé aux
@@ -135,3 +150,18 @@ visibles.
    dans `AssetLibrary`.
 3. `godot --headless -s tools/bake_assets.gd -- <id>` puis aperçu avec `tools/preview_asset.gd`.
 4. Comparer à la planche, ajuster, ajouter le test dans `tests/run_checks.gd`.
+
+## 10. Catalogue des matières de surface (Lot 3)
+
+| Style | Rendu en pixels de 2 cm |
+|---|---|
+| bois (`wood_*`) | fibres = rangées de pixels, tronçons de ton différent, veinures ondulées, nœuds en anneaux, bois de bout à cernes, fentes ; **usure** : neuf chaud → ancien gris-brun → usé argenté |
+| pierre taillée / appareil | mouchetis en taches de 2-6 pixels, pores, éclats clairs, fissures, joints d'un pixel (assises de 22 cm), biseaux, coulures, mousse |
+| roche | strates ondulées, micas, fissures profondes, érosion, mousse |
+| pavés | cellules de ~18 cm, un ton par pavé, joints sombres, herbe dans les joints |
+| métal | rayures d'un pixel, patine verte (cuivre/laiton) ou rouille (fer) dans les creux, arête de métal nu brillante, pixel intérieur sombre qui sépare métal et bois |
+| tissu | trame en damier d'un pixel, plis en bandes, salissures |
+| cristal | un ton par facette, cœur lumineux en anneaux, bord sombre d'un pixel, étincelles, pulsation |
+| herbe | quatre verts alternés, touffes, trèfles, plaques sèches, lisière irrégulière sur les flancs, version tondue / sauvage / piétinée |
+| terre | granulaire, plaques humides, cailloux, racines ; sèche / humide / fertile |
+| enduit, tuiles, bardeaux, écorce, feuillage | crépi à plaques, tuiles à joints et reliefs, fibres de bardeaux, sillons d'écorce, folioles |

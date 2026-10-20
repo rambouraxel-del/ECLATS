@@ -94,3 +94,15 @@ Le même nœud sert dans les deux scènes.
   `PlaceableAsset`, assets dans `props/`. `tools/bake_assets.gd` produit `assets/props/`.
 - `TerrainPatch` : portion de terrain pour les dioramas du laboratoire.
 - Détails : `docs/ASSETS.md`, `docs/DIRECTION_ARTISTIQUE.md`.
+
+## Ajouts du Lot 3
+
+- **Shader unique** `materials/voxel_stylized.gdshader` : pixels de 2 cm, une couleur par pixel, aucun fichier image.
+  Données par quad (`CUSTOM0/1` : position et taille du quad, épaisseur de matière, graine, sens du grain) produites par
+  `VoxelMesher.Style.DETAIL`. Usure par matière (`wear`).
+- **Grille de bâtiments de 10 cm** (`VoxelGrid.STRUCTURE_SIZE`), `BuildingKit` (fenêtres, portes, colombage, toits, cheminées).
+- **LOD** : `VoxelVolume.downsample`, `tools/bake_assets.gd` (maillages par niveau + fiche JSON).
+- **Instanciation** : `PropScatter` (MultiMesh par cellule et par LOD, collisions regroupées).
+- **Île habitée** : `VillageLayout` (plan), hooks `height_hook` / `surface_hook` du générateur, `colony_island.gd`.
+- **Ciel et nuages** : `sky_clouds.gdshader`, `VoxelClouds`, ambiances dans `config/lighting.json`.
+- Détails : `docs/OPTIMISATION.md`, `docs/BILAN_LOT3.md`, `docs/ASSETS.md`.

@@ -2,6 +2,7 @@ extends SceneTree
 ## Capture d'écran d'une scène (outil de vérification visuelle).
 ## Usage : godot --rendering-driver opengl3 -s tools/capture.gd -- <scène.tscn> <sortie.png> [px py pz tx ty tz] [preset]
 ##         ... -- <scène.tscn> <sortie.png> view <n> [preset]    (vue prédéfinie du laboratoire)
+##         ajouter « notex » désactive les nuances de pixels (comparaison avant / après)
 ##         ... -- <scène.tscn> <sortie.png> legacy <px py pz tx ty tz> [preset]  (île, rendu Lot 1)
 
 func _initialize() -> void:
@@ -12,6 +13,9 @@ func _initialize() -> void:
 	root.add_child(inst)
 	await process_frame
 	var cam := root.get_viewport().get_camera_3d()
+	if "notex" in args:
+		args.remove_at(args.find("notex"))
+		VoxelMaterials.set_global_param("tex_strength", 0.0)
 	if args.size() >= 3 and args[2] == "legacy":
 		for n in inst.get_children():
 			if n is VoxelIsland:

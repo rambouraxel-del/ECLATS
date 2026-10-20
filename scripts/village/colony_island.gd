@@ -317,8 +317,8 @@ func _view(n: int) -> Array:
 		6: return [Vector3(-3.4, 4.35, 5.4), Vector3(-4.6, 3.55, 1.4)]      # textures du terrain
 		7: return [Vector3(-7.6, 4.9, 4.9), Vector3(-12.2, 4.4, 2.4)]       # détails des objets (forge)
 		8: return [Vector3(-9.3, 4.5, -3.2), Vector3(-9.3, 5.2, -6.3)]      # matériaux : façade
-		9: return [Vector3(-14.5, 6.0, -0.8), Vector3(-24.0, 2.0, -5.0)]    # belvédère et nuages
-		0: return [Vector3(4.0, 5.2, 18.0), Vector3(7.5, 3.4, 22.6)]        # bateau volant
+		9: return [Vector3(-11.0, 6.4, -9.5), Vector3(-26.0, 1.0, -2.0)]    # belvédère et nuages
+		0: return [Vector3(-2.8, 5.0, 27.5), Vector3(6.5, 3.6, 22.4)]        # bateau volant
 	return []
 
 func _go_view(n: int) -> void:
