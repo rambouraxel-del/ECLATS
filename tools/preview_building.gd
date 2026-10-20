@@ -7,6 +7,13 @@ func _initialize() -> void:
 	VoxelMesher.palette_warmup()
 	var plan := BuildingPlanner.plan(args[0], int(args[1]))
 	var model := BuildingBuilder.build(plan)
+	var cut := int(OS.get_environment("CUT")) if OS.get_environment("CUT") != "" else 0
+	if cut > 0:       # coupe : on retire tout ce qui est au-dessus de `cut` cellules (toits, étages) pour voir l'intérieur
+		for y in range(cut, model.volume.size.y):
+			for z in model.volume.size.z:
+				for x in model.volume.size.x:
+					model.volume.set_voxel(x, y, z, 0)
+		model.roofs.clear()
 	var arrays := BuildingView.make_arrays(model)
 	var rig := LightingRig.new()
 	rig.start_preset = args[6] if args.size() > 6 else "presentation"

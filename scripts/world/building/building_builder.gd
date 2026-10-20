@@ -47,6 +47,7 @@ func _build(p_plan: BuildingPlan) -> BuildingModel:
 	BuildingDetails.add_all(self)
 	_colliders()
 	_rooms_info()
+	BuildingFurnisher.furnish(model)
 	_checks()
 	return model
 
@@ -128,12 +129,7 @@ func _walls() -> void:
 			continue
 		var y0 := plan.floor_y(w.floor)
 		var h := _wall_height(w.floor)
-		var is_annex := false
-		for a in plan.annexes:
-			if w.axis == 2 and w.p >= a.z0 and w.p <= a.z1 and w.u0 >= a.x0 and w.u1 <= a.x1:
-				is_annex = true
-			if w.axis == 0 and w.p >= a.x1 - 1 and w.u0 >= a.z0 and w.u1 <= a.z1 and w.p != plan.mx and w.p != plan.mx + plan.W - 2:
-				is_annex = true
+		var is_annex := _is_annex_wall(w)
 		for u in range(w.u0, w.u1 + 1):
 			for t in w.thickness:
 				var x := u if w.axis == 2 else w.p + t
@@ -146,6 +142,16 @@ func _walls() -> void:
 				else:
 					for y in range(y0, y0 + h):
 						set_cell(x, y, z, wall_key(w.floor, y - y0, x, z))
+
+func _is_annex_wall(w: P.Wall) -> bool:
+	if not w.exterior:
+		return false
+	for a in plan.annexes:
+		if w.axis == 2 and w.p >= a.z0 and w.p <= a.z1 and w.u0 >= a.x0 and w.u1 <= a.x1:
+			return true
+		if w.axis == 0 and w.p >= a.x1 - 1 and w.u0 >= a.z0 and w.u1 <= a.z1 and w.p != plan.mx and w.p != plan.mx + plan.W - 2:
+			return true
+	return false
 
 ## Hauteur des murs de l'appentis (cellules au-dessus du sol fini) à la colonne x : suit la pente du toit.
 func _annex_top(a: P.Annex, x: int) -> int:
@@ -563,7 +569,7 @@ func _colliders() -> void:
 		var h := _wall_height(w.floor) if w.exterior else P.CLEAR
 		var ops: Array[P.Opening] = []
 		for o in plan.openings:
-			if o.floor == w.floor and o.axis == w.axis and o.p == w.p:
+			if o.floor == w.floor and o.axis == w.axis and o.p == w.p and o.u >= w.u0 and o.u + o.w - 1 <= w.u1:
 				ops.append(o)
 		ops.sort_custom(func(a, b): return a.u < b.u)
 		var cur := w.u0
@@ -591,6 +597,24 @@ func _colliders() -> void:
 		_box(r.position.x, plan.floor_y(0), r.position.y, r.end.x - 1, plan.floor_y(0) + int(hb["h"]) - 1, r.end.y - 1)
 
 func _wall_box(w: P.Wall, u0: int, u1: int, y0: int, y1: int) -> void:
+	if _is_annex_wall(w):
+		# murs d'appentis : hauteur variable (suit la pente du toit) → tronçons de 6 cellules, hauteur du côté bas
+		var a: P.Annex = plan.annexes[0]
+		var u := u0
+		while u <= u1:
+			var ue := mini(u + 5, u1)
+			var top_h: int = a.eave
+			if w.axis == 2:
+				top_h = mini(_annex_top(a, u), _annex_top(a, ue))
+			var top := plan.floor_y(w.floor) + top_h - 1
+			if top >= y0 and top_h > 0:
+				var yy1 := mini(y1, top)
+				if w.axis == 2:
+					_box(u, y0, w.p, ue, yy1, w.p + w.thickness - 1)
+				else:
+					_box(w.p, y0, u, w.p + w.thickness - 1, yy1, ue)
+			u = ue + 1
+		return
 	if w.axis == 2:
 		_box(u0, y0, w.p, u1, y1, w.p + w.thickness - 1)
 	else:

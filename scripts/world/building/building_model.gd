@@ -14,6 +14,7 @@ var details: Array[Dictionary] = []     # {name, volume, grid, offset(Vector3 m)
 var colliders: Array[AABB] = []         # volumes durs simplifiés (murs, planchers, marches, foyer)
 var lights: Array[Dictionary] = []      # {pos(m), color, energy, range, interior}
 var rooms: Array[Dictionary] = []       # {id, role, floor, rect (Rect2, m), floor_y (m), obstacles: [Rect2]}
+var furniture: Array[Dictionary] = []   # {kind, floor, room, rect (Rect2 m), height (m), rot}
 var door_clear: Array[Dictionary] = []  # zones de dégagement devant les portes : {floor, rect (Rect2 m)}
 var ground_y_cells := BuildingPlan.GY
 var checks := {}                        # indicateurs de conception (portes, marches, hauteurs sous plafond)
