@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/lab/graphics_lab.gd" id="1_lab"]
+[ext_resource type="Script" path="res://scripts/rendering/lighting_rig.gd" id="2_rig"]
+[ext_resource type="Script" path="res://scripts/camera/free_camera.gd" id="3_cam"]
+
+[node name="GraphicsLab" type="Node3D"]
+script = ExtResource("1_lab")
+
+[node name="LightingRig" type="Node3D" parent="."]
+script = ExtResource("2_rig")
+start_preset = "overcast"
+shadow_distance = 40.0
+
+[node name="FreeCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.258819, 0, -0.258819, 0.9659258, -0.6, 2.4, 6)
+fov = 70.0
+script = ExtResource("3_cam")

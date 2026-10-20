@@ -1,0 +1,70 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/island/first_island.gd" id="1_scene"]
+[ext_resource type="Script" path="res://scripts/rendering/lighting_rig.gd" id="2_rig"]
+[ext_resource type="Script" path="res://scripts/terrain/voxel_island.gd" id="3_island"]
+[ext_resource type="Script" path="res://scripts/island/island_decor.gd" id="4_decor"]
+[ext_resource type="Script" path="res://scripts/camera/free_camera.gd" id="5_cam"]
+
+[node name="FirstIsland" type="Node3D"]
+script = ExtResource("1_scene")
+
+[node name="LightingRig" type="Node3D" parent="."]
+script = ExtResource("2_rig")
+start_preset = "golden"
+shadow_distance = 110.0
+
+[node name="Island" type="Node3D" parent="."]
+script = ExtResource("3_island")
+seed = 1234
+
+[node name="Decor" type="Node3D" parent="Island"]
+script = ExtResource("4_decor")
+island_path = NodePath("..")
+
+[node name="IsletNorth" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 7, -34)
+script = ExtResource("3_island")
+seed = 77
+radius_m = 5.0
+underside_depth_m = 6.0
+hill_height_m = 1.6
+
+[node name="Decor" type="Node3D" parent="IsletNorth"]
+script = ExtResource("4_decor")
+island_path = NodePath("..")
+tree_count = 2
+plant_count = 90
+tree_spacing_m = 3.0
+
+[node name="IsletEast" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -6, -26)
+script = ExtResource("3_island")
+seed = 91
+radius_m = 3.6
+underside_depth_m = 5.0
+hill_height_m = 1.0
+
+[node name="IsletSouth" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 12, 44)
+script = ExtResource("3_island")
+seed = 405
+radius_m = 6.4
+underside_depth_m = 8.0
+hill_height_m = 2.0
+
+[node name="Decor" type="Node3D" parent="IsletSouth"]
+script = ExtResource("4_decor")
+island_path = NodePath("..")
+tree_count = 3
+plant_count = 140
+tree_spacing_m = 3.5
+
+[node name="FreeCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 16, 30)
+fov = 65.0
+far = 1000.0
+script = ExtResource("5_cam")
+mode = 1
+orbit_target = Vector3(0, -2, 0)
+look_at_target_on_start = true

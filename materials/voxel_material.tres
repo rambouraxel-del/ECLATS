@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/voxel.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/edge_strength = 0.16
+shader_parameter/edge_width = 0.09
+shader_parameter/bevel_light = 0.06
+shader_parameter/emission_multiplier = 1.0

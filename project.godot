@@ -1,0 +1,30 @@
+; Engine configuration file.
+; ÉCLATS — Lot 1 : fondations graphiques 3D (Godot 4.3+)
+
+config_version=5
+
+[application]
+
+config/name="ÉCLATS"
+config/description="RPG d'exploration et de construction sur des îles flottantes — prototype graphique."
+run/main_scene="res://scenes/lab/graphics_lab.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+App="*res://scripts/app/app.gd"
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/vsync/vsync_mode=1
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
+anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/size=8192
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
+environment/defaults/default_clear_color=Color(0.62, 0.74, 0.86, 1)
