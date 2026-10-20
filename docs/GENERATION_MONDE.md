@@ -57,6 +57,9 @@ n'est créé avant `WorldView` : la génération tourne dans un fil d'exécution
    modifiable fait donc au plus 6 cellules (1,20 m). `TerrainField.set_top` **refuse** toute écriture sous
    `core_top + 2` : un terrassement ne peut pas entamer le cœur (vérifié par test et par le validateur).
 
+Option de profil `relief.terrace_strength` (0 → pentes continues, 1 → paliers pleins, défaut 1) : adoucit les marches des pentes
+naturelles ; les plateaux planifiés, déjà à un multiple du pas, ne bougent pas.
+
 Profils fournis : `settled` (île habitée), `verdant` (verdoyante, forêt dense), `rocky` (rocheuse, relief accentué).
 Ajouter un profil = déposer un JSON dans `config/profiles/` (aucun code).
 

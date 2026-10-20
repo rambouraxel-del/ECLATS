@@ -149,3 +149,25 @@ Les captures ci-dessous viennent d'un rendu OpenGL **logiciel** (mode Compatibil
 - Aucun habitant, aucune physique du bateau, pas d'ouverture des portes côté jeu (les battants sont fixes, ouverts).
 - Pistes : toitures à pans multiples, étages sur les annexes, enseignes par métier, jardins clos, génération
   progressive par chunks, maillage GDExtension, validation intégrée à l'éditeur.
+
+## 8. Captures de contrôle visuel (`docs/captures/lot4/`)
+
+Rendu OpenGL logiciel (voir §5), île habitée **graine 3** sauf mention. Générées par `tools/world_capture.gd`.
+
+| Fichier | Vue |
+|---|---|
+| `01_ile_generee_jour` / `02_…_coucher` / `03_…_nuit` | vue d'ensemble aux trois ambiances (nappes de nuages doux, îles lointaines) |
+| `04_colonie_toits` / `05_place_vue_de_la_rue` | la colonie : toitures de survivants, place pavée et marché vus de la rue |
+| `06_port_ponton_bateau` | ponton haubané et bateau paramétrique amarré (passerelle, amarres) |
+| `07_interieur_maison` | intérieur vu depuis l'embrasure de la porte (foyer, table, tonneau, sol de dalles) |
+| `08_bosquet_arbres`, `09_rochers_ruines`, `10_sanctuaire_ancre` | arbres (chênes, pins, bouleau, arbre mort), formations et vestiges, sanctuaire |
+| `11_iles_lointaines_nuages` | profondeur : îles lointaines estompées, mer de nuages |
+| `20_…verdoyante`, `21_…rocheuse` | îles **naturelles** (profils `verdant`, `rocky`) |
+| `22_zone_de_relief_rocheuse`, `23_…verdoyante` | **zones de fort relief** : collines à paliers, falaises stratifiées |
+| `30_`, `31_`, `32_demo_graine_*` | démonstrations sur d'autres graines (1, 2, 4) : même règles, autres îles |
+| `40_comparatif_lot3_vue_ensemble`, `41_comparatif_lot3_marche` | **comparatif** avec la colonie du Lot 3 (F4, conservée) |
+| `50_scene_F9` | la scène `settled_island.tscn` chargée telle quelle (génération dans un fil d'exécution) |
+
+Ce que les captures montrent par rapport au Lot 3 : bâtiments irréguliers et vieillis (plus de « maisons de poupée »),
+colonie qui épouse le relief (plateformes, soutènements, routes à marches), arbres connexes et enracinés, bateau aux
+voiles séparées, ciel et nuages doux, silhouettes lointaines.

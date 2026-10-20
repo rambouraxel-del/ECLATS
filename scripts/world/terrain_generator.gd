@@ -330,12 +330,16 @@ func _limit(cx: int, cz: int, dmax: float) -> void:
 func _quantize() -> void:
 	var n := field.n
 	var step := float(profile.g("relief.level_step_m", 0.6))
+	# force des paliers (0 = pente continue, 1 = marches pleines) : les plateaux planifiés sont déjà à un multiple
+	# du pas et ne bougent pas ; les pentes naturelles gardent une partie de leur inclinaison (moins de « gâteaux de mariage »)
+	var strength := clampf(float(profile.g("relief.terrace_strength", 1.0)), 0.0, 1.0)
 	for i in n * n:
 		if field.top[i] == TerrainField.NO_GROUND:
 			continue
 		var t := _heights[i] / step
 		var f := t - floorf(t)
 		var q := (floorf(t) + _smooth((f - 0.3) / 0.4)) * step
+		q = lerpf(_heights[i], q, strength)
 		field.top[i] = maxi(roundi(q / V) - 1, 2)
 
 # ------------------------------------------------------------------ 6. nettoyage
