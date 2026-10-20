@@ -1,0 +1,70 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_1r0we"]
+[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_structure.res" id="2_mhdi6"]
+[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_canopy.res" id="3_ckrqx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ynuy4"]
+size = Vector3(1.92, 0.98, 0.64)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_detpp"]
+size = Vector3(1.84, 1.98, 0.42)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rod65"]
+size = Vector3(0.28, 2.18, 0.28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kg7x4"]
+size = Vector3(0.28, 2.18, 0.28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jybp8"]
+size = Vector3(0.28, 2.18, 0.28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ok3p4"]
+size = Vector3(0.28, 2.18, 0.28)
+
+[node name="MarketStall" type="Node3D"]
+script = ExtResource("1_1r0we")
+asset_id = "market_stall"
+display_name = "Étal de marchand"
+footprint_cells = Vector3i(12, 13, 8)
+triangle_count = 45382
+vertex_count = 90764
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_mhdi6")
+
+[node name="Canopy" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.34, 0)
+mesh = ExtResource("3_ckrqx")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.96, 1.65, 1.36)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 1.3
+shadow_enabled = true
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.49, 1.24)
+shape = SubResource("BoxShape3D_ynuy4")
+
+[node name="Box2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.99, 0.29)
+shape = SubResource("BoxShape3D_detpp")
+
+[node name="Box3" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 1.09, 0.18)
+shape = SubResource("BoxShape3D_rod65")
+
+[node name="Box4" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.22, 1.09, 0.18)
+shape = SubResource("BoxShape3D_kg7x4")
+
+[node name="Box5" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 1.09, 1.38)
+shape = SubResource("BoxShape3D_jybp8")
+
+[node name="Box6" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.22, 1.09, 1.38)
+shape = SubResource("BoxShape3D_ok3p4")

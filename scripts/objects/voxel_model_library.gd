@@ -9,7 +9,7 @@ extends RefCounted
 ## Origine d'un modèle = coin minimum de son emprise, posé au sol (y = 0).
 ## Toutes les emprises sont des multiples de 0,20 m : elles s'alignent sur la grille du terrain.
 
-const D := 4  # cellules de détail par voxel de terrain (0,20 / 0,05)
+const D := 4  # cellules de 5 cm par voxel de terrain (modèles du Lot 1, grille 0,05 m)
 
 const KEYS := [
 	"block_stone", "block_dirt", "block_grass", "block_wood",
@@ -86,7 +86,7 @@ static func _wall() -> Dictionary:
 	# Couronnement en bois sombre, légèrement plus large que le joint.
 	b.box(0, h - 2, 0, w - 1, h - 1, t - 1, "wood_dark")
 	b.speckle("stone_brick", "moss", 0.02, 7)
-	return _model("wall", VoxelGrid.DETAIL_SIZE, b)
+	return _model("wall", VoxelGrid.LEGACY_DETAIL_SIZE, b)
 
 ## Dalle de sol : 1,00 × 1,00 × 0,20 m, quatre carreaux à coins chanfreinés.
 static func _slab() -> Dictionary:
@@ -103,7 +103,7 @@ static func _slab() -> Dictionary:
 			# Chanfrein : on retire les coins du carreau.
 			for corner in [Vector2i(x0, z0), Vector2i(x0 + tile - 2, z0), Vector2i(x0, z0 + tile - 2), Vector2i(x0 + tile - 2, z0 + tile - 2)]:
 				b.set_cell(corner.x, D - 1, corner.y, "")
-	return _model("slab", VoxelGrid.DETAIL_SIZE, b)
+	return _model("slab", VoxelGrid.LEGACY_DETAIL_SIZE, b)
 
 ## Escalier à limons de bois : 1,00 m de large, monte de 1,00 m sur 2,00 m.
 ## Marches ouvertes en planches, limons qui suivent la pente, embouts en laiton.
@@ -128,7 +128,7 @@ static func _stairs() -> Dictionary:
 		b.box(2, y_top - 1, z0, w - 3, y_top, z0 + step_run - 1, "wood_planks")
 		# Nez de marche plus sombre.
 		b.box(2, y_top, z0, w - 3, y_top, z0, "wood_dark")
-	return _model("stairs", VoxelGrid.DETAIL_SIZE, b)
+	return _model("stairs", VoxelGrid.LEGACY_DETAIL_SIZE, b)
 
 ## Table à tréteaux croisés : 1,40 × 0,80 × 0,80 m.
 static func _table() -> Dictionary:
@@ -150,7 +150,7 @@ static func _table() -> Dictionary:
 	b.box(3, 6, sz / 2 - 1, sx - 4, 7, sz / 2, "wood_dark")
 	b.box(3, 6, sz / 2 - 1, 4, 7, sz / 2, "brass")
 	b.box(sx - 5, 6, sz / 2 - 1, sx - 4, 7, sz / 2, "brass")
-	return _model("table", VoxelGrid.DETAIL_SIZE, b)
+	return _model("table", VoxelGrid.LEGACY_DETAIL_SIZE, b)
 
 ## Établi : 1,60 × 0,80 m, plan de travail à 0,90 m, râtelier à outils et étau.
 static func _workbench() -> Dictionary:
@@ -189,7 +189,7 @@ static func _workbench() -> Dictionary:
 	# Caisse sur l'étagère basse.
 	b.box(sx - 12, 5, 4, sx - 6, 9, 10, "wood_dark")
 	b.box(sx - 11, 9, 5, sx - 7, 9, 9, "wood_planks")
-	return _model("workbench", VoxelGrid.DETAIL_SIZE, b)
+	return _model("workbench", VoxelGrid.LEGACY_DETAIL_SIZE, b)
 
 ## Lampe à éclat : un cristal flotte dans une coupe de laiton au sommet d'une tige
 ## de bois cintrée. Emprise 0,40 × 0,40 m, hauteur 1,80 m.
@@ -221,9 +221,9 @@ static func _shard_lamp() -> Dictionary:
 	b.box(3, shard_base + 6, 3, 3, shard_base + 7, 3, "crystal_warm")
 	b.box(4, shard_base + 1, 4, 4, shard_base + 1, 5, "crystal_warm")
 	b.box(2, shard_base + 3, 3, 2, shard_base + 3, 3, "crystal_warm")
-	var model := _model("shard_lamp", VoxelGrid.DETAIL_SIZE, b)
+	var model := _model("shard_lamp", VoxelGrid.LEGACY_DETAIL_SIZE, b)
 	model["light"] = {
-		"position": Vector3(4.0, shard_base + 3.5, 4.0) * VoxelGrid.DETAIL_SIZE,
+		"position": Vector3(4.0, shard_base + 3.5, 4.0) * VoxelGrid.LEGACY_DETAIL_SIZE,
 		"color": Color("ffc97a"), "energy": 1.6, "range": 7.0,
 	}
 	return model

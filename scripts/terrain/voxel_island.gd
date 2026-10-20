@@ -25,6 +25,12 @@ const CHUNK := 32
 	set(v):
 		hill_height_m = v
 		_queue_regen()
+## Rendu du terrain : STYLIZED (Lot 2) ou LEGACY (Lot 1, pour comparaison).
+@export var render_style: VoxelMesher.Style = VoxelMesher.Style.STYLIZED:
+	set(v):
+		render_style = v
+		if is_inside_tree() and data != null:
+			_rebuild_meshes()
 ## Générer aussi dans l'éditeur (aperçu). Peut prendre quelques secondes.
 @export var preview_in_editor := true
 
@@ -83,16 +89,17 @@ func _rebuild_meshes() -> void:
 				var rmax := Vector3i(mini(cx + CHUNK, size.x), mini(cy + CHUNK, size.y), mini(cz + CHUNK, size.z)) - Vector3i.ONE
 				jobs.append([_core_root, data.core, rmin, rmax])
 				jobs.append([_surface_root, data.surface, rmin, rmax])
+	var style := render_style
 	var results := []
 	results.resize(jobs.size())
 	VoxelMesher.palette_warmup()
 	var task := WorkerThreadPool.add_group_task(func(i: int) -> void:
 		var j: Array = jobs[i]
-		results[i] = VoxelMesher.build_arrays(j[1], VoxelGrid.VOXEL_SIZE, j[2], j[3], data.solid, data.origin_cell),
+		results[i] = VoxelMesher.build_arrays(j[1], VoxelGrid.VOXEL_SIZE, j[2], j[3], data.solid, data.origin_cell, 0, style),
 		jobs.size(), -1, true, "VoxelIsland meshing")
 	WorkerThreadPool.wait_for_group_task_completion(task)
 	for i in jobs.size():
-		var mesh := VoxelMesher.arrays_to_mesh(results[i])
+		var mesh := VoxelMesher.arrays_to_mesh(results[i], style)
 		if mesh == null:
 			continue
 		var rmin: Vector3i = jobs[i][2]
@@ -121,4 +128,13 @@ func count_faces() -> int:
 			continue
 		for mi in root.get_children():
 			total += (mi as MeshInstance3D).mesh.surface_get_array_len(0) / 4
+	return total
+
+func count_triangles() -> int:
+	var total := 0
+	for root in [_core_root, _surface_root]:
+		if root == null:
+			continue
+		for mi in root.get_children():
+			total += VoxelMesher.triangle_count((mi as MeshInstance3D).mesh)
 	return total

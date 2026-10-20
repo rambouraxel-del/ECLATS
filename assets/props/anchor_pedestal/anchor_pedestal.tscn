@@ -1,0 +1,64 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_cykjg"]
+[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_structure.res" id="2_kp18h"]
+[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_anchor_crystal.res" id="3_2k6bi"]
+[ext_resource type="Script" path="res://scripts/assets/floating_part.gd" id="4_8ftny"]
+[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_orbiting_shards.res" id="5_7u2py"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2gta7"]
+size = Vector3(1.6, 0.36, 1.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sd5dp"]
+size = Vector3(0.8, 1.06, 0.8)
+
+[node name="AnchorPedestal" type="Node3D"]
+script = ExtResource("1_cykjg")
+asset_id = "anchor_pedestal"
+display_name = "Piédestal d'Ancre"
+footprint_cells = Vector3i(8, 12, 8)
+triangle_count = 26964
+vertex_count = 53928
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_kp18h")
+
+[node name="AnchorCrystal" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.56, 1.44, 0.56)
+mesh = ExtResource("3_2k6bi")
+script = ExtResource("4_8ftny")
+mode = "float"
+bob_height = 0.05
+spin_speed = 0.35
+pivot = Vector3(0.24, 0.48, 0.24)
+
+[node name="OrbitingShards" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
+mesh = ExtResource("5_7u2py")
+script = ExtResource("4_8ftny")
+mode = "orbit"
+bob_height = 0.05
+spin_speed = 0.35
+pivot = Vector3(0.8, 0.24, 0.8)
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 1.92, 0.8)
+light_color = Color(0.423529, 0.784314, 1, 1)
+light_energy = 2.4
+omni_range = 7.0
+
+[node name="Light2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.44, 0.8)
+light_color = Color(0.423529, 0.784314, 1, 1)
+light_energy = 0.6
+omni_range = 2.5
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.18, 0.8)
+shape = SubResource("BoxShape3D_2gta7")
+
+[node name="Box2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.89, 0.8)
+shape = SubResource("BoxShape3D_sd5dp")

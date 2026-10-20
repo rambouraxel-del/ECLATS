@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_hlnbf"]
+[ext_resource type="ArrayMesh" path="res://assets/props/decorative_bench/decorative_bench_structure.res" id="2_yq84r"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yh8h3"]
+size = Vector3(1.8, 0.52, 0.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ima7k"]
+size = Vector3(1.64, 0.46, 0.12)
+
+[node name="DecorativeBench" type="Node3D"]
+script = ExtResource("1_hlnbf")
+asset_id = "decorative_bench"
+display_name = "Banc décoratif"
+footprint_cells = Vector3i(9, 5, 3)
+triangle_count = 5564
+vertex_count = 11128
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_yq84r")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.26, 0.3)
+shape = SubResource("BoxShape3D_yh8h3")
+
+[node name="Box2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92, 0.73, 0.06)
+shape = SubResource("BoxShape3D_ima7k")

@@ -1,13 +1,20 @@
 @tool
 class_name VoxelMesher
 extends RefCounted
-## Transforme une VoxelVolume en ArrayMesh.
-## - Seules les faces en contact avec l'air sont générées (aucune face intérieure).
-## - Occlusion ambiante par sommet (coins plus sombres) pour des reliefs lisibles.
-## - Couleur légèrement variée par voxel, calculée à partir des coordonnées MONDE :
-##   un bloc posé a donc exactement la même teinte que le terrain au même endroit.
-## Canaux transmis au shader voxel.gdshader :
-##   COLOR = couleur linéaire * AO, UV = (émission, rugosité), UV2 = position dans la face.
+## Transforme une VoxelVolume en ArrayMesh. Seules les faces en contact avec l'air sont
+## générées (aucune face intérieure), avec occlusion ambiante par sommet.
+##
+## Deux styles de rendu :
+## - STYLIZED (Lot 2, par défaut) : les faces coplanaires de même matière et même
+##   occlusion sont FUSIONNÉES en grands rectangles (maillage glouton). Aucune variation
+##   de couleur par cellule : les nuances viennent du shader voxel_stylized.gdshader,
+##   calculées en continu dans l'espace monde (zones douces, transitions herbe/terre).
+##   Canaux : COLOR.rgb = couleur linéaire, COLOR.a = occlusion, UV = (émission, rugosité),
+##   UV2 = (style de la matière, aspect métal).
+## - LEGACY (Lot 1) : une face par voxel, teinte variée cellule par cellule, liseré
+##   des arêtes (voxel.gdshader). Conservé pour comparer l'ancien et le nouveau rendu.
+
+enum Style { LEGACY, STYLIZED }
 
 # Faces : normale, axes u et v (u × v = normale), coin de base. Les tables sont
 # recréées localement à chaque appel (les constantes partagées ne sont pas sûres entre threads).
@@ -27,27 +34,222 @@ static func _face_table() -> Array:
 ##               contre d'autres volumes (ex. cœur ↔ surface). Vide = le volume seul.
 ## region_min/max : sous-partie à mailler (bornes incluses) — sert au découpage en chunks.
 ## voxel_size  : taille d'un voxel en mètres (VoxelGrid.VOXEL_SIZE ou DETAIL_SIZE).
-## world_cell_offset : position de la cellule (0,0,0) dans la grille monde (variation de teinte).
-## color_seed  : graine de variation de teinte.
+## world_cell_offset, color_seed : variation de teinte par cellule (style LEGACY seulement).
 static func build(volume: VoxelVolume, voxel_size: float, region_min := Vector3i.ZERO,
 		region_max := Vector3i(-1, -1, -1), solid_mask := PackedByteArray(),
-		world_cell_offset := Vector3i.ZERO, color_seed := 0) -> ArrayMesh:
+		world_cell_offset := Vector3i.ZERO, color_seed := 0, style := Style.STYLIZED) -> ArrayMesh:
 	return arrays_to_mesh(build_arrays(volume, voxel_size, region_min, region_max, solid_mask,
-			world_cell_offset, color_seed))
+			world_cell_offset, color_seed, style), style)
 
 ## Crée l'ArrayMesh à partir des tableaux produits par build_arrays (null si vide).
-static func arrays_to_mesh(arrays: Array) -> ArrayMesh:
+static func arrays_to_mesh(arrays: Array, style := Style.STYLIZED) -> ArrayMesh:
 	if arrays.is_empty():
 		return null
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-	mesh.surface_set_material(0, VoxelMaterials.voxel_material())
+	mesh.surface_set_material(0, VoxelMaterials.material_for(style))
 	return mesh
 
 ## Calcule les tableaux de sommets. Fonction pure : peut tourner dans un thread.
 static func build_arrays(volume: VoxelVolume, voxel_size: float, region_min := Vector3i.ZERO,
 		region_max := Vector3i(-1, -1, -1), solid_mask := PackedByteArray(),
-		world_cell_offset := Vector3i.ZERO, color_seed := 0) -> Array:
+		world_cell_offset := Vector3i.ZERO, color_seed := 0, style := Style.STYLIZED) -> Array:
+	if style == Style.LEGACY:
+		return _build_arrays_legacy(volume, voxel_size, region_min, region_max, solid_mask,
+				world_cell_offset, color_seed)
+	return _build_arrays_greedy(volume, voxel_size, region_min, region_max, solid_mask)
+
+## Nombre de triangles d'un maillage (toutes surfaces).
+static func triangle_count(mesh: Mesh) -> int:
+	var n := 0
+	if mesh == null:
+		return 0
+	for i in mesh.get_surface_count():
+		n += mesh.surface_get_array_index_len(i) / 3
+	return n
+
+## Maillage glouton (style STYLIZED).
+static func _build_arrays_greedy(volume: VoxelVolume, voxel_size: float, rmin: Vector3i,
+		rmax: Vector3i, solid_mask: PackedByteArray) -> Array:
+	var palette := VoxelPalette.get_default()
+	if rmax.x < 0:
+		rmax = volume.size - Vector3i.ONE
+	var sx := volume.size.x
+	var sy := volume.size.y
+	var sz := volume.size.z
+	var stride_z := sx
+	var stride_y := sx * sz
+	var data := volume.data
+	var solid := data if solid_mask.is_empty() else solid_mask
+	var rs := rmax - rmin + Vector3i.ONE
+	# Index local dans la région : lx + lz * rs.x + ly * rs.x * rs.z (pas par axe x, y, z).
+	var lstride := PackedInt32Array([1, rs.x * rs.z, rs.x])
+	var cells := rs.x * rs.y * rs.z
+	var maxdim := maxi(rs.x, maxi(rs.y, rs.z))
+	var masks := PackedInt32Array()
+	masks.resize(cells * 6)
+	masks.fill(0)
+	# Rectangle englobant des faces de chaque tranche : [a_min, a_max, b_min, b_max].
+	var bounds := PackedInt32Array()
+	bounds.resize(6 * maxdim * 4)
+	for i in 6 * maxdim:
+		bounds[i * 4] = 1 << 30
+		bounds[i * 4 + 1] = -1
+		bounds[i * 4 + 2] = 1 << 30
+		bounds[i * 4 + 3] = -1
+	var face_n: Array[Vector3i] = []
+	var face_u: Array[Vector3i] = []
+	var face_v: Array[Vector3i] = []
+	var face_b: Array[Vector3i] = []
+	var ax_n := PackedInt32Array()
+	var ax_u := PackedInt32Array()
+	var ax_v := PackedInt32Array()
+	for f in _face_table():
+		face_n.append(f[0])
+		face_u.append(f[1])
+		face_v.append(f[2])
+		face_b.append(f[3])
+		ax_n.append(_axis_of(f[0]))
+		ax_u.append(_axis_of(f[1]))
+		ax_v.append(_axis_of(f[2]))
+	var corners: Array[Vector2i] = [Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(0, 1)]
+
+	# Passe 1 : faces visibles → clé (matière + occlusion des 4 coins) dans le masque de la tranche.
+	for y in range(rmin.y, rmax.y + 1):
+		for z in range(rmin.z, rmax.z + 1):
+			var row := z * stride_z + y * stride_y
+			for x in range(rmin.x, rmax.x + 1):
+				var mat := data[row + x]
+				if mat == 0:
+					continue
+				var lc := Vector3i(x - rmin.x, y - rmin.y, z - rmin.z)
+				var li := lc.x + lc.z * rs.x + lc.y * rs.x * rs.z
+				for fi in 6:
+					var n := face_n[fi]
+					var nx := x + n.x
+					var ny := y + n.y
+					var nz := z + n.z
+					if nx >= 0 and ny >= 0 and nz >= 0 and nx < sx and ny < sy and nz < sz:
+						if solid[nx + nz * stride_z + ny * stride_y] != 0:
+							continue
+					var u := face_u[fi]
+					var v := face_v[fi]
+					var key := mat
+					for k in 4:
+						var c := corners[k]
+						var su := c.x * 2 - 1
+						var sv := c.y * 2 - 1
+						var s1 := _is_solid(solid, nx + u.x * su, ny + u.y * su, nz + u.z * su, sx, sy, sz)
+						var s2 := _is_solid(solid, nx + v.x * sv, ny + v.y * sv, nz + v.z * sv, sx, sy, sz)
+						var s3 := _is_solid(solid, nx + u.x * su + v.x * sv, ny + u.y * su + v.y * sv, nz + u.z * su + v.z * sv, sx, sy, sz)
+						var level := 0 if (s1 and s2) else 3 - int(s1) - int(s2) - int(s3)
+						key |= level << (8 + k * 2)
+					masks[fi * cells + li] = key
+					var bi := (fi * maxdim + lc[ax_n[fi]]) * 4
+					var a := lc[ax_u[fi]]
+					var b := lc[ax_v[fi]]
+					if a < bounds[bi]: bounds[bi] = a
+					if a > bounds[bi + 1]: bounds[bi + 1] = a
+					if b < bounds[bi + 2]: bounds[bi + 2] = b
+					if b > bounds[bi + 3]: bounds[bi + 3] = b
+
+	var verts := PackedVector3Array()
+	var normals := PackedVector3Array()
+	var colors := PackedColorArray()
+	var uvs := PackedVector2Array()
+	var uv2s := PackedVector2Array()
+	var indices := PackedInt32Array()
+	var ao_curve := PackedFloat32Array([0.56, 0.72, 0.87, 1.0])  # luminosité selon l'occlusion
+
+	# Passe 2 : fusion gloutonne des faces identiques, tranche par tranche.
+	for fi in 6:
+		var na := ax_n[fi]
+		var su_ := lstride[ax_u[fi]]
+		var sv_ := lstride[ax_v[fi]]
+		var sn := lstride[na]
+		var off := fi * cells
+		var uf := Vector3(face_u[fi])
+		var vf := Vector3(face_v[fi])
+		var nf := Vector3(face_n[fi])
+		for s in rs[na]:
+			var bi := (fi * maxdim + s) * 4
+			var amax := bounds[bi + 1]
+			if amax < 0:
+				continue
+			var amin := bounds[bi]
+			var bmin := bounds[bi + 2]
+			var bmax := bounds[bi + 3]
+			for b in range(bmin, bmax + 1):
+				var rowi := off + s * sn + b * sv_
+				var a := amin
+				while a <= amax:
+					var li := rowi + a * su_
+					var key := masks[li]
+					if key == 0:
+						a += 1
+						continue
+					var w := 1
+					while a + w <= amax and masks[li + w * su_] == key:
+						w += 1
+					var h := 1
+					var grow := true
+					while grow and b + h <= bmax:
+						var li2 := li + h * sv_
+						for t in w:
+							if masks[li2 + t * su_] != key:
+								grow = false
+								break
+						if grow:
+							h += 1
+					for hh in h:
+						for t in w:
+							masks[li + hh * sv_ + t * su_] = 0
+					# Émission du rectangle fusionné.
+					var lc := Vector3i.ZERO
+					lc[na] = s
+					lc[ax_u[fi]] = a
+					lc[ax_v[fi]] = b
+					var origin := Vector3(rmin + lc + face_b[fi])
+					var mat := key & 0xFF
+					var base: Color = palette.colors_linear[mat]
+					var uv := Vector2(palette.emission[mat], palette.roughness[mat])
+					var uv2 := Vector2(palette.styles[mat], palette.metallic[mat])
+					var start := verts.size()
+					var lv := PackedInt32Array([0, 0, 0, 0])
+					for k in 4:
+						var c := corners[k]
+						var level := (key >> (8 + k * 2)) & 3
+						lv[k] = level
+						verts.append((origin + uf * (c.x * w) + vf * (c.y * h)) * voxel_size)
+						normals.append(nf)
+						colors.append(Color(base.r, base.g, base.b, ao_curve[level]))
+						uvs.append(uv)
+						uv2s.append(uv2)
+					if lv[0] + lv[2] >= lv[1] + lv[3]:
+						indices.append_array([start, start + 2, start + 1, start, start + 3, start + 2])
+					else:
+						indices.append_array([start, start + 3, start + 1, start + 1, start + 3, start + 2])
+					a += w
+
+	if verts.is_empty():
+		return []
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = verts
+	arrays[Mesh.ARRAY_NORMAL] = normals
+	arrays[Mesh.ARRAY_COLOR] = colors
+	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	arrays[Mesh.ARRAY_TEX_UV2] = uv2s
+	arrays[Mesh.ARRAY_INDEX] = indices
+	return arrays
+
+static func _axis_of(v: Vector3i) -> int:
+	return 0 if v.x != 0 else (1 if v.y != 0 else 2)
+
+## Style LEGACY (Lot 1) : une face par voxel, teinte variée par cellule.
+static func _build_arrays_legacy(volume: VoxelVolume, voxel_size: float, region_min: Vector3i,
+		region_max: Vector3i, solid_mask: PackedByteArray,
+		world_cell_offset: Vector3i, color_seed: int) -> Array:
 	var palette := VoxelPalette.get_default()
 	if region_max.x < 0:
 		region_max = volume.size - Vector3i.ONE

@@ -31,6 +31,14 @@ func _ready() -> void:
 		_enter_orbit()
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
+## Place la caméra en `pos`, regard vers `target` (vues prédéfinies).
+func look_from(pos: Vector3, target: Vector3) -> void:
+	global_position = pos
+	look_at(target)
+	_sync_angles_from_transform()
+	orbit_target = target
+	orbit_distance = pos.distance_to(target)
+
 func _sync_angles_from_transform() -> void:
 	var fwd := -global_transform.basis.z
 	_yaw = atan2(-fwd.x, -fwd.z)

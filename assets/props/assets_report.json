@@ -1,0 +1,130 @@
+{
+	"artisan_workbench": {
+		"name": "Établi d'artisan",
+		"size_m": [
+			2,
+			2,
+			1
+		],
+		"vertices": 28584,
+		"triangles": 14292,
+		"solid_microvoxels": 105072,
+		"mesh_kb": 171,
+		"build_ms": 51,
+		"total_ms": 763,
+		"parts": [
+			{
+				"name": "structure",
+				"vertices": 28584,
+				"triangles": 14292,
+				"file_kb": 171
+			}
+		]
+	},
+	"ancient_chest": {
+		"name": "Coffre ancien",
+		"size_m": [
+			1.20000004768372,
+			0.800000011920929,
+			0.800000011920929
+		],
+		"vertices": 13668,
+		"triangles": 6834,
+		"solid_microvoxels": 62361,
+		"mesh_kb": 79,
+		"build_ms": 47,
+		"total_ms": 338,
+		"parts": [
+			{
+				"name": "structure",
+				"vertices": 13668,
+				"triangles": 6834,
+				"file_kb": 79
+			}
+		]
+	},
+	"anchor_pedestal": {
+		"name": "Piédestal d'Ancre",
+		"size_m": [
+			1.60000002384186,
+			2.40000009536743,
+			1.60000002384186
+		],
+		"vertices": 53928,
+		"triangles": 26964,
+		"solid_microvoxels": 142156,
+		"mesh_kb": 324,
+		"build_ms": 165,
+		"total_ms": 939,
+		"parts": [
+			{
+				"name": "structure",
+				"vertices": 49656,
+				"triangles": 24828,
+				"file_kb": 299
+			},
+			{
+				"name": "anchor_crystal",
+				"vertices": 3344,
+				"triangles": 1672,
+				"file_kb": 18
+			},
+			{
+				"name": "orbiting_shards",
+				"vertices": 928,
+				"triangles": 464,
+				"file_kb": 5
+			}
+		]
+	},
+	"market_stall": {
+		"name": "Étal de marchand",
+		"size_m": [
+			2.40000009536743,
+			2.60000014305115,
+			1.60000002384186
+		],
+		"vertices": 90764,
+		"triangles": 45382,
+		"solid_microvoxels": 250405,
+		"mesh_kb": 531,
+		"build_ms": 114,
+		"total_ms": 2111,
+		"parts": [
+			{
+				"name": "structure",
+				"vertices": 63440,
+				"triangles": 31720,
+				"file_kb": 376
+			},
+			{
+				"name": "canopy",
+				"vertices": 27324,
+				"triangles": 13662,
+				"file_kb": 154
+			}
+		]
+	},
+	"decorative_bench": {
+		"name": "Banc décoratif",
+		"size_m": [
+			1.80000007152557,
+			1,
+			0.600000023841858
+		],
+		"vertices": 11128,
+		"triangles": 5564,
+		"solid_microvoxels": 33226,
+		"mesh_kb": 65,
+		"build_ms": 90,
+		"total_ms": 352,
+		"parts": [
+			{
+				"name": "structure",
+				"vertices": 11128,
+				"triangles": 5564,
+				"file_kb": 65
+			}
+		]
+	}
+}

@@ -6,8 +6,11 @@ extends RefCounted
 ## principale (VOXEL_SIZE) ; les objets fins utilisent la grille de détail.
 
 const VOXEL_SIZE := 0.2
-const DETAIL_SIZE := 0.05
-const DETAILS_PER_VOXEL := 4  # VOXEL_SIZE / DETAIL_SIZE
+## Microvoxels des objets détaillés (Lot 2) : 2 cm, soit 10 par voxel de terrain.
+const DETAIL_SIZE := 0.02
+const DETAILS_PER_VOXEL := 10  # VOXEL_SIZE / DETAIL_SIZE
+## Ancienne grille de détail du Lot 1 (5 cm), conservée pour les objets de référence du Lot 1.
+const LEGACY_DETAIL_SIZE := 0.05
 
 ## Cellule de la grille principale qui contient le point `p` (en mètres).
 static func world_to_cell(p: Vector3) -> Vector3i:

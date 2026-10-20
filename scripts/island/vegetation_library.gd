@@ -39,34 +39,54 @@ static func build_tree(seed: int) -> VoxelVolume:
 		b.ellipsoid(end + Vector3(0, 1.0, 0), Vector3(rng.randf_range(3.8, 5.0), rng.randf_range(2.4, 3.2), rng.randf_range(3.8, 5.0)), "leaves", true)
 	b.ellipsoid(top + Vector3(1.0, 2.5, 1.0), Vector3(5.0, 3.4, 5.0), "leaves", true)
 	# Touffes plus claires sur le dessus de la couronne.
-	b.speckle("leaves", "grass_lush", 0.12, seed + 1)
+	b.speckle("leaves", "leaf_light", 0.12, seed + 1)
 	if blossom:
 		b.speckle("leaves", "blossom", 0.22, seed)
 	return b.volume
 
-## Plantes basses (0,05 m). Emprise d'une cellule de terrain (4 × 4 cellules de détail).
+## Plantes basses en microvoxels de 2 cm. Emprise d'une cellule de terrain
+## (10 × 10 microvoxels = 20 × 20 cm), base au sol en y = 0.
 static func build_plant(kind: String) -> VoxelVolume:
 	var b: VoxelModelBuilder
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(kind)
 	match kind:
 		"tuft":
-			b = VoxelModelBuilder.new(Vector3i(4, 6, 4))
-			b.box(0, 0, 1, 0, 2, 1, "grass_lush")
-			b.box(1, 0, 3, 1, 4, 3, "grass")
-			b.box(2, 0, 0, 2, 3, 0, "grass_lush")
-			b.box(3, 0, 2, 3, 5, 2, "grass")
-			b.box(1, 0, 1, 2, 1, 2, "grass_lush")
-		"flower_yellow", "flower_violet":
-			b = VoxelModelBuilder.new(Vector3i(4, 8, 4))
-			b.box(1, 0, 1, 1, 5, 1, "grass_lush")
-			b.box(2, 0, 2, 2, 1, 3, "grass")
-			b.box(0, 2, 1, 0, 2, 1, "grass")
-			b.box(0, 6, 0, 2, 6, 2, kind)
-			b.box(1, 7, 1, 1, 7, 1, kind)
-			b.set_cell(1, 6, 1, "flower_yellow" if kind == "flower_violet" else "dirt")
+			# Touffe d'herbe : brins fins de hauteurs variées qui s'écartent du centre.
+			b = VoxelModelBuilder.new(Vector3i(10, 16, 10))
+			for i in 9:
+				var a := TAU * i / 9.0 + rng.randf_range(-0.3, 0.3)
+				var h := rng.randf_range(6.0, 14.5)
+				var lean := rng.randf_range(1.0, 3.5)
+				var key := "leaf_light" if i % 3 == 0 else ("ivy" if i % 3 == 1 else "leaves")
+				b.line(Vector3(5 + cos(a), 0.5, 5 + sin(a)), Vector3(5 + cos(a) * lean, h, 5 + sin(a) * lean), 1, key)
+		"flower_yellow", "flower_violet", "flower_white":
+			b = VoxelModelBuilder.new(Vector3i(10, 18, 10))
+			b.line(Vector3(5, 0.5, 5), Vector3(5.5, 13, 4.5), 1, "ivy")
+			b.line(Vector3(5, 3, 5), Vector3(2, 6, 6), 1, "leaf_light")
+			b.line(Vector3(5, 5, 5), Vector3(8, 8, 3), 1, "leaf_light")
+			# Corolle en croix de 5 pétales autour d'un cœur.
+			var cy := 14
+			for o in [Vector3i(1, 0, 0), Vector3i(-1, 0, 0), Vector3i(0, 0, 1), Vector3i(0, 0, -1), Vector3i(0, 1, 0)]:
+				b.set_cell(5 + o.x * 1, cy + o.y, 4 + o.z * 1, kind)
+				b.set_cell(5 + o.x * 2, cy, 4 + o.z * 2, kind)
+			b.set_cell(5, cy, 4, "flower_yellow" if kind != "flower_yellow" else "wood_honey")
 		"fern":
-			b = VoxelModelBuilder.new(Vector3i(4, 5, 4))
-			b.ellipsoid(Vector3(2, 1, 2), Vector3(2.2, 2.6, 2.2), "leaves")
-			b.speckle("leaves", "grass_lush", 0.3, 3)
+			# Fougère : frondes arquées.
+			b = VoxelModelBuilder.new(Vector3i(10, 10, 10))
+			for i in 6:
+				var a := TAU * i / 6.0 + 0.3
+				var p0 := Vector3(5, 0.5, 5)
+				var p1 := Vector3(5 + cos(a) * 2.5, 7, 5 + sin(a) * 2.5)
+				var p2 := Vector3(5 + cos(a) * 4.6, 3, 5 + sin(a) * 4.6)
+				b.line(p0, p1, 1, "leaves")
+				b.line(p1, p2, 1, "leaf_light" if i % 2 == 0 else "leaves")
+		"clover":
+			b = VoxelModelBuilder.new(Vector3i(10, 4, 10))
+			for c in [Vector2i(2, 3), Vector2i(6, 2), Vector2i(4, 6), Vector2i(7, 7)]:
+				b.box(c.x, 1, c.y, c.x + 1, 1, c.y + 1, "ivy")
+				b.set_cell(c.x, 0, c.y, "leaves")
+			b.set_cell(4, 2, 6, "flower_white")
 		_:
-			b = VoxelModelBuilder.new(Vector3i(4, 4, 4))
+			b = VoxelModelBuilder.new(Vector3i(10, 4, 10))
 	return b.volume

@@ -4,7 +4,8 @@
 
 - **1 unité Godot = 1 mètre.**
 - **Grille principale : 0,20 m** (`VoxelGrid.VOXEL_SIZE`) — terrain et blocs posés.
-- **Grille de détail : 0,05 m** (`VoxelGrid.DETAIL_SIZE`) — meubles, plantes, objets fins.
+- **Grille de détail : 0,02 m** (`VoxelGrid.DETAIL_SIZE`, Lot 2) — meubles, assets, plantes.
+  Les 10 objets du Lot 1 restent en 0,05 m (`LEGACY_DETAIL_SIZE`).
 - Toute emprise d'objet est un multiple de 0,20 m ; l'origine d'un objet est le coin
   minimum de son emprise, posé au sol. Un objet placé sur la grille s'aligne donc
   exactement sur le terrain.
@@ -83,3 +84,13 @@ Voxel Tools n'est **pas** une dépendance. Le code est organisé pour migrer fac
 `LightingRig` crée soleil (ombres en 4 cascades), ciel procédural et environnement
 (tonemap Filmic, SSAO, lueur, brouillard) et applique un préréglage de `lighting.json`.
 Le même nœud sert dans les deux scènes.
+
+## Ajouts du Lot 2
+
+- `VoxelMesher.Style.STYLIZED` (défaut) : maillage glouton + shader `voxel_stylized.gdshader` ;
+  `Style.LEGACY` : rendu du Lot 1, conservé pour comparaison (touche V sur l'île).
+- Palette étendue (50 matières) : `style` (traitement shader) et `metallic` par matière.
+- `scripts/assets/` : `AssetKit` (outils de modélisation 2 cm), `VoxelAsset`, `AssetLibrary`,
+  `PlaceableAsset`, assets dans `props/`. `tools/bake_assets.gd` produit `assets/props/`.
+- `TerrainPatch` : portion de terrain pour les dioramas du laboratoire.
+- Détails : `docs/ASSETS.md`, `docs/DIRECTION_ARTISTIQUE.md`.

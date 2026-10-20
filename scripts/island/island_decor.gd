@@ -6,11 +6,11 @@ extends Node3D
 
 @export var island_path: NodePath
 @export var tree_count := 9
-@export var plant_count := 700
+@export var plant_count := 1400
 ## Distance minimale entre deux arbres (m).
 @export var tree_spacing_m := 4.5
 
-const PLANTS := ["tuft", "tuft", "tuft", "fern", "flower_yellow", "flower_violet"]
+const PLANTS := ["tuft", "tuft", "tuft", "tuft", "clover", "clover", "fern", "flower_yellow", "flower_violet", "flower_white"]
 
 func _ready() -> void:
 	var island := get_node_or_null(island_path) as VoxelIsland
