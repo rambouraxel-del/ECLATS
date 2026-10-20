@@ -1,7 +1,7 @@
 {
 	"_doc": "Profil d'île habitée. Toutes les longueurs sont en mètres. Les plages [min, max] sont tirées avec les flux déterministes de la graine du monde.",
 	"name": "Île habitée",
-	"radius_m": [20.0, 24.0],
+	"radius_m": [24.0, 28.0],
 	"silhouette": { "harmonics": [[2, 0.10], [3, 0.07], [4, 0.04], [5, 0.025]], "roughness": 0.015 },
 	"relief": {
 		"base_m": [2.0, 2.6],

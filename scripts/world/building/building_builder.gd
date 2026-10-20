@@ -80,11 +80,7 @@ func wall_key(f: int, y_rel: int, x: int, z: int) -> String:
 # ------------------------------------------------------------------ toiture : hauteurs (pour murs et pignons)
 
 func _plan_roof_height() -> int:
-	var r: Dictionary = plan.roof
-	var pitch: Array = r["pitch"]
-	var half: float = (float(plan.D) if r["axis"] == 0 else float(plan.W)) * 0.5
-	var rise := int(ceil(half * float(pitch[0]) / float(pitch[1])))
-	return rise + int(r["thick"]) + 2
+	return plan.roof_rise_cells()
 
 ## Hauteur (cellules, depuis le bas du volume) de la sous-face du toit principal au-dessus de la
 ## cellule (x, z). Valable sur l'emprise du bloc principal.

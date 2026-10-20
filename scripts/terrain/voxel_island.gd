@@ -40,6 +40,8 @@ var layout: RefCounted
 
 var data: IslandData
 var last_generation_ms := 0
+## Données fournies de l'extérieur (WorldBuilder) : le nœud se contente de les mailler.
+var external_data := false
 var surface_visible := true:
 	set(v):
 		surface_visible = v
@@ -51,9 +53,20 @@ var _surface_root: Node3D
 var _regen_queued := false
 
 func _ready() -> void:
+	if external_data:
+		return
 	if Engine.is_editor_hint() and not preview_in_editor:
 		return
 	regenerate()
+
+## Adopte des données d'île déjà générées (monde du Lot 4) et construit les maillages.
+func adopt(d: IslandData) -> void:
+	external_data = true
+	var t0 := Time.get_ticks_msec()
+	data = d
+	_rebuild_meshes()
+	last_generation_ms = Time.get_ticks_msec() - t0
+	generated.emit(data)
 
 func _queue_regen() -> void:
 	if not is_inside_tree() or _regen_queued:

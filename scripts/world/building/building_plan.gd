@@ -108,6 +108,10 @@ var main_door := -1             # indice dans openings
 var door_front := Vector2i.ZERO # cellule (x, z) juste devant la porte d'entrée, à l'extérieur
 var archetype := {}
 
+## Emprise bâtie (murs, annexes) sans la frange de 20 cm latérale ni la cour de 60 cm devant la façade.
+func body_rect() -> Rect2i:
+	return Rect2i(mx, mz, footprint.x - 2 - mx, footprint.y - 6 - mz)
+
 func size_m() -> Vector2:
 	return Vector2(footprint) * VoxelGrid.STRUCTURE_SIZE
 
@@ -123,3 +127,13 @@ func floor_y(floor_idx: int) -> int:
 
 func total_height_cells() -> int:
 	return floor_y(floors - 1) + CLEAR
+
+## Montée du toit principal au-dessus de l'égout (cellules), épaisseur de couverture comprise.
+func roof_rise_cells() -> int:
+	var pitch: Array = roof["pitch"]
+	var half: float = (float(D) if roof["axis"] == 0 else float(W)) * 0.5
+	return int(ceil(half * float(pitch[0]) / float(pitch[1]))) + int(roof["thick"]) + 2
+
+## Hauteur hors tout, du bas du volume au faîtage (cellules).
+func max_height_cells() -> int:
+	return total_height_cells() + roof_rise_cells()

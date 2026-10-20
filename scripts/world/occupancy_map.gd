@@ -93,6 +93,15 @@ func add_item(item: Dictionary) -> int:
 				_hash[key].append(k)
 	return k
 
+## Retire le dernier objet ajouté (annulation d'un placement dans la même séquence).
+func remove_last_item() -> void:
+	if items.is_empty():
+		return
+	var k := items.size() - 1
+	for key in _hash.keys():
+		_hash[key].erase(k)
+	items.pop_back()
+
 func _keys(b: AABB) -> Array:
 	var out := []
 	for gz in range(floori(b.position.z / HASH), floori(b.end.z / HASH) + 1):

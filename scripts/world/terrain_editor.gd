@@ -11,7 +11,7 @@ const SKIRT_MAX_DELTA := 3      # au-delà, soutènement vertical plutôt que ta
 
 ## Évalue l'implantation d'une plateforme (rect en colonnes) : cibles, coûts, faisabilité.
 static func evaluate_pad(field: TerrainField, occ: OccupancyMap, rect: Rect2i, margin_cols: int,
-		max_cut: int, max_fill: int, step := 3, allow_tags := PackedInt32Array()) -> Dictionary:
+		max_cut: int, max_fill: int, step := 3, allow_tags := PackedInt32Array(), edge_min := 0.8) -> Dictionary:
 	var out := {"ok": false, "reason": "", "target": 0, "cost": 1.0e9, "cut": 0, "fill": 0}
 	var tops := []
 	var lo_t := -(1 << 30)
@@ -20,15 +20,22 @@ static func evaluate_pad(field: TerrainField, occ: OccupancyMap, rect: Rect2i, m
 	var fill_cells := 0
 	max_cut = mini(max_cut, TerrainField.SURFACE_DEPTH - TerrainField.MIN_SURFACE)
 	var grown := Rect2i(rect.position - Vector2i(margin_cols, margin_cols), rect.size + Vector2i(margin_cols, margin_cols) * 2)
-	for cz in range(grown.position.y, grown.end.y, step):
-		for cx in range(grown.position.x, grown.end.x, step):
+	var near := Rect2i(rect.position - Vector2i.ONE, rect.size + Vector2i(2, 2))
+	# l'emprise (et sa frange d'une colonne) doit être sur l'île et à `edge_min` m du vide ;
+	# la marge ne sert qu'à garder de l'espace libre vis-à-vis des autres réservations
+	for cz in range(near.position.y, near.end.y, step):
+		for cx in range(near.position.x, near.end.x, step):
 			if not field.has_ground(cx, cz):
 				out["reason"] = "hors_ile"
 				return out
-			var i := field.idx(cx, cz)
-			if field.edge_dist[i] < 1.0:
+			if field.edge_dist[field.idx(cx, cz)] < edge_min:
 				out["reason"] = "trop_pres_du_bord"
 				return out
+	for cz in range(grown.position.y, grown.end.y, step):
+		for cx in range(grown.position.x, grown.end.x, step):
+			if not field.has_ground(cx, cz):
+				continue
+			var i := field.idx(cx, cz)
 			if occ.tag[i] != PlacementSpec.TAG_FREE and not allow_tags.has(occ.tag[i]):
 				out["reason"] = "reserve"
 				return out
