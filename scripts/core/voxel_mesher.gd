@@ -70,6 +70,48 @@ static func build_arrays(volume: VoxelVolume, voxel_size: float, region_min := V
 				world_cell_offset, color_seed)
 	return _build_arrays_greedy(volume, voxel_size, region_min, region_max, solid_mask, style == Style.DETAIL)
 
+## Étire d'un facteur `factor` un maillage extrudé d'UNE cellule le long de `axis` (0 = x, 2 = z) :
+## sert aux toitures (profil en microvoxels de 2 cm extrudé sur toute la longueur du faîtage).
+## Les données de quad (CUSTOM0) suivent l'étirement pour que les motifs de pixels restent corrects.
+static func stretch_axis(arrays: Array, axis: int, factor: float, voxel_size: float) -> Array:
+	if arrays.is_empty():
+		return arrays
+	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+	var c0: PackedFloat32Array = arrays[Mesh.ARRAY_CUSTOM0] if arrays[Mesh.ARRAY_CUSTOM0] != null else PackedFloat32Array()
+	for i in verts.size():
+		var v := verts[i]
+		var nrm := normals[i]
+		if axis == 0:
+			v.x *= factor
+		else:
+			v.z *= factor
+		verts[i] = v
+		if c0.is_empty():
+			continue
+		# Quel axe du quad (u = 0, v = 1) est l'axe étiré ? Selon la face.
+		var qaxis := -1
+		if axis == 0:
+			if nrm.y > 0.5: qaxis = 1
+			elif nrm.y < -0.5: qaxis = 0
+			elif nrm.z > 0.5: qaxis = 0
+			elif nrm.z < -0.5: qaxis = 1
+		else:
+			if nrm.x > 0.5: qaxis = 1
+			elif nrm.x < -0.5: qaxis = 0
+			elif nrm.y > 0.5: qaxis = 0
+			elif nrm.y < -0.5: qaxis = 1
+		if qaxis == 0:
+			c0[i * 4] *= factor
+			c0[i * 4 + 2] *= factor
+		elif qaxis == 1:
+			c0[i * 4 + 1] *= factor
+			c0[i * 4 + 3] *= factor
+	arrays[Mesh.ARRAY_VERTEX] = verts
+	if not c0.is_empty():
+		arrays[Mesh.ARRAY_CUSTOM0] = c0
+	return arrays
+
 ## Nombre de triangles d'un maillage (toutes surfaces).
 static func triangle_count(mesh: Mesh) -> int:
 	var n := 0

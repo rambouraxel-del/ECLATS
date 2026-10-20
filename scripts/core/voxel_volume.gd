@@ -112,3 +112,40 @@ func downsample(factor: int, threshold := 0.25) -> VoxelVolume:
 							best = m
 					out.data[ox + oz * out._stride_z + oy * out._stride_y] = best
 	return out
+
+## Copie tournée de k quarts de tour autour de l'axe y (sens horaire vu de dessus). k = 0..3.
+## Taille de sortie : (z, y, x) pour k impair. Le sens du grain (aux) est tourné avec le volume.
+func rotated_y(k: int) -> VoxelVolume:
+	k = posmod(k, 4)
+	if k == 0:
+		return self
+	var ns := Vector3i(size.z, size.y, size.x) if k % 2 == 1 else size
+	var out := VoxelVolume.new(ns)
+	if not aux.is_empty():
+		out.aux.resize(out.data.size())
+	for y in size.y:
+		for z in size.z:
+			for x in size.x:
+				var m := data[x + z * _stride_z + y * _stride_y]
+				if m == 0:
+					continue
+				var nx := x
+				var nz := z
+				match k:
+					1:
+						nx = size.z - 1 - z
+						nz = x
+					2:
+						nx = size.x - 1 - x
+						nz = size.z - 1 - z
+					3:
+						nx = z
+						nz = size.x - 1 - x
+				var j := out.index_of(nx, y, nz)
+				out.data[j] = m
+				if not aux.is_empty():
+					var a := aux[x + z * _stride_z + y * _stride_y]
+					if a > 0 and k % 2 == 1 and a != 2:
+						a = 4 - a        # x <-> z
+					out.aux[j] = a
+	return out

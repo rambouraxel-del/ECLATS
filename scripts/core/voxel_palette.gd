@@ -9,7 +9,7 @@ const PALETTE_PATH := "res://config/palette.json"
 
 ## Traitements du shader voxel_stylized.gdshader (l'ordre = le code transmis au shader).
 const STYLES := ["default", "grass", "soil", "stone", "wood", "metal", "crystal", "fabric", "foliage",
-		"ashlar", "plaster", "tiles", "cobble", "rock", "bark", "gravel", "shingle", "lamp", "water"]
+		"ashlar", "plaster", "tiles", "cobble", "rock", "bark", "gravel", "shingle", "lamp", "water", "rubble", "thatch"]
 
 static var _instance: VoxelPalette
 

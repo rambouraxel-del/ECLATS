@@ -1,5 +1,5 @@
 {
-	"_doc": "Palette commune terrain + objets. L'identifiant numérique d'une matière = sa position dans la liste (1, 2, 3...). 0 = air. Ajouter les nouvelles matières À LA FIN pour ne pas décaler les identifiants. color = couleur sRGB ; roughness = rugosité (0 brillant, 1 mat) ; emission = luminosité propre ; metallic = aspect métal (0-1) ; style = traitement du shader (grass, soil, stone, wood, metal, crystal, fabric, foliage, default) ; variation = écart de teinte par voxel, utilisé uniquement par le rendu « Lot 1 ». wear = usure/âge de la matière (0 neuf/propre, 1 très vieux/usé) lue par le shader (bois neuf/ancien/usé, pierre mousseuse, métal oxydé...). Styles : default, grass, soil, stone, wood, metal, crystal, fabric, foliage, ashlar, plaster, tiles, cobble, rock, bark, gravel, shingle, lamp, water.",
+	"_doc": "Palette commune terrain + objets. L'identifiant numérique d'une matière = sa position dans la liste (1, 2, 3...). 0 = air. Ajouter les nouvelles matières À LA FIN pour ne pas décaler les identifiants. color = couleur sRGB ; roughness = rugosité (0 brillant, 1 mat) ; emission = luminosité propre ; metallic = aspect métal (0-1) ; style = traitement du shader (grass, soil, stone, wood, metal, crystal, fabric, foliage, default) ; variation = écart de teinte par voxel, utilisé uniquement par le rendu « Lot 1 ». wear = usure/âge de la matière (0 neuf/propre, 1 très vieux/usé) lue par le shader (bois neuf/ancien/usé, pierre mousseuse, métal oxydé...). Styles : default, grass, soil, stone, wood, metal, crystal, fabric, foliage, ashlar, plaster, tiles, cobble, rock, bark, gravel, shingle, lamp, water, rubble, thatch.",
 	"materials": [
 		{"key": "stone", "name": "Pierre", "color": "#a9a395", "variation": 0.07, "roughness": 0.92, "emission": 0.0, "style": "rock", "metallic": 0.0, "wear": 0.45},
 		{"key": "stone_dark", "name": "Roche profonde", "color": "#6f676c", "variation": 0.08, "roughness": 0.95, "emission": 0.0, "style": "rock", "metallic": 0.0, "wear": 0.55},
@@ -88,9 +88,32 @@
 		{"key": "window_lit", "name": "Fenêtre éclairée", "color": "#ffcf80", "variation": 0.04, "roughness": 0.2, "emission": 2.6, "style": "lamp", "metallic": 0, "wear": 0.2},
 		{"key": "fire", "name": "Flamme", "color": "#ffb23d", "variation": 0.04, "roughness": 0.3, "emission": 3.5, "style": "crystal", "metallic": 0, "wear": 0.2},
 		{"key": "ember", "name": "Braise", "color": "#d4521f", "variation": 0.04, "roughness": 0.5, "emission": 2.0, "style": "crystal", "metallic": 0, "wear": 0.2},
-		{"key": "thatch", "name": "Chaume", "color": "#b79a58", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.5},
+		{"key": "thatch", "name": "Chaume", "color": "#b59a5c", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "thatch", "metallic": 0, "wear": 0.5},
 		{"key": "snow_white", "name": "Blanc de chaux", "color": "#efeadd", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "plaster", "metallic": 0, "wear": 0.3},
 		{"key": "cloud_white", "name": "Nuage", "color": "#ffffff", "variation": 0.0, "roughness": 1.0, "emission": 0.0, "style": "default", "metallic": 0.0, "wear": 0.0},
-		{"key": "cloud_dim", "name": "Nuage ombré", "color": "#e9edf4", "variation": 0.0, "roughness": 1.0, "emission": 0.0, "style": "default", "metallic": 0.0, "wear": 0.0}
+		{"key": "cloud_dim", "name": "Nuage ombré", "color": "#e9edf4", "variation": 0.0, "roughness": 1.0, "emission": 0.0, "style": "default", "metallic": 0.0, "wear": 0.0},
+		{"key": "stone_rubble", "name": "Moellons", "color": "#8d8372", "variation": 0.04, "roughness": 0.95, "emission": 0, "style": "rubble", "metallic": 0, "wear": 0.6},
+		{"key": "stone_rubble_dark", "name": "Moellons sombres", "color": "#6c6458", "variation": 0.04, "roughness": 0.95, "emission": 0, "style": "rubble", "metallic": 0, "wear": 0.7},
+		{"key": "stone_rubble_warm", "name": "Moellons chauds", "color": "#9b8466", "variation": 0.04, "roughness": 0.95, "emission": 0, "style": "rubble", "metallic": 0, "wear": 0.55},
+		{"key": "plaster_worn_cream", "name": "Enduit usé crème", "color": "#cdbf9f", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "plaster", "metallic": 0, "wear": 0.88},
+		{"key": "plaster_worn_ochre", "name": "Enduit usé ocre", "color": "#bf9d6c", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "plaster", "metallic": 0, "wear": 0.88},
+		{"key": "plaster_worn_grey", "name": "Enduit usé gris", "color": "#a9a296", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "plaster", "metallic": 0, "wear": 0.92},
+		{"key": "wood_aged", "name": "Bois vieilli", "color": "#6f5b49", "variation": 0.04, "roughness": 0.9, "emission": 0, "style": "wood", "metallic": 0, "wear": 0.9},
+		{"key": "wood_aged_dark", "name": "Bois vieilli sombre", "color": "#4b3c31", "variation": 0.04, "roughness": 0.9, "emission": 0, "style": "wood", "metallic": 0, "wear": 0.95},
+		{"key": "wood_pale_old", "name": "Bois blanchi", "color": "#a79a86", "variation": 0.04, "roughness": 0.9, "emission": 0, "style": "wood", "metallic": 0, "wear": 0.97},
+		{"key": "thatch_old", "name": "Chaume ancien", "color": "#8c7a4e", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "thatch", "metallic": 0, "wear": 0.9},
+		{"key": "tiles_patched", "name": "Tuiles rapiécées", "color": "#9a5a3c", "variation": 0.04, "roughness": 0.8, "emission": 0, "style": "tiles", "metallic": 0, "wear": 0.75},
+		{"key": "slate_old", "name": "Lauzes anciennes", "color": "#58636f", "variation": 0.04, "roughness": 0.75, "emission": 0, "style": "tiles", "metallic": 0, "wear": 0.8},
+		{"key": "shingle_aged", "name": "Bardeaux vieillis", "color": "#6f5b45", "variation": 0.04, "roughness": 0.9, "emission": 0, "style": "shingle", "metallic": 0, "wear": 0.92},
+		{"key": "floor_planks", "name": "Plancher", "color": "#85694a", "variation": 0.04, "roughness": 0.85, "emission": 0, "style": "wood", "metallic": 0, "wear": 0.7},
+		{"key": "floor_earth", "name": "Sol battu", "color": "#7b6249", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "soil", "metallic": 0, "wear": 0.5},
+		{"key": "floor_flag", "name": "Dallage", "color": "#8a8274", "variation": 0.04, "roughness": 0.9, "emission": 0, "style": "cobble", "metallic": 0, "wear": 0.7},
+		{"key": "cloth_brown", "name": "Toile brune", "color": "#86704f", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.6},
+		{"key": "cloth_ochre", "name": "Toile ocre", "color": "#ab8748", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.5},
+		{"key": "cloth_faded_blue", "name": "Toile bleue passée", "color": "#5f7a93", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.5},
+		{"key": "iron_rust", "name": "Fer rouillé", "color": "#6d4c3b", "variation": 0.04, "roughness": 0.7, "emission": 0, "style": "metal", "metallic": 0.35, "wear": 1.0},
+		{"key": "soot", "name": "Suie", "color": "#2d2825", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "default", "metallic": 0, "wear": 0.5},
+		{"key": "ember_glow", "name": "Braise vive", "color": "#e0672a", "variation": 0.04, "roughness": 0.6, "emission": 2.2, "style": "crystal", "metallic": 0, "wear": 0.2},
+		{"key": "sack_cloth", "name": "Toile de sac", "color": "#b8a27a", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.5}
 	]
 }

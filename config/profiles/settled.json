@@ -1,0 +1,37 @@
+{
+	"_doc": "Profil d'île habitée. Toutes les longueurs sont en mètres. Les plages [min, max] sont tirées avec les flux déterministes de la graine du monde.",
+	"name": "Île habitée",
+	"radius_m": [20.0, 24.0],
+	"silhouette": { "harmonics": [[2, 0.10], [3, 0.07], [4, 0.04], [5, 0.025]], "roughness": 0.015 },
+	"relief": {
+		"base_m": [2.0, 2.6],
+		"dome_m": [1.0, 1.8],
+		"level_step_m": 0.6,
+		"plateaus": { "count": [5, 7], "radius_m": [3.2, 6.4], "level_range": [-1, 3], "skirt_per_level_m": 1.5, "edge_margin_m": 3.0 },
+		"hills": { "count": [1, 2], "height_m": [2.4, 3.6], "radius_m": [5.5, 8.0] },
+		"noise_amp_m": 0.5,
+		"max_natural_step": 2
+	},
+	"cliff": { "min_height_m": 1.0, "rock_step": 3 },
+	"underside": { "depth_m": [13.0, 17.0], "spikes": [7, 11], "spike_len_m": [3.0, 8.0], "spike_radius_m": [1.6, 3.2], "crystal_tips": true, "roots": [6, 12] },
+	"climate": { "moisture_freq": 0.03, "lush_above": 0.62, "dry_below": 0.3 },
+	"settlement": {
+		"enabled": true,
+		"plaza_radius_m": [4.2, 5.2],
+		"buildings": [
+			{ "type": "house_small", "count": [2, 3] },
+			{ "type": "house_large", "count": [1, 2] },
+			{ "type": "workshop", "count": [1, 1] },
+			{ "type": "warehouse", "count": [1, 1] },
+			{ "type": "shop", "count": [1, 1] },
+			{ "type": "community_hall", "count": [0, 1] }
+		],
+		"port": true,
+		"market_props": [3, 5],
+		"gardens": [1, 2],
+		"max_cut_cells": 6,
+		"max_fill_cells": 14
+	},
+	"vegetation": { "tree_count": [26, 38], "species": ["oak", "parasol", "pine", "weeping", "birch", "fruit"], "grove_count": [3, 5], "plant_density": 1.0 },
+	"rocks": { "count": [10, 16], "families": ["boulder", "outcrop", "formation", "ruin"] }
+}

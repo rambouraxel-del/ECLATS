@@ -1,0 +1,21 @@
+{
+	"_doc": "Profil d'île verdoyante : relief doux, grands plateaux herbeux, forêt dense, aucun village.",
+	"name": "Île verdoyante",
+	"radius_m": [17.0, 22.0],
+	"silhouette": { "harmonics": [[2, 0.08], [3, 0.09], [4, 0.05], [6, 0.02]], "roughness": 0.012 },
+	"relief": {
+		"base_m": [2.2, 3.0],
+		"dome_m": [1.4, 2.4],
+		"level_step_m": 0.6,
+		"plateaus": { "count": [3, 5], "radius_m": [3.5, 6.5], "level_range": [-1, 2], "skirt_per_level_m": 1.8, "edge_margin_m": 2.5 },
+		"hills": { "count": [2, 3], "height_m": [2.0, 3.4], "radius_m": [5.0, 8.0] },
+		"noise_amp_m": 0.6,
+		"max_natural_step": 2
+	},
+	"cliff": { "min_height_m": 1.0, "rock_step": 3 },
+	"underside": { "depth_m": [10.0, 14.0], "spikes": [5, 9], "spike_len_m": [2.5, 6.5], "spike_radius_m": [1.4, 2.8], "crystal_tips": true, "roots": [8, 16] },
+	"climate": { "moisture_freq": 0.035, "lush_above": 0.5, "dry_below": 0.22 },
+	"settlement": { "enabled": false },
+	"vegetation": { "tree_count": [34, 52], "species": ["oak", "parasol", "weeping", "birch", "fruit", "pine"], "grove_count": [4, 7], "plant_density": 1.4 },
+	"rocks": { "count": [6, 12], "families": ["boulder", "outcrop", "ruin"] }
+}

@@ -13,7 +13,7 @@ shader_type spatial;
 //   CUSTOM1 = (épaisseur derrière la face, graine du quad, sens du grain)   [objets seulement]
 // Styles (VoxelPalette.STYLES) : 0 défaut 1 herbe 2 terre 3 pierre taillée 4 bois 5 métal
 //   6 cristal 7 tissu 8 feuillage 9 appareil de pierre 10 enduit 11 tuiles 12 pavés
-//   13 roche 14 écorce 15 gravier 16 bardeaux 17 lampe 18 eau
+//   13 roche 14 écorce 15 gravier 16 bardeaux 17 lampe 18 eau 19 moellons 20 chaume
 render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
 
 // Active les données de quad (objets / bâtiments). Faux pour le terrain.
@@ -495,8 +495,42 @@ vec3 fabric_surface(Ctx c, vec3 base, inout float rough) {
 
 // ---------------------------------------------------------------- divers
 
+// Moellons : pierres irrégulières de 12 à 30 cm, un ton par pierre, joints d'un pixel, mousse.
+vec3 rubble_surface(Ctx c, vec3 base, inout float rough) {
+	float s = sl(c, 111.0);
+	vec3 big = worley(c.wp, 13.0, s);
+	vec3 small = worley(c.wp + vec2(37.0, 11.0), 7.0, s + 5.0);
+	// Les grandes pierres dominent ; quelques éclats de petites pierres dans les joints larges.
+	bool use_small = big.y < 1.1 && small.x < 2.5;
+	float id = use_small ? small.z : big.z;
+	float edge = use_small ? small.y : big.y;
+	vec3 col = base * (0.7 + 0.55 * ps(id, 4.0));
+	// Chaque pierre est un peu plus claire en haut qu'en bas (relief suggéré par pixels).
+	col *= 1.0 + c.amp * (rnd2(c.pc, s + 1.0) - 0.5) * 0.18;
+	if (edge < 0.9) {
+		col = base * vec3(0.38, 0.35, 0.31) * (0.85 + 0.3 * rnd2(c.pc, s + 2.0));
+	} else if (edge < 2.2) {
+		col *= 0.88;
+	}
+	// Fissures et pierres de calage plus pâles.
+	if (rnd2(floor(c.wp / 5.0), s + 3.0) > 0.92) {
+		col *= 1.12;
+	}
+	col = moss_layer(c, col, c.wear * 0.75 * c.amp, s + 9.0);
+	rough = 0.97;
+	return col;
+}
+
 vec3 plaster_surface(Ctx c, vec3 base, inout float rough) {
 	float s = sl(c, 91.0);
+	// Enduit très usé : par plaques (amas de pixels), la maçonnerie de moellons réapparaît dessous.
+	if (c.wear > 0.55) {
+		float patch = 0.65 * vnoise(c.wp, 9.0, s + 31.0) + 0.35 * rnd2(c.wp, s + 32.0);
+		float edge_fall = smoothstep(0.0, 1.4, c.py) * 0.0;
+		if (patch < (c.wear - 0.55) * 0.9 + 0.1 * smoothstep(1.6, 0.0, c.py)) {
+			return rubble_surface(c, vec3(0.30, 0.26, 0.2), rough);
+		}
+	}
 	// Plaques de crépi de 4 à 10 pixels, trois tons, pixels isolés.
 	float p = ps(vnoise(c.pc, 6.0, s) * 0.7 + rnd2(c.pc, s + 1.0) * 0.3, 3.0);
 	vec3 col = base * (0.92 + 0.1 * mix(0.5, p, c.amp));
@@ -548,6 +582,28 @@ vec3 roof_surface(Ctx c, vec3 base, int style, inout float rough) {
 	}
 	col = moss_layer(c, col, c.wear * 0.6 * c.amp, 5.0 + id);
 	rough = style == 11 ? 0.62 : 0.85;
+	return col;
+}
+
+vec3 thatch_surface(Ctx c, vec3 base, inout float rough) {
+	// Chaume : rangées de brins le long du faîtage (gp.x), chaque rangée de 3 à 4 pixels d'épaisseur,
+	// ton propre à la rangée, pixels clairs et sombres isolés ; usure : plaques mousseuses.
+	float s = sl(c, 121.0);
+	float row = floor(c.gp.y / 3.0);
+	float rt = ps(rnd1(row, s), 3.0);
+	vec3 col = base * (0.78 + 0.38 * rt);
+	float seg = floor((c.gp.x + floor(rnd1(row, s + 1.0) * 20.0)) / (6.0 + floor(rnd1(row, s + 2.0) * 10.0)));
+	col *= 1.0 + c.amp * (rnd2(vec2(row, seg), s + 3.0) - 0.5) * 0.22;
+	float r = rnd2(c.pc, s + 4.0);
+	col *= r > 0.93 ? 1.0 + 0.18 * c.amp : (r < 0.06 ? 1.0 - 0.28 * c.amp : 1.0);
+	if (mod(c.gp.y, 3.0) < 1.0) {
+		col *= 1.0 - 0.1 * c.amp;
+	}
+	if (c.up < 0.5) {
+		col *= 0.8;
+	}
+	col = moss_layer(c, col, c.wear * 0.5 * c.amp, s + 7.0);
+	rough = 1.0;
 	return col;
 }
 
@@ -691,6 +747,10 @@ void fragment() {
 		col = base * (0.88 + 0.24 * f);
 		emis *= lamp_emission * (0.88 + 0.24 * f);
 		rough = 0.25;
+	} else if (style == 19) {
+		col = rubble_surface(c, col, rough);
+	} else if (style == 20) {
+		col = thatch_surface(c, col, rough);
 	} else if (style == 18) {
 		float wv = ps(vnoise(c.pc + vec2(floor(TIME * 1.5), 0.0), 8.0, 2.0), 3.0);
 		col = base * (0.85 + 0.3 * wv);
