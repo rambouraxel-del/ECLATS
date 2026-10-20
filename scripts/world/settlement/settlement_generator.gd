@@ -170,18 +170,57 @@ func _building(type: String, index: int) -> void:
 	var spec := BuildingPlacement.spec_for(plan)
 	var ring := _ring_for(type)
 	var anchor: Vector2 = plaza["center"]
-	var bias := Callable()
 	if type == "warehouse" and not port.is_empty():
 		anchor = (port["landing"] as Vector2).lerp(plaza["center"], 0.4)
 		ring = Vector2(0.5, 9.0)
 	var max_cut: int = profile.g("settlement.max_cut_cells", 6)
 	var max_fill: int = mini(int(profile.g("settlement.max_fill_cells", 14)), 8)
 	var tries: Array[Dictionary] = []
-	var samples := 150
-	for i in samples:
-		var rr := lerpf(ring.x, ring.y, sqrt((float(i) + 0.5) / samples))
-		var a := float(i) * 2.399963 + rng.randf() * 0.5
-		var p := anchor + Vector2(cos(a), sin(a)) * rr
+	var rings: Array = [[anchor, ring]]
+	# repli : si le secteur voulu est plein, on cherche sur toute l'île autour de la place
+	rings.append([plaza["center"], Vector2(float(plaza["radius"]) + 3.0, field.radius_m * 0.9)])
+	for rr_def in rings:
+		tries.append_array(_candidates(spec, plan, rr_def[0], rr_def[1], max_cut, max_fill))
+		if tries.size() >= 3:
+			break
+	tries.sort_custom(func(a, b): return a["score"] < b["score"])
+	var attempts := 0
+	for t in tries:
+		attempts += 1
+		if attempts > 24:
+			break
+		if _commit_building(type, plan, spec, t):
+			return
+	fail("bâtiment:" + type, "aucun site valide (%d candidats, %d essais)" % [tries.size(), attempts])
+
+func _candidates(spec: PlacementSpec, _plan: BuildingPlan, anchor: Vector2, ring: Vector2, max_cut: int, max_fill: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	# balayage régulier (pas de 1 m, léger décalage) de la couronne, dans un ordre mélangé : toute la couronne
+	# est examinée, pas seulement quelques tirages (les derniers bâtiments trouvent les espaces restants)
+	var points: Array[Vector2] = []
+	var span := ring.y
+	var x := -span
+	while x <= span:
+		var z := -span
+		while z <= span:
+			var d := Vector2(x, z).length()
+			if d >= ring.x and d <= ring.y:
+				points.append(anchor + Vector2(x, z) + Vector2(rng.randf_range(-0.3, 0.3), rng.randf_range(-0.3, 0.3)))
+			z += 1.0
+		x += 1.0
+	for i in range(points.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var t := points[i]
+		points[i] = points[j]
+		points[j] = t
+	var evaluated := 0
+	for p in points:
+		if evaluated > 900 or out.size() >= 40:
+			break
+		var col := field.col_of_m(p.x, p.y)
+		if not field.has_ground(col.x, col.y) or occ.tag_at(col.x, col.y) != PlacementSpec.TAG_FREE:
+			continue
+		evaluated += 1
 		var yaw := _yaw_toward(p, plaza["center"])
 		var half := spec.half_extents(yaw)
 		var sp: Vector2 = Vector2(roundf((p.x - half.x) / spec.snap_m), roundf((p.y - half.y) / spec.snap_m)) * spec.snap_m + half
@@ -193,18 +232,11 @@ func _building(type: String, index: int) -> void:
 			var rs: String = ev["reason"]
 			stats["site_reasons"][rs] = int(stats["site_reasons"].get(rs, 0)) + 1
 			continue
+		var rr := sp.distance_to(anchor)
 		var dist_to_plaza := sp.distance_to(plaza["center"]) - float(plaza["radius"])
 		var score: float = float(ev["cost"]) * 2.5 + absf(rr - (ring.x + ring.y) * 0.5) * 0.12 + rng.randf() * 0.5 + maxf(dist_to_plaza - 12.0, 0.0) * 0.3
-		tries.append({"score": score, "pos": sp, "yaw": yaw, "rect": rect, "yard": yard, "target": ev["target"]})
-	tries.sort_custom(func(a, b): return a["score"] < b["score"])
-	var attempts := 0
-	for t in tries:
-		attempts += 1
-		if attempts > 6:
-			break
-		if _commit_building(type, plan, spec, t):
-			return
-	fail("bâtiment:" + type, "aucun site valide (%d candidats, %d essais)" % [tries.size(), attempts])
+		out.append({"score": score, "pos": sp, "yaw": yaw, "rect": rect, "yard": yard, "target": ev["target"]})
+	return out
 
 func _commit_building(type: String, plan: BuildingPlan, spec: PlacementSpec, t: Dictionary) -> bool:
 	var yard: Rect2i = t["yard"]
@@ -240,7 +272,8 @@ func _commit_building(type: String, plan: BuildingPlan, spec: PlacementSpec, t: 
 		occ.remove_last_item()
 		_restore(snapshot)
 		occ.release_owner(owner)
-		stats["site_reasons"]["route_impossible"] = int(stats["site_reasons"].get("route_impossible", 0)) + 1
+		var why: String = paths.failures.back()["reason"] if not paths.failures.is_empty() else "?"
+		stats["site_reasons"]["route:" + why] = int(stats["site_reasons"].get("route:" + why, 0)) + 1
 		return false
 	buildings.append({"type": type, "plan": plan, "res": res, "door": door, "door_col": dc, "xform": BuildingPlacement.node_transform(res),
 		"owner": owner, "plot_rect": rect, "yard": yard, "route": route})

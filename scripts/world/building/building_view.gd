@@ -17,7 +17,7 @@ static func make_arrays(model: BuildingModel) -> Dictionary:
 	out["lod2"] = VoxelMesher.build_arrays(s2, C * 4.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
 	var det := []
 	for d in model.details:
-		det.append(VoxelMesher.build_arrays(d["volume"], float(d["grid"]), Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL))
+		det.append(MeshCache.arrays_for(d["volume"], float(d["grid"])))
 	out["details"] = det
 	return out
 

@@ -1,6 +1,7 @@
 extends Node
 ## Autoload « App » : raccourcis globaux et petit panneau d'aide.
-##   F1 : laboratoire graphique   F2 : première île   F4 : île habitée   F8 : galerie de matériaux
+##   F1 : laboratoire graphique   F2 : première île   F4 : île habitée (Lot 3)   F8 : galerie de matériaux
+##   F9 : île générée (Lot 4, génération structurelle)
 ##   L : éclairage suivant
 ##   F3 : afficher / masquer l'aide   F11 : plein écran
 
@@ -9,6 +10,7 @@ const SCENES := {
 	KEY_F2: "res://scenes/island/first_island.tscn",
 	KEY_F4: "res://scenes/island/colony_island.tscn",
 	KEY_F8: "res://scenes/lab/material_gallery.tscn",
+	KEY_F9: "res://scenes/world/settled_island.tscn",
 }
 
 var _hud: Label
@@ -70,7 +72,7 @@ func _process(_delta: float) -> void:
 	lines.append("")
 	lines.append("ZQSD/WASD bouger · souris regarder · Espace/Ctrl monter/descendre · Shift accélérer")
 	lines.append("Molette vitesse/zoom · Tab vol/orbite · Échap libérer la souris (clic pour reprendre)")
-	lines.append("F1 laboratoire · F2 île · F4 colonie · F8 matériaux · L éclairage · F3 aide · F11 plein écran")
+	lines.append("F1 laboratoire · F2 île · F4 colonie · F9 île générée · F8 matériaux · L éclairage · F3 aide · F11 plein écran")
 	if _extra_help != "":
 		lines.append(_extra_help)
 	_hud.text = "\n".join(lines)

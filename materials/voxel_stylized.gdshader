@@ -527,8 +527,8 @@ vec3 plaster_surface(Ctx c, vec3 base, inout float rough) {
 	if (c.wear > 0.55) {
 		float patch = 0.65 * vnoise(c.wp, 9.0, s + 31.0) + 0.35 * rnd2(c.wp, s + 32.0);
 		float edge_fall = smoothstep(0.0, 1.4, c.py) * 0.0;
-		if (patch < (c.wear - 0.55) * 0.9 + 0.1 * smoothstep(1.6, 0.0, c.py)) {
-			return rubble_surface(c, vec3(0.30, 0.26, 0.2), rough);
+		if (patch < (c.wear - 0.55) * 0.55 + 0.08 * smoothstep(1.6, 0.0, c.py)) {
+			return rubble_surface(c, vec3(0.46, 0.41, 0.33), rough);
 		}
 	}
 	// Plaques de crépi de 4 à 10 pixels, trois tons, pixels isolés.

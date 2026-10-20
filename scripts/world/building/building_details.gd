@@ -46,7 +46,7 @@ static func _door_leaf(b: BuildingBuilder, o: P.Opening, rng: RandomNumberGenera
 	var lw := o.w / leaves
 	var y_m := float(plan.floor_y(o.floor) + o.sill) * C
 	for li in leaves:
-		var kit := _leaf_kit(lw, o.h, plan.seed + o.u + li, key)
+		var kit := _leaf_kit(lw, o.h, (plan.seed + o.u + li) % 3, key)
 		var vol := kit.volume
 		var left := (li == 0)
 		if leaves == 1:
@@ -76,18 +76,18 @@ static func _window_dress(b: BuildingBuilder, o: P.Opening, rng: RandomNumberGen
 	var half_w := o.w / 2
 	if roll < 0.25:
 		# volets fermés : un battant plein devant l'ouverture, légèrement en saillie
-		var kit := _shutter_kit(o.w, o.h, plan.seed + o.u, rng, true)
+		var kit := _shutter_kit(o.w, o.h, (plan.seed + o.u) % 3, rng, true)
 		_place_on_wall(b, o, kit, float(o.u) * C, y_m, true)
 		return
 	if roll < 0.7:
 		# volets ouverts, plaqués contre le mur de chaque côté
 		for side in [-1, 1]:
-			var kit := _shutter_kit(maxi(half_w, 2), o.h, plan.seed + o.u + side, rng, false)
+			var kit := _shutter_kit(maxi(half_w, 2), o.h, (plan.seed + o.u + side) % 3, rng, false)
 			var u0 := float(o.u - maxi(half_w, 2)) * C - 0.02 if side < 0 else float(o.u + o.w) * C + 0.02
 			_place_on_wall(b, o, kit, u0, y_m, true)
 	else:
 		# claustra : lattis de bois dans l'ouverture (barres de 2 cm tous les 6 cm)
-		var kit := _claustra_kit(o.w, o.h, plan.seed + o.u)
+		var kit := _claustra_kit(o.w, o.h, (plan.seed + o.u) % 3)
 		_place_on_wall(b, o, kit, float(o.u) * C, y_m, false)
 	# Rideau de toile derrière le volet ouvert ou le claustra : petit pli de tissu
 	if o.floor >= 0 and rng.randf() < 0.5:

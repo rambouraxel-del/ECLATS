@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/world_scene.gd" id="1_world"]
+[ext_resource type="Script" path="res://scripts/rendering/environment_manager.gd" id="2_env"]
+[ext_resource type="Script" path="res://scripts/camera/free_camera.gd" id="3_cam"]
+
+[node name="SettledIsland" type="Node3D"]
+script = ExtResource("1_world")
+
+[node name="Environment" type="Node3D" parent="."]
+script = ExtResource("2_env")
+start_preset = "village_day"
+
+[node name="FreeCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.97, 0.24, 0, -0.24, 0.97, 2, 15, 50)
+fov = 62.0
+near = 0.05
+far = 2500.0
+script = ExtResource("3_cam")
+mode = 1
+orbit_target = Vector3(0, 3, -1)

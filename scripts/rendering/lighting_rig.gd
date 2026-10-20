@@ -22,6 +22,8 @@ var sun: DirectionalLight3D
 var world_env: WorldEnvironment
 ## Intensité des lumières d'objets (0 le jour, plus la nuit).
 var lamp_scale := 0.0
+## Intensité minimale des lumières INTÉRIEURES (pièces de bâtiments) : lisibles même en plein jour.
+var interior_min := 0.0
 ## Matériaux de nuages à teinter selon l'ambiance (renseignés par VoxelClouds).
 var cloud_materials: Array[ShaderMaterial] = []
 var sky_material: ShaderMaterial
@@ -104,7 +106,27 @@ func apply_preset(index: int) -> void:
 	if sun == null or presets.is_empty():
 		return
 	current_index = index
-	var p: Dictionary = presets[index]
+	apply_preset_dict(presets[index])
+	preset_changed.emit(current_name())
+
+## Mélange deux préréglages (couleurs « #rrggbb » et nombres interpolés, le reste pris au plus proche).
+static func blend(a: Dictionary, b: Dictionary, k: float) -> Dictionary:
+	var out := {}
+	for key in a:
+		var va = a[key]
+		var vb = b.get(key, va)
+		if typeof(va) == TYPE_STRING and String(va).begins_with("#") and typeof(vb) == TYPE_STRING and String(vb).begins_with("#"):
+			out[key] = "#" + Color.html(va).lerp(Color.html(vb), k).to_html(false)
+		elif (typeof(va) == TYPE_FLOAT or typeof(va) == TYPE_INT) and (typeof(vb) == TYPE_FLOAT or typeof(vb) == TYPE_INT):
+			out[key] = lerpf(float(va), float(vb), k)
+		else:
+			out[key] = va if k < 0.5 else vb
+	return out
+
+## Applique un préréglage décrit par un dictionnaire (voir config/lighting.json).
+func apply_preset_dict(p: Dictionary) -> void:
+	if sun == null:
+		return
 	sun.light_color = Color.html(p["sun_color"])
 	sun.light_energy = float(p["sun_energy"])
 	sun.rotation_degrees = Vector3(-float(p["sun_angle"]), float(p["sun_heading"]), 0.0)
@@ -138,7 +160,6 @@ func apply_preset(index: int) -> void:
 	env.fog_enabled = env.fog_density > 0.0
 	env.glow_intensity = float(p["glow"])
 	refresh_lamps()
-	preset_changed.emit(current_name())
 
 ## Ajuste l'intensité des lumières d'objets (groupe « asset_lamps ») selon l'ambiance.
 func refresh_lamps() -> void:
@@ -151,5 +172,8 @@ func refresh_lamps() -> void:
 		if not l.has_meta("base_energy"):
 			l.set_meta("base_energy", l.light_energy)
 		var base: float = l.get_meta("base_energy")
-		l.light_energy = base * lamp_scale
-		l.visible = lamp_scale > 0.02
+		var sc := lamp_scale
+		if l.get_meta("interior", false):
+			sc = maxf(lamp_scale, interior_min)
+		l.light_energy = base * sc
+		l.visible = sc > 0.02

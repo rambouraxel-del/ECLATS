@@ -18,6 +18,8 @@ uniform float cloud_cover : hint_range(0.0, 1.0) = 0.5;
 uniform float cloud_block : hint_range(10.0, 80.0) = 34.0;
 uniform float star_amount : hint_range(0.0, 1.0) = 0.0;
 uniform float sea_cover : hint_range(0.0, 1.0) = 0.5;
+// 0 = nuages en blocs de pixels (Lot 3), 1 = nuages doux continus (Lot 4)
+uniform float cloud_soft : hint_range(0.0, 1.0) = 1.0;
 
 float h2(vec2 p) {
 	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -31,18 +33,18 @@ float vn(vec2 p) {
 }
 
 float fbm2(vec2 p) {
-	return 0.55 * vn(p) + 0.3 * vn(p * 2.1 + 7.0) + 0.15 * vn(p * 4.3 + 3.0);
+	return 0.5 * vn(p) + 0.27 * vn(p * 2.1 + 7.0) + 0.15 * vn(p * 4.3 + 3.0) + 0.08 * vn(p * 8.7 + 1.0);
 }
 
 // Nuages en blocs : valeur plate par cellule, trois tons selon la lumière du soleil.
 vec4 cloud_layer(vec2 uv, vec2 sun2, float cover, float block) {
 	vec2 cell = floor(uv * block);
-	vec2 c = (cell + 0.5) / block;
+	vec2 c = mix((cell + 0.5) / block, uv, cloud_soft);
 	float d = fbm2(c * 1.6 + vec2(3.0, 9.0));
-	float dens = smoothstep(1.0 - cover, 1.0 - cover + 0.16, d);
+	float dens = smoothstep(1.0 - cover, 1.0 - cover + mix(0.16, 0.38, cloud_soft), d);
 	float d2 = fbm2((c + sun2 * (1.2 / block)) * 1.6 + vec2(3.0, 9.0));
-	float lit = clamp(0.5 + (d - d2) * 9.0, 0.0, 1.0);
-	float tone = floor(lit * 2.99) / 2.0;
+	float lit = clamp(0.5 + (d - d2) * mix(9.0, 5.0, cloud_soft), 0.0, 1.0);
+	float tone = mix(floor(lit * 2.99) / 2.0, lit, cloud_soft);
 	vec3 col = mix(cloud_shadow, cloud_light, tone);
 	return vec4(col, dens);
 }

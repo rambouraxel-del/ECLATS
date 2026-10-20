@@ -1,0 +1,27 @@
+{
+	"_doc": "Configuration CENTRALISÉE de l'environnement (EnvironmentManager). Les préréglages d'éclairage restent dans lighting.json ; ici : plafonds d'exposition (anti-surexposition), brume, nuages, îles lointaines, cycle jour/nuit.",
+	"tonemap": { "white": 4.0 },
+	"glow": { "hdr_threshold": 1.15, "hdr_scale": 1.2, "bloom": 0.02, "intensity_cap": 0.85 },
+	"emission_scale": {
+		"_doc": "Multiplicateur global d'émission des matériaux (cristaux, lampes, verres) : faible en plein jour (sinon cristaux et socles blanchissent), fort la nuit.",
+		"village_day": 0.2, "village_sunset": 0.6, "village_night": 1.0, "village_dawn": 0.55, "default": 0.35
+	},
+	"interior_lamp_min": 0.55,
+	"fog": { "sky_affect": 0.35, "aerial_perspective": 0.5, "density_scale": 1.0 },
+	"clouds": {
+		"cover_scale": { "village_day": 1.0, "village_sunset": 1.05, "village_night": 0.9, "village_dawn": 1.0 },
+		"opacity_scale": { "village_day": 1.0, "village_sunset": 0.95, "village_night": 0.75, "village_dawn": 1.0 }
+	},
+	"far_islands": { "count": 9, "distance": [130.0, 340.0], "radius": [7.0, 19.0], "height": [-30.0, 36.0], "fog_end": 420.0 },
+	"derived_presets": {
+		"village_dawn": { "from": "village_sunset", "set": { "sun_heading": 95, "sky_horizon": "#f3cdb8", "fog_color": "#d9c7c9", "sky_top": "#3f5a96" } }
+	},
+	"time_keys": [
+		{ "t": 0.00, "preset": "village_night" },
+		{ "t": 0.17, "preset": "village_dawn" },
+		{ "t": 0.38, "preset": "village_day" },
+		{ "t": 0.66, "preset": "village_day" },
+		{ "t": 0.82, "preset": "village_sunset" },
+		{ "t": 1.00, "preset": "village_night" }
+	]
+}

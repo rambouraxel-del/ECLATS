@@ -260,7 +260,7 @@ static func _commit(model: BuildingModel, info: Dictionary, kind: String, cand: 
 	var plan := model.plan
 	var base := Vector3(float(x0 + fp.position.x) * C, float(info["floor_y"]), float(z0 + fp.position.y) * C)
 	var s: Vector2i = SIZES[kind]
-	var kit := build_kit(kind, s, plan.seed + model.furniture.size() * 31 + hash(kind) % 997, rng)
+	var kit := build_kit(kind, s, (plan.seed + model.furniture.size()) % 3, rng)
 	var vol := kit.volume.rotated_y(rot)
 	model.details.append({"name": "f_%s_%d" % [kind, model.furniture.size()], "volume": vol, "grid": PIX, "offset": base, "material": "props"})
 	var h: int = HEIGHTS[kind]

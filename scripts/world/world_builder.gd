@@ -32,6 +32,9 @@ static func build(profile_key: String, seed: int, opts := {}) -> WorldData:
 	if not opts.get("no_nature", false):
 		NatureGenerator.generate(w)
 	lap.call("nature")
+	if opts.get("no_models", false):
+		w.failures = w.settlement.failures.duplicate()
+		return w
 	w.island = TerrainVoxelizer.build(w.field)
 	lap.call("voxelisation")
 	_build_models(w)
@@ -44,6 +47,7 @@ static func build(profile_key: String, seed: int, opts := {}) -> WorldData:
 
 ## Modèles de bâtiments (volumes + maillages) calculés en parallèle : aucun nœud n'est touché.
 static func _build_models(w: WorldData) -> void:
+	var _t_models := Time.get_ticks_msec()
 	var list: Array = w.settlement.buildings
 	var out: Array = []
 	out.resize(list.size())
@@ -59,7 +63,9 @@ static func _build_models(w: WorldData) -> void:
 		b["model"] = out[i]["model"]
 		b["arrays"] = out[i]["arrays"]
 		w.buildings.append(b)
+	w.timings["modeles_batiments"] = Time.get_ticks_msec() - _t_models
 	_build_nature_models(w)
+	w.timings["modeles_nature"] = Time.get_ticks_msec() - _t_models - int(w.timings["modeles_batiments"])
 	if not w.settlement.port.is_empty():
 		var port: Dictionary = w.settlement.port
 		port["pier"] = PortBuilder.build_pier(port, w.seed)

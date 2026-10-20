@@ -183,9 +183,10 @@ static func build_pier(port: Dictionary, seed: int) -> Dictionary:
 		for z in range(1, deck_end + 1):
 			if open_side and z >= gap0 and z <= gap1:
 				continue
-			box.call(x, 7, z, x, 8, z, "wood_aged")
-			if z % 2 == 0:
-				box.call(x, 3, z, x, 3, z, "wood_aged_dark")
+			box.call(x, 7, z, x, 8, z, "wood_aged")                    # lisse haute continue
+			box.call(x, 3, z, x, 3, z, "wood_aged_dark")              # lisse basse continue
+			if z % 3 == 0:
+				box.call(x, 0, z, x, 6, z, "wood_aged_dark")           # barreau
 	# bout de l'appontement : traverse et bittes d'amarrage
 	box.call(-12, 0, deck_end, 11, 2, deck_end, "wood_aged_dark")
 	for bx in [-9, 8]:

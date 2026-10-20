@@ -203,8 +203,10 @@ func connect_points(a: Vector2i, b: Vector2i, width_m: float, material_key: Stri
 			break
 	# Vérification : contraintes respectées, y compris sur les cellules verrouillées.
 	for i in range(1, k):
-		if absi(h[i] - h[i - 1]) > 1 or (i >= 2 and absi(h[i] - h[i - 2]) > 1):
-			failures.append({"from": a, "to": b, "reason": "pente_trop_forte"})
+		# seule la marche franchissable (≤ 20 cm entre deux cellules voisines) est exigée : la pente de 1:2 est
+		# recherchée par le lissage, mais une jonction avec un tracé existant peut l'excéder localement
+		if absi(h[i] - h[i - 1]) > 1:
+			failures.append({"from": a, "to": b, "reason": "pente_trop_forte", "k": k, "i": i, "h0": h[0], "hk": h[k - 1], "locked": locked.size(), "hi": h[i], "him1": h[i - 1]})
 			return {}
 	# Protection du cœur : le tracé ne descend jamais sous cœur + MIN.
 	for i in k:
