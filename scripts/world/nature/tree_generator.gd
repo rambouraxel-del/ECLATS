@@ -25,7 +25,7 @@ const SPECIES := {
 		"blob": {"r": [1.5, 2.0], "flat": 0.36, "lift": 0.1, "top": [1.6, 2.0]},
 		"leaf": ["leaf_light", "leaves", "leaf_light", "leaf_olive"]},
 	"pine": {"h": [5.6, 7.6], "r0": [0.26, 0.34], "r1": 0.06, "lean": 0.03, "wobble": 0.05, "bark": "bark_dark",
-		"tiers": {"from": 0.24, "step": 0.9, "r0": 1.55, "r1": 0.35, "h": 0.95},
+		"tiers": {"from": 0.22, "step": 1.05, "r0": 1.75, "r1": 0.3, "h": 0.62},
 		"leaf": ["pine", "pine", "leaf_dark", "pine"]},
 	"weeping": {"h": [2.6, 3.4], "r0": [0.32, 0.4], "r1": 0.18, "lean": 0.08, "wobble": 0.12, "bark": "bark",
 		"limbs": {"t": [0.7, 0.96], "count": [4, 6], "pitch": [38, 62], "len": [1.6, 2.3], "r": 0.5, "droop": 0.9, "children": {"p": 0.0, "pitch": [20, 30], "len": 0.4}},

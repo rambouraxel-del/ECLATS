@@ -19,8 +19,10 @@ static func parts(ship: Dictionary) -> Array:
 	return out
 
 static func create_node(ship: Dictionary) -> Node3D:
-	var p := parts(ship)
-	var node := VoxelObjectView.create_node("Ship", p, VoxelObjectView.make_arrays(p), [45.0, 120.0], true)
+	# parties et maillages précalculés par WorldBuilder (fil d'exécution) ; sinon calculés ici
+	var p: Array = ship["parts"] if ship.has("parts") else parts(ship)
+	var arrays: Array = ship["arrays"] if ship.has("arrays") else VoxelObjectView.make_arrays(p)
+	var node := VoxelObjectView.create_node("Ship", p, arrays, [45.0, 120.0], true)
 	for l in ship["lights"]:
 		var light := OmniLight3D.new()
 		light.position = l["pos"]

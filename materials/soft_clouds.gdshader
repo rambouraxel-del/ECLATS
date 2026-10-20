@@ -15,6 +15,7 @@ uniform float opacity : hint_range(0.0, 1.0) = 0.9;
 uniform float fade_near = 8.0;
 uniform float fade_far = 520.0;
 uniform float seed = 0.0;
+uniform float brightness : hint_range(0.3, 1.0) = 0.74;
 
 varying vec3 wpos;
 
@@ -42,7 +43,7 @@ void fragment() {
 	// éclairage : le gradient du bruit vers le soleil éclaire les bords ; le cœur est plus sombre
 	vec2 sun2 = normalize(sun_dir.xz + vec2(0.001));
 	float d2 = fbm(uv + sun2 * 0.07);
-	float lit = clamp(0.55 + (d - d2) * 6.0, 0.0, 1.0);
+	float lit = clamp(brightness + (d - d2) * 6.0, 0.0, 1.0);
 	lit = mix(lit, 1.0, smoothstep(0.55, 1.0, d) * 0.15);
 	vec3 col = mix(shade_color, light_color, lit);
 	float dist = distance(wpos, CAMERA_POSITION_WORLD);

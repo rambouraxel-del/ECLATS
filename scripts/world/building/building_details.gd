@@ -211,7 +211,7 @@ static func _hearth_fire(b: BuildingBuilder) -> void:
 			cz = float(r.end.y - 4) * C
 	var y := float(fy) * C
 	_part(b, "hearth_fire", kit, Vector3(cx - 0.4 if side == "W" else cx, y, cz), "crystal")
-	b.model.lights.append({"pos": Vector3(cx + 0.4, y + 0.5, cz + 0.4), "color": Color("ff8a3a"), "energy": 1.1, "range": 5.0, "interior": true})
+	b.model.lights.append({"pos": Vector3(cx + 0.4, y + 0.5, cz + 0.4), "color": Color("ff8a3a"), "energy": 1.8, "range": 5.5, "interior": true})
 
 static func _interior_lights(b: BuildingBuilder) -> void:
 	var plan := b.plan
@@ -223,7 +223,7 @@ static func _interior_lights(b: BuildingBuilder) -> void:
 			break
 		var cx := float(r.x0 + r.x1 + 1) * 0.5 * C
 		var cz := float(r.z0 + r.z1 + 1) * 0.5 * C
-		b.model.lights.append({"pos": Vector3(cx, float(plan.floor_y(0) + 17) * C, cz), "color": Color("ffc072"), "energy": 0.55, "range": 4.2, "interior": true})
+		b.model.lights.append({"pos": Vector3(cx, float(plan.floor_y(0) + 17) * C, cz), "color": Color("ffc072"), "energy": 1.3, "range": 5.5, "interior": true})
 		used += 1
 
 static func _signs(b: BuildingBuilder) -> void:

@@ -165,3 +165,29 @@ visibles.
 | herbe | quatre verts alternés, touffes, trèfles, plaques sèches, lisière irrégulière sur les flancs, version tondue / sauvage / piétinée |
 | terre | granulaire, plaques humides, cailloux, racines ; sèche / humide / fertile |
 | enduit, tuiles, bardeaux, écorce, feuillage | crépi à plaques, tuiles à joints et reliefs, fibres de bardeaux, sillons d'écorce, folioles |
+
+## 11. Architecture des survivants et ambiance (Lot 4)
+
+**Lore** : des siècles après la chute de grandes civilisations, des survivants peu technologiques bâtissent avec ce
+qu'ils trouvent.
+
+À faire : pierre ancienne irrégulière (moellons, parfois sombres ou chauds), bois vieilli, poutres et colombages
+apparents, enduits usés qui laissent voir la maçonnerie, toitures rustiques (chaume, bardeaux, tuiles et lauzes
+rapiécées, patchs de teintes voisines), ouvertures étroites et irrégulières, volets, claustras, toiles, extensions
+et réparations successives (appentis), éléments de réemploi (linteaux sculptés, tambours de colonne, cristaux
+éteints). Intérieurs : sol de terre, planches ou dalles ; foyer en maçonnerie, mobilier de bois brut (table, bancs,
+coffres, étagères, tonneaux, caisses, établi, enclume selon la fonction).
+
+À éviter : grandes baies vitrées, tuiles modernes, façades symétriques et « propres », toitures en escalier,
+bâtiments qui ressemblent à des maisons de poupée (tout est dimensionné pour un personnage de 1,80 m).
+
+**Couleurs** : toits désaturés (ardoise grise, tuile terre cuite éteinte, bardeau brun, chaume doré terni), enduits
+crème / ocre / gris usés, sols de cour de terre claire ; le vert vif est réservé à l'herbe et aux feuillages, et reste
+sous la saturation du ciel.
+
+**Ambiance** : l'émission des matériaux (cristaux, lampes, verres) est multipliée par un facteur d'ambiance
+(`config/environment.json`) — environ 0,2 en plein jour, 0,6 au coucher, 1,0 la nuit — pour qu'un cristal ou le socle
+de l'Ancre ne blanchisse jamais en plein soleil ; le halo ne s'allume qu'au-dessus d'un seuil HDR. Les nuages sont
+**doux** (nappes continues en 3D sous l'île et à l'horizon, ciel continu) et non plus en blocs ; des silhouettes
+d'îles lointaines, estompées par la distance, donnent la profondeur du monde. Les lumières intérieures restent
+lisibles de jour.

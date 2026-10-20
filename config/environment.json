@@ -6,7 +6,7 @@
 		"_doc": "Multiplicateur global d'émission des matériaux (cristaux, lampes, verres) : faible en plein jour (sinon cristaux et socles blanchissent), fort la nuit.",
 		"village_day": 0.2, "village_sunset": 0.6, "village_night": 1.0, "village_dawn": 0.55, "default": 0.35
 	},
-	"interior_lamp_min": 0.55,
+	"interior_lamp_min": 0.7,
 	"fog": { "sky_affect": 0.35, "aerial_perspective": 0.5, "density_scale": 1.0 },
 	"clouds": {
 		"cover_scale": { "village_day": 1.0, "village_sunset": 1.05, "village_night": 0.9, "village_dawn": 1.0 },

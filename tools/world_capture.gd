@@ -24,8 +24,21 @@ func _initialize() -> void:
 	env.setup(world.seed)
 	rig.refresh_lamps()
 	var s := world.settlement
-	var pc: Vector2 = s.plaza["center"]
-	var pl_y := float(world.field.ground_y_m(s.plaza["col"].x, s.plaza["col"].y))
+	var pc := Vector2.ZERO
+	var pl_y := 3.0
+	if not s.plaza.is_empty():
+		pc = s.plaza["center"]
+		pl_y = float(world.field.ground_y_m(s.plaza["col"].x, s.plaza["col"].y))
+	else:
+		var g := world.field.ground_at_m(0.0, 0.0)
+		pl_y = 3.0 if is_nan(g) else g
+	# point le plus haut de l'île (vue « relief »)
+	var hi_i := 0
+	for i in world.field.n * world.field.n:
+		if world.field.top[i] > world.field.top[hi_i]:
+			hi_i = i
+	var hi_m := world.field.center_m(hi_i % world.field.n, hi_i / world.field.n)
+	var hi_y := float(world.field.top[hi_i] + 1) * 0.2
 	for v in views:
 		var preset := "village_day"
 		var from := Vector3.ZERO
@@ -45,12 +58,17 @@ func _initialize() -> void:
 				var d: Vector2 = b["door"]
 				var dir := (pc - d).normalized()
 				from = Vector3(d.x - dir.x * 1.0, world.field.ground_at_m(d.x, d.y) + 1.65, d.y - dir.y * 1.0); to = Vector3(pc.x, pl_y + 1.4, pc.y); fov = 70.0
-			"relief":
+			"shrine":
 				if s.shrine.is_empty():
 					continue
 				var sc: Vector2 = s.shrine["center"]
 				var dirv := (sc - pc).normalized()
 				from = Vector3(sc.x - dirv.x * 11.0, pl_y + 2.5, sc.y - dirv.y * 11.0); to = Vector3(sc.x, float(world.field.ground_at_m(sc.x, sc.y)) + 1.8, sc.y)
+			"relief":
+				var dirh := (hi_m - Vector2.ZERO).normalized() if hi_m.length() > 1.0 else Vector2(0, 1)
+				from = Vector3(hi_m.x - dirh.x * 4.0 + dirh.y * 9.0, hi_y + 3.5, hi_m.y - dirh.y * 4.0 - dirh.x * 9.0); to = Vector3(hi_m.x, hi_y - 0.5, hi_m.y); fov = 66.0
+			"natural":
+				from = Vector3(10, 34, 46); to = Vector3(0, 1, 0)
 			"port":
 				if world.port.is_empty():
 					continue
@@ -77,7 +95,7 @@ func _initialize() -> void:
 					continue
 				var t: Dictionary = world.trees[0]
 				var tp: Vector3 = t["pos"]
-				from = tp + Vector3(7.0, 3.0, 7.5); to = tp + Vector3(0, 2.2, 0)
+				from = tp + Vector3(10.0, 5.5, 11.0); to = tp + Vector3(0, 1.8, 0)
 			"rocks":
 				if world.rocks.is_empty():
 					continue
@@ -91,7 +109,7 @@ func _initialize() -> void:
 			"sunset":
 				preset = "village_sunset"; from = Vector3(pc.x + 8, 24, pc.y + 44); to = Vector3(pc.x, 3, pc.y)
 			"night":
-				preset = "village_night"; from = Vector3(pc.x - 10, pl_y + 7, pc.y + 20); to = Vector3(pc.x + 1, pl_y + 1.2, pc.y - 3)
+				preset = "village_night"; from = Vector3(pc.x - 7, pl_y + 15, pc.y + 21); to = Vector3(pc.x + 1, pl_y + 0.5, pc.y - 2)
 		env.apply_key(preset)
 		rig.refresh_lamps()
 		cam.fov = fov

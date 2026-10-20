@@ -106,3 +106,36 @@ Le même nœud sert dans les deux scènes.
 - **Île habitée** : `VillageLayout` (plan), hooks `height_hook` / `surface_hook` du générateur, `colony_island.gd`.
 - **Ciel et nuages** : `sky_clouds.gdshader`, `VoxelClouds`, ambiances dans `config/lighting.json`.
 - Détails : `docs/OPTIMISATION.md`, `docs/BILAN_LOT3.md`, `docs/ASSETS.md`.
+
+## Ajouts du Lot 4 (génération structurelle)
+
+Le détail des règles est dans `docs/GENERATION_MONDE.md` ; ici la carte du code :
+
+```
+scripts/world/
+  world_rng.gd, island_profile.gd, world_data.gd        graines par étiquette, profils JSON, résultat (pur données)
+  terrain_field.gd / terrain_generator.gd / terrain_voxelizer.gd   carte de colonnes → relief hiérarchique → IslandData
+  placement_spec.gd, placement_system.gd, occupancy_map.gd, world_nav.gd     placement universel, réservations, accessibilité
+  terrain_editor.gd, path_network.gd                     plateformes, talus, soutènements, routes
+  building/        plan → catalogue → planner → builder → détails → mobilier → validateur → vue
+  settlement/      colonie (place, parcelles, routes, port, sanctuaire, potagers) et ponton haubané
+  nature/          arbres, rochers, plantes, primitives voxel (VoxelShapes), vue multi-LOD (VoxelObjectView)
+  ship/            bateau paramétrique + vue
+  validation/      WorldValidator (contrôles automatiques sur l'état final)
+  world_builder.gd, world_view.gd, world_scene.gd        orchestration, mise en scène, scène F9
+scripts/rendering/ environment_manager.gd (point d'entrée unique de l'ambiance), cloud_layer.gd, far_islands.gd
+scripts/core/      mesh_cache.gd (tableaux de sommets mis en cache par contenu)
+config/            profiles/*.json, environment.json
+tools/             world_report.gd (diagnostic), world_capture.gd (captures), world_perf.gd (mesures), preview_*.gd
+tests/             run_checks_lot4.gd
+```
+
+Principes d'architecture :
+- **Données puis nœuds** : `WorldBuilder` produit un `WorldData` sans nœud (exécutable dans un fil d'exécution,
+  validable, sérialisable) ; `WorldView` crée ensuite les nœuds.
+- **Une règle, un endroit** : les dimensions de portes, d'escaliers, la fraction d'appui, la marge de falaise… sont
+  des constantes ou des champs de spec lus par TOUS les générateurs et par le validateur.
+- **Déterminisme** : un flux aléatoire par étiquette (`WorldRng.stream(graine, "…")`) ; aucun conteneur partagé
+  entre fils d'exécution (les `const Dictionary` lus en parallèle ont corrompu des chaînes : chaque objet copie ses
+  propres identifiants de matières avant d'être rastérisé en parallèle).
+- **Échelles** : terrain 20 cm, structures 10 cm, détails 2 cm (inchangées, testées).

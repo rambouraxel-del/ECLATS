@@ -227,6 +227,11 @@ func _candidates(spec: PlacementSpec, _plan: BuildingPlan, anchor: Vector2, ring
 		var rect := placement.footprint_rect(sp, half)
 		var yard := Rect2i(rect.position - Vector2i(2, 2), rect.size + Vector2i(4, 4))
 		stats["sites_tried"] += 1
+		# refus rapide (cinq colonnes) avant l'évaluation complète : hors de l'île, trop près du vide, déjà réservé
+		var quick := _quick_reject(yard)
+		if quick != "":
+			stats["site_reasons"][quick] = int(stats["site_reasons"].get(quick, 0)) + 1
+			continue
 		var ev := TerrainEditor.evaluate_pad(field, occ, yard, 2, max_cut, max_fill, 2)
 		if not ev["ok"]:
 			var rs: String = ev["reason"]
@@ -237,6 +242,17 @@ func _candidates(spec: PlacementSpec, _plan: BuildingPlan, anchor: Vector2, ring
 		var score: float = float(ev["cost"]) * 2.5 + absf(rr - (ring.x + ring.y) * 0.5) * 0.12 + rng.randf() * 0.5 + maxf(dist_to_plaza - 12.0, 0.0) * 0.3
 		out.append({"score": score, "pos": sp, "yaw": yaw, "rect": rect, "yard": yard, "target": ev["target"]})
 	return out
+
+func _quick_reject(r: Rect2i) -> String:
+	for c in [r.position, Vector2i(r.end.x - 1, r.position.y), Vector2i(r.position.x, r.end.y - 1), r.end - Vector2i.ONE, r.get_center()]:
+		if not field.has_ground(c.x, c.y):
+			return "hors_ile"
+		var i := field.idx(c.x, c.y)
+		if field.edge_dist[i] < 0.8:
+			return "trop_pres_du_bord"
+		if occ.tag[i] != PlacementSpec.TAG_FREE:
+			return "reserve"
+	return ""
 
 func _commit_building(type: String, plan: BuildingPlan, spec: PlacementSpec, t: Dictionary) -> bool:
 	var yard: Rect2i = t["yard"]

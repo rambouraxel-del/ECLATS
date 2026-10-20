@@ -13,11 +13,11 @@ extends RefCounted
 static func build(profile_key: String, seed: int, opts := {}) -> WorldData:
 	var w := WorldData.new()
 	w.seed = seed
-	var t0 := Time.get_ticks_msec()
+	var clock := [Time.get_ticks_msec()]      # tableau : une lambda ne modifie pas les variables capturées
 	var lap := func(label: String) -> void:
 		var now := Time.get_ticks_msec()
-		w.timings[label] = now - t0
-		t0 = now
+		w.timings[label] = now - int(clock[0])
+		clock[0] = now
 	VoxelMesher.palette_warmup()
 	w.profile = IslandProfile.load_profile(profile_key)
 	var gen := TerrainGenerator.new()
@@ -35,9 +35,12 @@ static func build(profile_key: String, seed: int, opts := {}) -> WorldData:
 	if opts.get("no_models", false):
 		w.failures = w.settlement.failures.duplicate()
 		return w
+	# Les modèles (bâtiments, arbres, rochers, ponton, bateau) sont calculés par des fils d'exécution pendant que le
+	# fil principal voxélise le terrain : les deux phases se recouvrent.
+	var ctx := _start_models(w)
 	w.island = TerrainVoxelizer.build(w.field)
 	lap.call("voxelisation")
-	_build_models(w)
+	_finish_models(w, ctx)
 	lap.call("modeles")
 	w.failures = w.settlement.failures.duplicate()
 	w.props = w.settlement.props
@@ -45,55 +48,69 @@ static func build(profile_key: String, seed: int, opts := {}) -> WorldData:
 	w.stats["site_reasons"] = w.settlement.stats["site_reasons"]
 	return w
 
-## Modèles de bâtiments (volumes + maillages) calculés en parallèle : aucun nœud n'est touché.
-static func _build_models(w: WorldData) -> void:
-	var _t_models := Time.get_ticks_msec()
-	var list: Array = w.settlement.buildings
-	var out: Array = []
-	out.resize(list.size())
-	if list.size() > 0:
-		var task := WorkerThreadPool.add_group_task(func(i: int) -> void:
-			var b: Dictionary = list[i]
-			var model := BuildingBuilder.build(b["plan"])
-			out[i] = {"model": model, "arrays": BuildingView.make_arrays(model)},
-			list.size(), -1, true, "Bâtiments")
-		WorkerThreadPool.wait_for_group_task_completion(task)
-	for i in list.size():
-		var b: Dictionary = list[i].duplicate()
-		b["model"] = out[i]["model"]
-		b["arrays"] = out[i]["arrays"]
-		w.buildings.append(b)
-	w.timings["modeles_batiments"] = Time.get_ticks_msec() - _t_models
-	_build_nature_models(w)
-	w.timings["modeles_nature"] = Time.get_ticks_msec() - _t_models - int(w.timings["modeles_batiments"])
+## Un « travail » = un objet à modéliser. Chaque travail écrit uniquement dans son propre dictionnaire.
+static func _start_models(w: WorldData) -> Dictionary:
+	var jobs: Array[Dictionary] = []
+	for b in w.settlement.buildings:
+		jobs.append({"kind": "building", "src": b})
 	if not w.settlement.port.is_empty():
-		var port: Dictionary = w.settlement.port
-		port["pier"] = PortBuilder.build_pier(port, w.seed)
-		w.ship = ShipGenerator.build(WorldRng.sub_seed(w.seed, "ship"))
-		port["mooring"] = PortBuilder.moor(port, w.ship)
-		w.port = port
-
-## Arbres et rochers : rastérisation et maillages (3 niveaux de détail) en parallèle.
-static func _build_nature_models(w: WorldData) -> void:
-	var items: Array = []
-	items.append_array(w.trees)
-	items.append_array(w.rocks)
-	if items.is_empty():
-		return
+		jobs.append({"kind": "ship", "seed": WorldRng.sub_seed(w.seed, "ship")})
+		jobs.append({"kind": "pier", "port": w.settlement.port, "seed": w.seed})
+	for t in w.trees:
+		jobs.append({"kind": "tree", "src": t})
+	for r in w.rocks:
+		jobs.append({"kind": "rock", "src": r})
 	var task := WorkerThreadPool.add_group_task(func(i: int) -> void:
-		var it: Dictionary = items[i]
-		var parts: Array = []
-		if it["kind"] == "tree":
+		_run_job(jobs[i]),
+		jobs.size(), -1, true, "Modèles")
+	return {"task": task, "jobs": jobs, "t0": Time.get_ticks_msec()}
+
+static func _run_job(job: Dictionary) -> void:
+	match job["kind"]:
+		"building":
+			var model := BuildingBuilder.build(job["src"]["plan"])
+			job["out"] = {"model": model, "arrays": BuildingView.make_arrays(model)}
+		"ship":
+			var ship := ShipGenerator.build(job["seed"])
+			var parts := ShipView.parts(ship)
+			ship["parts"] = parts
+			ship["arrays"] = VoxelObjectView.make_arrays(parts)
+			job["out"] = ship
+		"pier":
+			job["out"] = PortBuilder.build_pier(job["port"], job["seed"])
+		"tree":
+			var it: Dictionary = job["src"]
 			var m := TreeGenerator.rasterize(it["plan"], it["ground"])
 			it["model"] = m
-			parts.append({"name": "wood", "volume": m["wood"], "origin": m["wood_origin"], "grid": TreeGenerator.C, "material": "props"})
+			var parts: Array = [{"name": "wood", "volume": m["wood"], "origin": m["wood_origin"], "grid": TreeGenerator.C, "material": "props"}]
 			if m["foliage"] != null:
 				parts.append({"name": "leaves", "volume": m["foliage"], "origin": m["foliage_origin"], "grid": TreeGenerator.F, "material": "props"})
-		else:
+			it["parts"] = parts
+			it["arrays"] = VoxelObjectView.make_arrays(parts)
+		"rock":
+			var it: Dictionary = job["src"]
 			var m := RockGenerator.rasterize(it["plan"], it["ground"])
 			it["model"] = m
-			parts.append({"name": "rock", "volume": m["volume"], "origin": m["origin"], "grid": RockGenerator.C, "material": "props"})
-		it["parts"] = parts
-		it["arrays"] = VoxelObjectView.make_arrays(parts),
-		items.size(), -1, true, "Nature")
-	WorkerThreadPool.wait_for_group_task_completion(task)
+			var parts: Array = [{"name": "rock", "volume": m["volume"], "origin": m["origin"], "grid": RockGenerator.C, "material": "props"}]
+			it["parts"] = parts
+			it["arrays"] = VoxelObjectView.make_arrays(parts)
+
+static func _finish_models(w: WorldData, ctx: Dictionary) -> void:
+	WorkerThreadPool.wait_for_group_task_completion(ctx["task"])
+	var port: Dictionary = w.settlement.port
+	for job in ctx["jobs"]:
+		match job["kind"]:
+			"building":
+				var b: Dictionary = (job["src"] as Dictionary).duplicate()
+				b["model"] = job["out"]["model"]
+				b["arrays"] = job["out"]["arrays"]
+				w.buildings.append(b)
+			"ship":
+				w.ship = job["out"]
+			"pier":
+				port["pier"] = job["out"]
+	if not port.is_empty():
+		port["mooring"] = PortBuilder.moor(port, w.ship)
+		w.port = port
+	w.timings["modeles_threads"] = Time.get_ticks_msec() - int(ctx["t0"])
+

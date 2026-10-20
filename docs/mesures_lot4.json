@@ -1,0 +1,96 @@
+{
+	"collider_boxes_buildings": 404,
+	"counts": {
+		"buildings": 8,
+		"plant_instances": 5073,
+		"props": 23,
+		"rocks": 16,
+		"trees": 26
+	},
+	"frames": {
+		"aerial": {
+			"draw_calls": 1215,
+			"objects": 1541,
+			"primitives": 1430650
+		},
+		"far": {
+			"draw_calls": 971,
+			"objects": 1300,
+			"primitives": 723804
+		},
+		"plaza": {
+			"draw_calls": 1333,
+			"objects": 1634,
+			"primitives": 3404894
+		}
+	},
+	"generation_ms": 22847,
+	"memory_mb": {
+		"peak": 404,
+		"static_after": 347.1,
+		"static_before": 28.4
+	},
+	"mesh_cache": {
+		"hits": 110,
+		"misses": 100
+	},
+	"nodes": {
+		"CollisionShape3D": 32,
+		"MeshInstance3D": 584,
+		"MultiMeshInstance3D": 220,
+		"OmniLight3D": 52
+	},
+	"profile": "settled",
+	"scene_build_ms": 4135,
+	"seed": 3,
+	"timings_ms": {
+		"colonie": 3882,
+		"modeles": 10630,
+		"modeles_threads": 14410,
+		"nature": 802,
+		"terrain": 3753,
+		"voxelisation": 3780
+	},
+	"triangles_by_category_lod": {
+		"Buildings": [
+			282080,
+			16372,
+			9702
+		],
+		"Island": [
+			267434,
+			0,
+			0
+		],
+		"Mooring": [
+			2092,
+			0,
+			0
+		],
+		"Nature": [
+			301242,
+			53382,
+			9590
+		],
+		"Pier": [
+			16346,
+			0,
+			0
+		],
+		"Plants": [
+			1205338,
+			432038,
+			0
+		],
+		"Props": [
+			268950,
+			80898,
+			9226
+		],
+		"Ship": [
+			59884,
+			15058,
+			2142
+		]
+	}
+}

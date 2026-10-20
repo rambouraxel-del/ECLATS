@@ -16,6 +16,7 @@ func _initialize() -> void:
 	var t0 := Time.get_ticks_msec()
 	var world := WorldBuilder.build(args[0], int(args[1]))
 	var gen_ms := Time.get_ticks_msec() - t0
+	printerr("[perf] génération ", gen_ms, " ms ", world.timings)
 	var env := EnvironmentManager.new()
 	root.add_child(env)
 	var scene := Node3D.new()
@@ -23,6 +24,7 @@ func _initialize() -> void:
 	var t1 := Time.get_ticks_msec()
 	var refs := WorldView.create(world, scene)
 	var view_ms := Time.get_ticks_msec() - t1
+	printerr("[perf] mise en scène ", view_ms, " ms")
 	env.setup(world.seed)
 	# triangles par catégorie et par niveau de détail
 	var cats := {}
@@ -51,9 +53,9 @@ func _initialize() -> void:
 		elif n is MultiMeshInstance3D:
 			var mm := (n as MultiMeshInstance3D).multimesh
 			var tri := VoxelMesher.triangle_count(mm.mesh) * mm.instance_count
-			if not cats.has("Plants"):
-				cats["Plants"] = [0, 0, 0]
-			cats["Plants" if cat == "Plants" else cat][0 if (n as MultiMeshInstance3D).visibility_range_begin <= 0.0 else 1] += tri
+			if not cats.has(cat):
+				cats[cat] = [0, 0, 0]
+			cats[cat][0 if (n as MultiMeshInstance3D).visibility_range_begin <= 0.0 else 1] += tri
 	var colliders := 0
 	for b in world.buildings:
 		colliders += b["model"].colliders.size()
@@ -74,8 +76,9 @@ func _initialize() -> void:
 	for k in views:
 		cam.global_position = views[k][0]
 		cam.look_at(views[k][1])
-		for i in 4:
+		for i in 2:
 			await process_frame
+		printerr("[perf] vue ", k)
 		frames[k] = {
 			"draw_calls": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
 			"primitives": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
