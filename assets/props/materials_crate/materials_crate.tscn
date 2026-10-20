@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_0e47m"]
+[ext_resource type="ArrayMesh" path="res://assets/props/materials_crate/materials_crate_structure.res" id="2_gjb00"]
+[ext_resource type="ArrayMesh" path="res://assets/props/materials_crate/materials_crate_structure_lod1.res" id="3_7yew4"]
+[ext_resource type="ArrayMesh" path="res://assets/props/materials_crate/materials_crate_structure_lod2.res" id="4_e63u4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h5e03"]
+size = Vector3(1, 0.42, 0.6)
+
+[node name="MaterialsCrate" type="Node3D"]
+script = ExtResource("1_0e47m")
+asset_id = "materials_crate"
+display_name = "Caisse à matériaux"
+footprint_cells = Vector3i(5, 3, 3)
+triangle_count = 2578
+vertex_count = 5156
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 10.0
+mesh = ExtResource("2_gjb00")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 10.0
+visibility_range_end = 26.0
+mesh = ExtResource("3_7yew4")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 26.0
+mesh = ExtResource("4_e63u4")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.21, 0.3)
+shape = SubResource("BoxShape3D_h5e03")

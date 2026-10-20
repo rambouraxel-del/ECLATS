@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_rjqct"]
+[ext_resource type="ArrayMesh" path="res://assets/props/boulder_1/boulder_1_rock.res" id="2_awpi2"]
+[ext_resource type="ArrayMesh" path="res://assets/props/boulder_1/boulder_1_rock_lod1.res" id="3_0ymil"]
+[ext_resource type="ArrayMesh" path="res://assets/props/boulder_1/boulder_1_rock_lod2.res" id="4_pkveh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_w8ph8"]
+size = Vector3(1.5, 0.9, 1.5)
+
+[node name="Boulder1" type="Node3D"]
+script = ExtResource("1_rjqct")
+asset_id = "boulder_1"
+display_name = "Rocher"
+footprint_cells = Vector3i(16, 11, 16)
+triangle_count = 5392
+vertex_count = 10784
+
+[node name="Rock" type="MeshInstance3D" parent="."]
+visibility_range_end = 16.0
+mesh = ExtResource("2_awpi2")
+
+[node name="Rock_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 16.0
+visibility_range_end = 45.0
+mesh = ExtResource("3_0ymil")
+
+[node name="Rock_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 45.0
+mesh = ExtResource("4_pkveh")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.65, 0.45, 1.65)
+shape = SubResource("BoxShape3D_w8ph8")

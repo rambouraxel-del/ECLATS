@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/lab/material_gallery.gd" id="1_gal"]
+[ext_resource type="Script" path="res://scripts/rendering/lighting_rig.gd" id="2_rig"]
+[ext_resource type="Script" path="res://scripts/camera/free_camera.gd" id="3_cam"]
+
+[node name="MaterialGallery" type="Node3D"]
+script = ExtResource("1_gal")
+
+[node name="LightingRig" type="Node3D" parent="."]
+script = ExtResource("2_rig")
+start_preset = "presentation"
+shadow_distance = 40.0
+
+[node name="FreeCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.98, 0.2, 0, -0.2, 0.98, -0.5, 1.4, -1.5)
+fov = 60.0
+script = ExtResource("3_cam")

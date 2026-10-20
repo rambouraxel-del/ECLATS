@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_3iwd3"]
+[ext_resource type="ArrayMesh" path="res://assets/props/large_planter/large_planter_structure.res" id="2_yw8xh"]
+[ext_resource type="ArrayMesh" path="res://assets/props/large_planter/large_planter_structure_lod1.res" id="3_56kln"]
+[ext_resource type="ArrayMesh" path="res://assets/props/large_planter/large_planter_structure_lod2.res" id="4_o8bwh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_k3nio"]
+size = Vector3(1.6, 0.46, 0.6)
+
+[node name="LargePlanter" type="Node3D"]
+script = ExtResource("1_3iwd3")
+asset_id = "large_planter"
+display_name = "Grande jardinière"
+footprint_cells = Vector3i(8, 5, 3)
+triangle_count = 17826
+vertex_count = 35652
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 10.0
+mesh = ExtResource("2_yw8xh")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 10.0
+visibility_range_end = 28.0
+mesh = ExtResource("3_56kln")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 28.0
+mesh = ExtResource("4_o8bwh")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.23, 0.3)
+shape = SubResource("BoxShape3D_k3nio")

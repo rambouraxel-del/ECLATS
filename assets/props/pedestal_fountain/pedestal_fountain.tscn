@@ -1,0 +1,53 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_1du1i"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pedestal_fountain/pedestal_fountain_structure.res" id="2_4ac2c"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pedestal_fountain/pedestal_fountain_structure_lod1.res" id="3_ekom2"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pedestal_fountain/pedestal_fountain_structure_lod2.res" id="4_i26op"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mhxmk"]
+size = Vector3(2, 0.64, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2mg6c"]
+size = Vector3(0.56, 1, 0.56)
+
+[node name="PedestalFountain" type="Node3D"]
+script = ExtResource("1_1du1i")
+asset_id = "pedestal_fountain"
+display_name = "Fontaine à piédestal"
+footprint_cells = Vector3i(10, 9, 10)
+triangle_count = 26110
+vertex_count = 52220
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 14.0
+mesh = ExtResource("2_4ac2c")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_ekom2")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_i26op")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.2, 1)
+light_color = Color(0.560784, 0.878431, 1, 1)
+light_energy = 0.9
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 4.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.32, 1)
+shape = SubResource("BoxShape3D_mhxmk")
+
+[node name="Box2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.12, 1)
+shape = SubResource("BoxShape3D_2mg6c")

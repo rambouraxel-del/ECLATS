@@ -20,7 +20,11 @@ var presets: Array = []
 var current_index := 0
 var sun: DirectionalLight3D
 var world_env: WorldEnvironment
-var sky_material: ProceduralSkyMaterial
+## Intensité des lumières d'objets (0 le jour, plus la nuit).
+var lamp_scale := 0.0
+## Matériaux de nuages à teinter selon l'ambiance (renseignés par VoxelClouds).
+var cloud_materials: Array[ShaderMaterial] = []
+var sky_material: ShaderMaterial
 
 func _ready() -> void:
 	add_to_group("lighting_rig")
@@ -47,9 +51,11 @@ func _build_nodes() -> void:
 	sun.light_angular_distance = 0.6
 	add_child(sun)
 
-	sky_material = ProceduralSkyMaterial.new()
+	sky_material = ShaderMaterial.new()
+	sky_material.shader = load("res://materials/sky_clouds.gdshader")
 	var sky := Sky.new()
 	sky.sky_material = sky_material
+	sky.radiance_size = Sky.RADIANCE_SIZE_128
 	var env := Environment.new()
 	env.background_mode = Environment.BG_SKY
 	env.sky = sky
@@ -62,6 +68,7 @@ func _build_nodes() -> void:
 	env.ssao_detail = 0.6
 	env.glow_enabled = true
 	env.glow_bloom = 0.05
+	env.sdfgi_enabled = false
 	env.fog_enabled = true
 	env.fog_sky_affect = 0.25
 	env.adjustment_enabled = true
@@ -101,11 +108,28 @@ func apply_preset(index: int) -> void:
 	sun.light_color = Color.html(p["sun_color"])
 	sun.light_energy = float(p["sun_energy"])
 	sun.rotation_degrees = Vector3(-float(p["sun_angle"]), float(p["sun_heading"]), 0.0)
-	sky_material.sky_top_color = Color.html(p["sky_top"])
-	sky_material.sky_horizon_color = Color.html(p["sky_horizon"])
-	sky_material.ground_bottom_color = Color.html(p["ground_bottom"])
-	sky_material.ground_horizon_color = Color.html(p["ground_horizon"])
-	sky_material.sun_angle_max = 20.0
+	sky_material.set_shader_parameter("sky_top", Color.html(p["sky_top"]))
+	sky_material.set_shader_parameter("sky_horizon", Color.html(p["sky_horizon"]))
+	sky_material.set_shader_parameter("ground_bottom", Color.html(p["ground_bottom"]))
+	sky_material.set_shader_parameter("ground_horizon", Color.html(p["ground_horizon"]))
+	var sun_vec := sun.global_transform.basis.z   # le soleil éclaire dans -z : il se trouve vers +z
+	sky_material.set_shader_parameter("sun_dir", sun_vec)
+	sky_material.set_shader_parameter("sun_color", Color.html(p["sun_color"]))
+	var night := float(p.get("moon", 0.0))
+	sky_material.set_shader_parameter("moon_dir", sun_vec)
+	sky_material.set_shader_parameter("moon_amount", night)
+	sky_material.set_shader_parameter("sun_glow", 0.0 if night > 0.5 else 0.8)
+	sky_material.set_shader_parameter("sun_size", 0.001 if night > 0.5 else 0.028)
+	sky_material.set_shader_parameter("star_amount", float(p.get("stars", 0.0)))
+	sky_material.set_shader_parameter("cloud_light", Color.html(p.get("cloud_light", "#ffffff")))
+	sky_material.set_shader_parameter("cloud_shadow", Color.html(p.get("cloud_shadow", "#b4bfd2")))
+	sky_material.set_shader_parameter("cloud_cover", float(p.get("cloud_cover", 0.45)))
+	lamp_scale = float(p.get("lamp_scale", 0.0))
+	VoxelMaterials.set_global_param("lamp_emission", float(p.get("lamp_emission", 0.35)))
+	for cm in cloud_materials:
+		cm.set_shader_parameter("light_color", Color.html(p.get("cloud_light", "#ffffff")))
+		cm.set_shader_parameter("shade_color", Color.html(p.get("cloud_shadow", "#b4bfd2")))
+		cm.set_shader_parameter("sun_dir", sun_vec)
 	var env := world_env.environment
 	env.ambient_light_energy = float(p["ambient_energy"])
 	env.tonemap_exposure = float(p["exposure"])
@@ -113,4 +137,19 @@ func apply_preset(index: int) -> void:
 	env.fog_density = float(p["fog_density"])
 	env.fog_enabled = env.fog_density > 0.0
 	env.glow_intensity = float(p["glow"])
+	refresh_lamps()
 	preset_changed.emit(current_name())
+
+## Ajuste l'intensité des lumières d'objets (groupe « asset_lamps ») selon l'ambiance.
+func refresh_lamps() -> void:
+	if not is_inside_tree():
+		return
+	for node in get_tree().get_nodes_in_group("asset_lamps"):
+		var l := node as Light3D
+		if l == null:
+			continue
+		if not l.has_meta("base_energy"):
+			l.set_meta("base_energy", l.light_energy)
+		var base: float = l.get_meta("base_energy")
+		l.light_energy = base * lamp_scale
+		l.visible = lamp_scale > 0.02

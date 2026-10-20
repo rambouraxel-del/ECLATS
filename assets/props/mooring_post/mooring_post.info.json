@@ -1,0 +1,71 @@
+{
+	"id": "mooring_post",
+	"name": "Bitte d'amarrage",
+	"group": "prop",
+	"footprint_cells": [
+		5,
+		6,
+		4
+	],
+	"size_m": [
+		1,
+		1.20000004768372,
+		0.800000011920929
+	],
+	"lod_ranges": [
+		10,
+		28,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 17048,
+	"triangles": 8524,
+	"triangles_lod": [
+		8524,
+		2352,
+		290
+	],
+	"solid_voxels": 32407,
+	"mesh_kb": 211,
+	"build_ms": 30,
+	"total_ms": 344,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/mooring_post/mooring_post_structure.res",
+				"res://assets/props/mooring_post/mooring_post_structure_lod1.res",
+				"res://assets/props/mooring_post/mooring_post_structure_lod2.res"
+			],
+			"triangles": [
+				8524,
+				2352,
+				290
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0.119999997317791,
+				0,
+				0.0799999982118607
+			],
+			"size": [
+				0.759999990463257,
+				1.05999994277954,
+				0.639999985694885
+			]
+		}
+	]
+}

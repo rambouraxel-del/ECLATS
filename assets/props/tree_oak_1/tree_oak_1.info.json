@@ -1,0 +1,71 @@
+{
+	"id": "tree_oak_1",
+	"name": "Chêne 1",
+	"group": "tree",
+	"footprint_cells": [
+		39,
+		19,
+		39
+	],
+	"size_m": [
+		7.80000019073486,
+		3.79999995231628,
+		7.80000019073486
+	],
+	"lod_ranges": [
+		20,
+		55,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 77436,
+	"triangles": 38718,
+	"triangles_lod": [
+		38718,
+		6350,
+		1556
+	],
+	"solid_voxels": 33942,
+	"mesh_kb": 930,
+	"build_ms": 835,
+	"total_ms": 1614,
+	"parts": [
+		{
+			"name": "tree",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/tree_oak_1/tree_oak_1_tree.res",
+				"res://assets/props/tree_oak_1/tree_oak_1_tree_lod1.res",
+				"res://assets/props/tree_oak_1/tree_oak_1_tree_lod2.res"
+			],
+			"triangles": [
+				38718,
+				6350,
+				1556
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				3.70000004768372,
+				0,
+				3.70000004768372
+			],
+			"size": [
+				0.400000005960464,
+				2.5,
+				0.400000005960464
+			]
+		}
+	]
+}

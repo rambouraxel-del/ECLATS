@@ -1,0 +1,102 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_g7f1h"]
+[ext_resource type="ArrayMesh" path="res://assets/props/teleport_anchor/teleport_anchor_structure.res" id="2_n6hso"]
+[ext_resource type="ArrayMesh" path="res://assets/props/teleport_anchor/teleport_anchor_structure_lod1.res" id="3_0ewet"]
+[ext_resource type="ArrayMesh" path="res://assets/props/teleport_anchor/teleport_anchor_structure_lod2.res" id="4_a5ajf"]
+[ext_resource type="ArrayMesh" path="res://assets/props/teleport_anchor/teleport_anchor_glyph.res" id="5_t7eff"]
+[ext_resource type="ArrayMesh" path="res://assets/props/teleport_anchor/teleport_anchor_glyph_lod1.res" id="6_pfklc"]
+[ext_resource type="ArrayMesh" path="res://assets/props/teleport_anchor/teleport_anchor_glyph_lod2.res" id="7_pdqxw"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v0fib"]
+size = Vector3(5.2, 0.9, 5.2)
+
+[node name="TeleportAnchor" type="Node3D"]
+script = ExtResource("1_g7f1h")
+asset_id = "teleport_anchor"
+display_name = "Plateforme d'Ancre"
+footprint_cells = Vector3i(26, 6, 26)
+triangle_count = 27716
+vertex_count = 55432
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 16.0
+mesh = ExtResource("2_n6hso")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 16.0
+visibility_range_end = 44.0
+mesh = ExtResource("3_0ewet")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 44.0
+mesh = ExtResource("4_a5ajf")
+
+[node name="Glyph" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.8, 0.9)
+visibility_range_end = 16.0
+mesh = ExtResource("5_t7eff")
+
+[node name="Glyph_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.8, 0.9)
+visibility_range_begin = 16.0
+visibility_range_end = 44.0
+mesh = ExtResource("6_pfklc")
+
+[node name="Glyph_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.8, 0.9)
+cast_shadow = 0
+visibility_range_begin = 44.0
+mesh = ExtResource("7_pdqxw")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 2, 2.6)
+light_color = Color(0.423529, 0.784314, 1, 1)
+light_energy = 1.4
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 7.0
+
+[node name="Light2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.8, 4)
+light_color = Color(0.498039, 0.823529, 1, 1)
+light_energy = 0.5
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 3.5
+
+[node name="Light3" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 1.8, 4)
+light_color = Color(0.498039, 0.823529, 1, 1)
+light_energy = 0.5
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 3.5
+
+[node name="Light4" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 1.8, 1.1)
+light_color = Color(0.498039, 0.823529, 1, 1)
+light_energy = 0.5
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 3.5
+
+[node name="Light5" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.8, 1.1)
+light_color = Color(0.498039, 0.823529, 1, 1)
+light_energy = 0.5
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 3.5
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.45, 2.6)
+shape = SubResource("BoxShape3D_v0fib")

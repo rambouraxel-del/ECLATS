@@ -1,0 +1,227 @@
+{
+	"id": "sky_ship",
+	"name": "Bateau volant",
+	"group": "vehicle",
+	"footprint_cells": [
+		52,
+		60,
+		24
+	],
+	"size_m": [
+		10.4000005722046,
+		12,
+		4.80000019073486
+	],
+	"lod_ranges": [
+		30,
+		80,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 52868,
+	"triangles": 26434,
+	"triangles_lod": [
+		26434,
+		8260,
+		1546
+	],
+	"solid_voxels": 109507,
+	"mesh_kb": 720,
+	"build_ms": 171,
+	"total_ms": 2685,
+	"parts": [
+		{
+			"name": "banner_0",
+			"offset": [
+				0.5,
+				2.93999981880188,
+				2
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/sky_ship/sky_ship_banner_0.res",
+				"res://assets/props/sky_ship/sky_ship_banner_0_lod1.res",
+				"res://assets/props/sky_ship/sky_ship_banner_0_lod2.res"
+			],
+			"triangles": [
+				562,
+				176,
+				32
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_0",
+			"offset": [
+				0.839999973773956,
+				4.11999988555908,
+				2.27999997138977
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/sky_ship/sky_ship_lantern_0.res",
+				"res://assets/props/sky_ship/sky_ship_lantern_0_lod1.res",
+				"res://assets/props/sky_ship/sky_ship_lantern_0_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_1",
+			"offset": [
+				9.34000015258789,
+				3.8199999332428,
+				1.19999992847443
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/sky_ship/sky_ship_lantern_1.res",
+				"res://assets/props/sky_ship/sky_ship_lantern_1_lod1.res",
+				"res://assets/props/sky_ship/sky_ship_lantern_1_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "hull",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/sky_ship/sky_ship_hull.res",
+				"res://assets/props/sky_ship/sky_ship_hull_lod1.res",
+				"res://assets/props/sky_ship/sky_ship_hull_lod2.res"
+			],
+			"triangles": [
+				14114,
+				4954,
+				1098
+			],
+			"grid": 0.1
+		},
+		{
+			"name": "engine",
+			"offset": [
+				4.40000009536743,
+				0,
+				2
+			],
+			"animation": "float",
+			"material": "crystal",
+			"meshes": [
+				"res://assets/props/sky_ship/sky_ship_engine.res"
+			],
+			"triangles": [
+				3344
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "main_sail",
+			"offset": [
+				2.39999985694885,
+				6.09999990463257,
+				2.33999991416931
+			],
+			"animation": "",
+			"material": "cloth",
+			"meshes": [
+				"res://assets/props/sky_ship/sky_ship_main_sail.res",
+				"res://assets/props/sky_ship/sky_ship_main_sail_lod1.res",
+				"res://assets/props/sky_ship/sky_ship_main_sail_lod2.res"
+			],
+			"triangles": [
+				6430,
+				2280,
+				130
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "fore_sail",
+			"offset": [
+				6.29999971389771,
+				5.5,
+				2.33999991416931
+			],
+			"animation": "",
+			"material": "cloth",
+			"meshes": [
+				"res://assets/props/sky_ship/sky_ship_fore_sail.res",
+				"res://assets/props/sky_ship/sky_ship_fore_sail_lod1.res",
+				"res://assets/props/sky_ship/sky_ship_fore_sail_lod2.res"
+			],
+			"triangles": [
+				1312,
+				626,
+				230
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				1,
+				4.29999971389771,
+				2.45000004768372
+			],
+			"color": "ffb860",
+			"energy": 1,
+			"range": 5,
+			"shadow": false
+		},
+		{
+			"position": [
+				9.5,
+				4,
+				1.35000002384186
+			],
+			"color": "ffb860",
+			"energy": 0.9,
+			"range": 4,
+			"shadow": false
+		},
+		{
+			"position": [
+				1,
+				2.79999995231628,
+				2.40000009536743
+			],
+			"color": "6cc8ff",
+			"energy": 1.2,
+			"range": 6,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0.800000011920929,
+				1.20000004768372
+			],
+			"size": [
+				10.1000003814697,
+				3.29999995231628,
+				2.5
+			]
+		}
+	]
+}

@@ -1,0 +1,71 @@
+{
+	"id": "tree_parasol_2",
+	"name": "Arbre parasol 2",
+	"group": "tree",
+	"footprint_cells": [
+		37,
+		30,
+		37
+	],
+	"size_m": [
+		7.40000009536743,
+		6,
+		7.40000009536743
+	],
+	"lod_ranges": [
+		20,
+		55,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 81156,
+	"triangles": 40578,
+	"triangles_lod": [
+		40578,
+		5550,
+		1342
+	],
+	"solid_voxels": 37392,
+	"mesh_kb": 940,
+	"build_ms": 955,
+	"total_ms": 1742,
+	"parts": [
+		{
+			"name": "tree",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/tree_parasol_2/tree_parasol_2_tree.res",
+				"res://assets/props/tree_parasol_2/tree_parasol_2_tree_lod1.res",
+				"res://assets/props/tree_parasol_2/tree_parasol_2_tree_lod2.res"
+			],
+			"triangles": [
+				40578,
+				5550,
+				1342
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				3.5,
+				0,
+				3.5
+			],
+			"size": [
+				0.400000005960464,
+				2.5,
+				0.400000005960464
+			]
+		}
+	]
+}

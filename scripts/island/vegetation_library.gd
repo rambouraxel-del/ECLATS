@@ -54,8 +54,8 @@ static func build_plant(kind: String) -> VoxelVolume:
 		"tuft":
 			# Touffe d'herbe : brins fins de hauteurs variées qui s'écartent du centre.
 			b = VoxelModelBuilder.new(Vector3i(10, 16, 10))
-			for i in 9:
-				var a := TAU * i / 9.0 + rng.randf_range(-0.3, 0.3)
+			for i in 6:
+				var a := TAU * i / 6.0 + rng.randf_range(-0.3, 0.3)
 				var h := rng.randf_range(6.0, 14.5)
 				var lean := rng.randf_range(1.0, 3.5)
 				var key := "leaf_light" if i % 3 == 0 else ("ivy" if i % 3 == 1 else "leaves")

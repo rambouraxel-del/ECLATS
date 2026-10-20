@@ -1,0 +1,83 @@
+{
+	"id": "crystal_cluster",
+	"name": "Amas de cristaux",
+	"group": "prop",
+	"footprint_cells": [
+		7,
+		9,
+		7
+	],
+	"size_m": [
+		1.39999997615814,
+		1.80000007152557,
+		1.39999997615814
+	],
+	"lod_ranges": [
+		14,
+		40,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 42844,
+	"triangles": 21422,
+	"triangles_lod": [
+		21422,
+		4492,
+		1018
+	],
+	"solid_voxels": 78123,
+	"mesh_kb": 554,
+	"build_ms": 164,
+	"total_ms": 1046,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/crystal_cluster/crystal_cluster_structure.res",
+				"res://assets/props/crystal_cluster/crystal_cluster_structure_lod1.res",
+				"res://assets/props/crystal_cluster/crystal_cluster_structure_lod2.res"
+			],
+			"triangles": [
+				21422,
+				4492,
+				1018
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				0.680000007152557,
+				0.799999952316284,
+				0.680000007152557
+			],
+			"color": "7fd2ff",
+			"energy": 0.9,
+			"range": 4,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				1.39999997615814,
+				0.620000004768372,
+				1.39999997615814
+			]
+		}
+	]
+}

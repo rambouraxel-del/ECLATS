@@ -1,0 +1,66 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_2p40d"]
+[ext_resource type="ArrayMesh" path="res://assets/props/brazier/brazier_structure.res" id="2_4pdnt"]
+[ext_resource type="ArrayMesh" path="res://assets/props/brazier/brazier_structure_lod1.res" id="3_a3374"]
+[ext_resource type="ArrayMesh" path="res://assets/props/brazier/brazier_structure_lod2.res" id="4_y0l65"]
+[ext_resource type="ArrayMesh" path="res://assets/props/brazier/brazier_flame.res" id="5_b6ct0"]
+[ext_resource type="ArrayMesh" path="res://assets/props/brazier/brazier_flame_lod1.res" id="6_sc385"]
+[ext_resource type="ArrayMesh" path="res://assets/props/brazier/brazier_flame_lod2.res" id="7_dd7mh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wa1bf"]
+size = Vector3(0.8, 1.14, 0.8)
+
+[node name="Brazier" type="Node3D"]
+script = ExtResource("1_2p40d")
+asset_id = "brazier"
+display_name = "Brasero rituel"
+footprint_cells = Vector3i(4, 8, 4)
+triangle_count = 11184
+vertex_count = 22368
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 12.0
+mesh = ExtResource("2_4pdnt")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 12.0
+visibility_range_end = 34.0
+mesh = ExtResource("3_a3374")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 34.0
+mesh = ExtResource("4_y0l65")
+
+[node name="Flame" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.14, 0)
+visibility_range_end = 12.0
+mesh = ExtResource("5_b6ct0")
+
+[node name="Flame_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.14, 0)
+visibility_range_begin = 12.0
+visibility_range_end = 34.0
+mesh = ExtResource("6_sc385")
+
+[node name="Flame_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.14, 0)
+cast_shadow = 0
+visibility_range_begin = 34.0
+mesh = ExtResource("7_dd7mh")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 1.44, 0.4)
+light_color = Color(1, 0.635294, 0.290196, 1)
+light_energy = 2.2
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 7.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.57, 0.4)
+shape = SubResource("BoxShape3D_wa1bf")

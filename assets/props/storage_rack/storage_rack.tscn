@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_w3kwj"]
+[ext_resource type="ArrayMesh" path="res://assets/props/storage_rack/storage_rack_structure.res" id="2_r4qmv"]
+[ext_resource type="ArrayMesh" path="res://assets/props/storage_rack/storage_rack_structure_lod1.res" id="3_ge42b"]
+[ext_resource type="ArrayMesh" path="res://assets/props/storage_rack/storage_rack_structure_lod2.res" id="4_iuigu"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qyvid"]
+size = Vector3(1.6, 1.78, 0.6)
+
+[node name="StorageRack" type="Node3D"]
+script = ExtResource("1_w3kwj")
+asset_id = "storage_rack"
+display_name = "Étagère de stockage"
+footprint_cells = Vector3i(8, 9, 3)
+triangle_count = 16854
+vertex_count = 33708
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 12.0
+mesh = ExtResource("2_r4qmv")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 12.0
+visibility_range_end = 32.0
+mesh = ExtResource("3_ge42b")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 32.0
+mesh = ExtResource("4_iuigu")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.89, 0.3)
+shape = SubResource("BoxShape3D_qyvid")

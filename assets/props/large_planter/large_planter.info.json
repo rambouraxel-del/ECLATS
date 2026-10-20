@@ -1,0 +1,71 @@
+{
+	"id": "large_planter",
+	"name": "Grande jardinière",
+	"group": "prop",
+	"footprint_cells": [
+		8,
+		5,
+		3
+	],
+	"size_m": [
+		1.60000002384186,
+		1,
+		0.600000023841858
+	],
+	"lod_ranges": [
+		10,
+		28,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 35652,
+	"triangles": 17826,
+	"triangles_lod": [
+		17826,
+		2414,
+		380
+	],
+	"solid_voxels": 53735,
+	"mesh_kb": 406,
+	"build_ms": 43,
+	"total_ms": 552,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/large_planter/large_planter_structure.res",
+				"res://assets/props/large_planter/large_planter_structure_lod1.res",
+				"res://assets/props/large_planter/large_planter_structure_lod2.res"
+			],
+			"triangles": [
+				17826,
+				2414,
+				380
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				1.59999990463257,
+				0.459999978542328,
+				0.599999964237213
+			]
+		}
+	]
+}

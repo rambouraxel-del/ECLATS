@@ -1,0 +1,83 @@
+{
+	"id": "ancient_chest",
+	"name": "Coffre ancien",
+	"group": "lot2",
+	"footprint_cells": [
+		6,
+		4,
+		4
+	],
+	"size_m": [
+		1.20000004768372,
+		0.800000011920929,
+		0.800000011920929
+	],
+	"lod_ranges": [
+		14,
+		40,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 13688,
+	"triangles": 6844,
+	"triangles_lod": [
+		6844,
+		1508,
+		310
+	],
+	"solid_voxels": 62361,
+	"mesh_kb": 179,
+	"build_ms": 53,
+	"total_ms": 571,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/ancient_chest/ancient_chest_structure.res",
+				"res://assets/props/ancient_chest/ancient_chest_structure_lod1.res",
+				"res://assets/props/ancient_chest/ancient_chest_structure_lod2.res"
+			],
+			"triangles": [
+				6844,
+				1508,
+				310
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				0.589999973773956,
+				0.539999961853027,
+				0.839999973773956
+			],
+			"color": "7fd2ff",
+			"energy": 0.35,
+			"range": 1.2,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				1.19999992847443,
+				0.740000009536743,
+				0.799999952316284
+			]
+		}
+	]
+}

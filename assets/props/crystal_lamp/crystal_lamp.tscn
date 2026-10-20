@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_8uyfl"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crystal_lamp/crystal_lamp_structure.res" id="2_0w03m"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crystal_lamp/crystal_lamp_structure_lod1.res" id="3_16lyg"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crystal_lamp/crystal_lamp_structure_lod2.res" id="4_f6ndk"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qecpp"]
+size = Vector3(0.52, 2.5, 0.46)
+
+[node name="CrystalLamp" type="Node3D"]
+script = ExtResource("1_8uyfl")
+asset_id = "crystal_lamp"
+display_name = "Lampadaire à éclat"
+footprint_cells = Vector3i(4, 14, 3)
+triangle_count = 4966
+vertex_count = 9932
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 12.0
+mesh = ExtResource("2_0w03m")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 12.0
+visibility_range_end = 34.0
+mesh = ExtResource("3_16lyg")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 34.0
+mesh = ExtResource("4_f6ndk")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 1.78, 0.24)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 6.5
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.25, 0.27)
+shape = SubResource("BoxShape3D_qecpp")

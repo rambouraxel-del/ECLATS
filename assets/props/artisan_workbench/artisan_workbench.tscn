@@ -1,37 +1,53 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_ik2js"]
-[ext_resource type="ArrayMesh" path="res://assets/props/artisan_workbench/artisan_workbench_structure.res" id="2_cilre"]
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_ynd0s"]
+[ext_resource type="ArrayMesh" path="res://assets/props/artisan_workbench/artisan_workbench_structure.res" id="2_a3apo"]
+[ext_resource type="ArrayMesh" path="res://assets/props/artisan_workbench/artisan_workbench_structure_lod1.res" id="3_1nyfd"]
+[ext_resource type="ArrayMesh" path="res://assets/props/artisan_workbench/artisan_workbench_structure_lod2.res" id="4_0d05r"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_pgilj"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_nnsma"]
 size = Vector3(2, 0.94, 0.98)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_nav8v"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_s6cth"]
 size = Vector3(1.92, 0.8, 0.12)
 
 [node name="ArtisanWorkbench" type="Node3D"]
-script = ExtResource("1_ik2js")
+script = ExtResource("1_ynd0s")
 asset_id = "artisan_workbench"
 display_name = "Établi d'artisan"
 footprint_cells = Vector3i(10, 10, 5)
-triangle_count = 14292
-vertex_count = 28584
+triangle_count = 14290
+vertex_count = 28580
 
 [node name="Structure" type="MeshInstance3D" parent="."]
-mesh = ExtResource("2_cilre")
+visibility_range_end = 14.0
+mesh = ExtResource("2_a3apo")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_1nyfd")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_0d05r")
 
 [node name="Light1" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19, 1.16, 0.25)
 light_color = Color(1, 0.760784, 0.466667, 1)
 light_energy = 0.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
 omni_range = 3.0
 
 [node name="Collision" type="StaticBody3D" parent="."]
 
 [node name="Box1" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.47, 0.49)
-shape = SubResource("BoxShape3D_pgilj")
+shape = SubResource("BoxShape3D_nnsma")
 
 [node name="Box2" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.34, 0.08)
-shape = SubResource("BoxShape3D_nav8v")
+shape = SubResource("BoxShape3D_s6cth")

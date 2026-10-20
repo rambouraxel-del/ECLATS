@@ -1,0 +1,71 @@
+{
+	"id": "ruin_column",
+	"name": "Colonne en ruine",
+	"group": "prop",
+	"footprint_cells": [
+		5,
+		14,
+		5
+	],
+	"size_m": [
+		1,
+		2.79999995231628,
+		1
+	],
+	"lod_ranges": [
+		12,
+		34,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 19796,
+	"triangles": 9898,
+	"triangles_lod": [
+		9898,
+		2556,
+		490
+	],
+	"solid_voxels": 82157,
+	"mesh_kb": 260,
+	"build_ms": 138,
+	"total_ms": 803,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/ruin_column/ruin_column_structure.res",
+				"res://assets/props/ruin_column/ruin_column_structure_lod1.res",
+				"res://assets/props/ruin_column/ruin_column_structure_lod2.res"
+			],
+			"triangles": [
+				9898,
+				2556,
+				490
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0.0399999991059303,
+				0,
+				0.0399999991059303
+			],
+			"size": [
+				0.919999957084656,
+				1.93999993801117,
+				0.919999957084656
+			]
+		}
+	]
+}

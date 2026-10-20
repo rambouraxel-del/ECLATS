@@ -1,0 +1,71 @@
+{
+	"id": "tree_pine_2",
+	"name": "Pin 2",
+	"group": "tree",
+	"footprint_cells": [
+		22,
+		33,
+		22
+	],
+	"size_m": [
+		4.40000009536743,
+		6.59999990463257,
+		4.40000009536743
+	],
+	"lod_ranges": [
+		20,
+		55,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 29232,
+	"triangles": 14616,
+	"triangles_lod": [
+		14616,
+		4450,
+		706
+	],
+	"solid_voxels": 18868,
+	"mesh_kb": 379,
+	"build_ms": 733,
+	"total_ms": 1175,
+	"parts": [
+		{
+			"name": "tree",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/tree_pine_2/tree_pine_2_tree.res",
+				"res://assets/props/tree_pine_2/tree_pine_2_tree_lod1.res",
+				"res://assets/props/tree_pine_2/tree_pine_2_tree_lod2.res"
+			],
+			"triangles": [
+				14616,
+				4450,
+				706
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				2,
+				0,
+				2
+			],
+			"size": [
+				0.400000005960464,
+				2.5,
+				0.400000005960464
+			]
+		}
+	]
+}

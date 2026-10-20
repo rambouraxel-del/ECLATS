@@ -1,0 +1,71 @@
+{
+	"id": "vegetable_bed",
+	"name": "Carré de potager",
+	"group": "prop",
+	"footprint_cells": [
+		10,
+		3,
+		5
+	],
+	"size_m": [
+		2,
+		0.600000023841858,
+		1
+	],
+	"lod_ranges": [
+		10,
+		26,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 19840,
+	"triangles": 9920,
+	"triangles_lod": [
+		9920,
+		4224,
+		490
+	],
+	"solid_voxels": 56905,
+	"mesh_kb": 267,
+	"build_ms": 21,
+	"total_ms": 630,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/vegetable_bed/vegetable_bed_structure.res",
+				"res://assets/props/vegetable_bed/vegetable_bed_structure_lod1.res",
+				"res://assets/props/vegetable_bed/vegetable_bed_structure_lod2.res"
+			],
+			"triangles": [
+				9920,
+				4224,
+				490
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				2,
+				0.5,
+				1
+			]
+		}
+	]
+}

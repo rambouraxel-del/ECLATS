@@ -1,0 +1,230 @@
+{
+	"id": "house_colonist",
+	"name": "Maison de colon",
+	"group": "building",
+	"footprint_cells": [
+		40,
+		52,
+		35
+	],
+	"size_m": [
+		8,
+		10.4000005722046,
+		7
+	],
+	"lod_ranges": [
+		28,
+		75,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 74408,
+	"triangles": 37204,
+	"triangles_lod": [
+		37204,
+		7580,
+		1516
+	],
+	"solid_voxels": 299541,
+	"mesh_kb": 912,
+	"build_ms": 132,
+	"total_ms": 2511,
+	"parts": [
+		{
+			"name": "flower_box_0",
+			"offset": [
+				1.17999994754791,
+				0.599999964237213,
+				6
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_colonist/house_colonist_flower_box_0.res",
+				"res://assets/props/house_colonist/house_colonist_flower_box_0_lod1.res",
+				"res://assets/props/house_colonist/house_colonist_flower_box_0_lod2.res"
+			],
+			"triangles": [
+				5316,
+				704,
+				128
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "flower_box_1",
+			"offset": [
+				5.57999992370605,
+				0.599999964237213,
+				6
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_colonist/house_colonist_flower_box_1.res",
+				"res://assets/props/house_colonist/house_colonist_flower_box_1_lod1.res",
+				"res://assets/props/house_colonist/house_colonist_flower_box_1_lod2.res"
+			],
+			"triangles": [
+				5454,
+				680,
+				128
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "flower_box_2",
+			"offset": [
+				0.979999959468842,
+				3.5,
+				6.29999971389771
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_colonist/house_colonist_flower_box_2.res",
+				"res://assets/props/house_colonist/house_colonist_flower_box_2_lod1.res",
+				"res://assets/props/house_colonist/house_colonist_flower_box_2_lod2.res"
+			],
+			"triangles": [
+				5208,
+				696,
+				144
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "flower_box_3",
+			"offset": [
+				5.77999973297119,
+				3.5,
+				6.29999971389771
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_colonist/house_colonist_flower_box_3.res",
+				"res://assets/props/house_colonist/house_colonist_flower_box_3_lod1.res",
+				"res://assets/props/house_colonist/house_colonist_flower_box_3_lod2.res"
+			],
+			"triangles": [
+				5264,
+				682,
+				126
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "banner_0",
+			"offset": [
+				2.59999990463257,
+				2.44000005722046,
+				5.92000007629395
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_colonist/house_colonist_banner_0.res",
+				"res://assets/props/house_colonist/house_colonist_banner_0_lod1.res",
+				"res://assets/props/house_colonist/house_colonist_banner_0_lod2.res"
+			],
+			"triangles": [
+				546,
+				142,
+				56
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_0",
+			"offset": [
+				4.73999977111816,
+				2.1800000667572,
+				5.85999965667725
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_colonist/house_colonist_lantern_0.res",
+				"res://assets/props/house_colonist/house_colonist_lantern_0_lod1.res",
+				"res://assets/props/house_colonist/house_colonist_lantern_0_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_1",
+			"offset": [
+				2.1399998664856,
+				2.1800000667572,
+				5.85999965667725
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_colonist/house_colonist_lantern_1.res",
+				"res://assets/props/house_colonist/house_colonist_lantern_1_lod1.res",
+				"res://assets/props/house_colonist/house_colonist_lantern_1_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_colonist/house_colonist_structure.res",
+				"res://assets/props/house_colonist/house_colonist_structure_lod1.res",
+				"res://assets/props/house_colonist/house_colonist_structure_lod2.res"
+			],
+			"triangles": [
+				14744,
+				4452,
+				878
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				4.90000009536743,
+				2.34999990463257,
+				6.01999998092651
+			],
+			"color": "ffb860",
+			"energy": 1.1,
+			"range": 5,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0.400000005960464,
+				0,
+				0.400000005960464
+			],
+			"size": [
+				7.20000028610229,
+				6.30000019073486,
+				5.90000009536743
+			]
+		}
+	]
+}

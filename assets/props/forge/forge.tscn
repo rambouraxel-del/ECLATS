@@ -1,0 +1,52 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_8v1sm"]
+[ext_resource type="ArrayMesh" path="res://assets/props/forge/forge_structure.res" id="2_rsm81"]
+[ext_resource type="ArrayMesh" path="res://assets/props/forge/forge_structure_lod1.res" id="3_nhg40"]
+[ext_resource type="ArrayMesh" path="res://assets/props/forge/forge_structure_lod2.res" id="4_li7fr"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hoers"]
+size = Vector3(1.26, 2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7khpx"]
+size = Vector3(0.66, 0.82, 0.42)
+
+[node name="Forge" type="Node3D"]
+script = ExtResource("1_8v1sm")
+asset_id = "forge"
+display_name = "Forge"
+footprint_cells = Vector3i(11, 10, 8)
+triangle_count = 23348
+vertex_count = 46696
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 14.0
+mesh = ExtResource("2_rsm81")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 38.0
+mesh = ExtResource("3_nhg40")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 38.0
+mesh = ExtResource("4_li7fr")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 0.48, 0.6)
+light_color = Color(1, 0.603922, 0.235294, 1)
+light_energy = 1.5
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.63, 1, 0.5)
+shape = SubResource("BoxShape3D_hoers")
+
+[node name="Box2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.85, 0.41, 0.57)
+shape = SubResource("BoxShape3D_7khpx")

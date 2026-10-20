@@ -9,6 +9,10 @@ const VOXEL_SIZE := 0.2
 ## Microvoxels des objets détaillés (Lot 2) : 2 cm, soit 10 par voxel de terrain.
 const DETAIL_SIZE := 0.02
 const DETAILS_PER_VOXEL := 10  # VOXEL_SIZE / DETAIL_SIZE
+## Grille des bâtiments (Lot 3) : 10 cm = 5 pixels de texture de 2 cm, alignée sur le terrain.
+const STRUCTURE_SIZE := 0.1
+## Taille d'un pixel de texture : une seule couleur par pixel de 2 cm (voir voxel_stylized.gdshader).
+const PIXEL_SIZE := 0.02
 ## Ancienne grille de détail du Lot 1 (5 cm), conservée pour les objets de référence du Lot 1.
 const LEGACY_DETAIL_SIZE := 0.05
 

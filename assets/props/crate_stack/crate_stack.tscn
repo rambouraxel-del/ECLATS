@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_88qkp"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crate_stack/crate_stack_structure.res" id="2_o4wwj"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crate_stack/crate_stack_structure_lod1.res" id="3_gfd8k"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crate_stack/crate_stack_structure_lod2.res" id="4_1jbr2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rtlqk"]
+size = Vector3(1, 0.76, 1)
+
+[node name="CrateStack" type="Node3D"]
+script = ExtResource("1_88qkp")
+asset_id = "crate_stack"
+display_name = "Caisses empilées"
+footprint_cells = Vector3i(5, 5, 5)
+triangle_count = 3796
+vertex_count = 7592
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 10.0
+mesh = ExtResource("2_o4wwj")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 10.0
+visibility_range_end = 26.0
+mesh = ExtResource("3_gfd8k")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 26.0
+mesh = ExtResource("4_1jbr2")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.38, 0.5)
+shape = SubResource("BoxShape3D_rtlqk")

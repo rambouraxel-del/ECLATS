@@ -1,0 +1,71 @@
+{
+	"id": "tree_birch_1",
+	"name": "Bouleau 1",
+	"group": "tree",
+	"footprint_cells": [
+		27,
+		32,
+		27
+	],
+	"size_m": [
+		5.40000009536743,
+		6.40000009536743,
+		5.40000009536743
+	],
+	"lod_ranges": [
+		20,
+		55,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 35424,
+	"triangles": 17712,
+	"triangles_lod": [
+		17712,
+		3330,
+		778
+	],
+	"solid_voxels": 14351,
+	"mesh_kb": 438,
+	"build_ms": 803,
+	"total_ms": 1224,
+	"parts": [
+		{
+			"name": "tree",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/tree_birch_1/tree_birch_1_tree.res",
+				"res://assets/props/tree_birch_1/tree_birch_1_tree_lod1.res",
+				"res://assets/props/tree_birch_1/tree_birch_1_tree_lod2.res"
+			],
+			"triangles": [
+				17712,
+				3330,
+				778
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				2.5,
+				0,
+				2.5
+			],
+			"size": [
+				0.400000005960464,
+				2.5,
+				0.400000005960464
+			]
+		}
+	]
+}

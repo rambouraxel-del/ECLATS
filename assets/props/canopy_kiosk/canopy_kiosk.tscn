@@ -1,0 +1,93 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_kib4l"]
+[ext_resource type="ArrayMesh" path="res://assets/props/canopy_kiosk/canopy_kiosk_structure.res" id="2_dij57"]
+[ext_resource type="ArrayMesh" path="res://assets/props/canopy_kiosk/canopy_kiosk_structure_lod1.res" id="3_2ui8g"]
+[ext_resource type="ArrayMesh" path="res://assets/props/canopy_kiosk/canopy_kiosk_structure_lod2.res" id="4_8w2xa"]
+[ext_resource type="ArrayMesh" path="res://assets/props/canopy_kiosk/canopy_kiosk_canopy.res" id="5_7dhvg"]
+[ext_resource type="ArrayMesh" path="res://assets/props/canopy_kiosk/canopy_kiosk_canopy_lod1.res" id="6_ios28"]
+[ext_resource type="ArrayMesh" path="res://assets/props/canopy_kiosk/canopy_kiosk_canopy_lod2.res" id="7_xrusi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0uaby"]
+size = Vector3(1.72, 0.86, 0.58)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kdmkq"]
+size = Vector3(0.28, 1.94, 0.28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vxh4y"]
+size = Vector3(0.28, 1.94, 0.28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m4o30"]
+size = Vector3(0.28, 1.94, 0.28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b7qgh"]
+size = Vector3(0.28, 1.94, 0.28)
+
+[node name="CanopyKiosk" type="Node3D"]
+script = ExtResource("1_kib4l")
+asset_id = "canopy_kiosk"
+display_name = "Kiosque à auvent"
+footprint_cells = Vector3i(11, 12, 7)
+triangle_count = 20714
+vertex_count = 41428
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 14.0
+mesh = ExtResource("2_dij57")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_2ui8g")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_8w2xa")
+
+[node name="Canopy" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.26, 0)
+visibility_range_end = 14.0
+mesh = ExtResource("5_7dhvg")
+
+[node name="Canopy_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.26, 0)
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("6_ios28")
+
+[node name="Canopy_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.26, 0)
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("7_xrusi")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.69, 1.24)
+light_color = Color(1, 0.721569, 0.376471, 1)
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 4.5
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 0.43, 1.05)
+shape = SubResource("BoxShape3D_0uaby")
+
+[node name="Box2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 0.97, 0.18)
+shape = SubResource("BoxShape3D_kdmkq")
+
+[node name="Box3" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02, 0.97, 0.18)
+shape = SubResource("BoxShape3D_vxh4y")
+
+[node name="Box4" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 0.97, 1.18)
+shape = SubResource("BoxShape3D_m4o30")
+
+[node name="Box5" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02, 0.97, 1.18)
+shape = SubResource("BoxShape3D_b7qgh")

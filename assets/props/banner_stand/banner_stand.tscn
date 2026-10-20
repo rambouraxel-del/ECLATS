@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_bw804"]
+[ext_resource type="ArrayMesh" path="res://assets/props/banner_stand/banner_stand_structure.res" id="2_gxs3p"]
+[ext_resource type="ArrayMesh" path="res://assets/props/banner_stand/banner_stand_structure_lod1.res" id="3_g0j0u"]
+[ext_resource type="ArrayMesh" path="res://assets/props/banner_stand/banner_stand_structure_lod2.res" id="4_bh8lx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ay25t"]
+size = Vector3(1.2, 2.18, 0.24)
+
+[node name="BannerStand" type="Node3D"]
+script = ExtResource("1_bw804")
+asset_id = "banner_stand"
+display_name = "Porte-bannière"
+footprint_cells = Vector3i(6, 12, 2)
+triangle_count = 2812
+vertex_count = 5624
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 12.0
+mesh = ExtResource("2_gxs3p")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 12.0
+visibility_range_end = 32.0
+mesh = ExtResource("3_g0j0u")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 32.0
+mesh = ExtResource("4_bh8lx")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.09, 0.12)
+shape = SubResource("BoxShape3D_ay25t")

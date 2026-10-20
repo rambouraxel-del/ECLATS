@@ -1,70 +1,101 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=14 format=3]
 
-[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_1r0we"]
-[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_structure.res" id="2_mhdi6"]
-[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_canopy.res" id="3_ckrqx"]
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_eyg84"]
+[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_structure.res" id="2_l0wak"]
+[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_structure_lod1.res" id="3_rkxfs"]
+[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_structure_lod2.res" id="4_ocbrq"]
+[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_canopy.res" id="5_fsocp"]
+[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_canopy_lod1.res" id="6_hp8ee"]
+[ext_resource type="ArrayMesh" path="res://assets/props/market_stall/market_stall_canopy_lod2.res" id="7_5mhkb"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ynuy4"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_j3556"]
 size = Vector3(1.92, 0.98, 0.64)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_detpp"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8nrxg"]
 size = Vector3(1.84, 1.98, 0.42)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_rod65"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_w1xut"]
 size = Vector3(0.28, 2.18, 0.28)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_kg7x4"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8lfwg"]
 size = Vector3(0.28, 2.18, 0.28)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jybp8"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_x62sw"]
 size = Vector3(0.28, 2.18, 0.28)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ok3p4"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_q5c7r"]
 size = Vector3(0.28, 2.18, 0.28)
 
 [node name="MarketStall" type="Node3D"]
-script = ExtResource("1_1r0we")
+script = ExtResource("1_eyg84")
 asset_id = "market_stall"
 display_name = "Étal de marchand"
 footprint_cells = Vector3i(12, 13, 8)
-triangle_count = 45382
-vertex_count = 90764
+triangle_count = 45390
+vertex_count = 90780
 
 [node name="Structure" type="MeshInstance3D" parent="."]
-mesh = ExtResource("2_mhdi6")
+visibility_range_end = 14.0
+mesh = ExtResource("2_l0wak")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_rkxfs")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_ocbrq")
 
 [node name="Canopy" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.34, 0)
-mesh = ExtResource("3_ckrqx")
+visibility_range_end = 14.0
+mesh = ExtResource("5_fsocp")
+
+[node name="Canopy_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.34, 0)
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("6_hp8ee")
+
+[node name="Canopy_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.34, 0)
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("7_5mhkb")
 
 [node name="Light1" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.96, 1.65, 1.36)
 light_color = Color(1, 0.721569, 0.376471, 1)
 light_energy = 1.3
 shadow_enabled = true
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
 
 [node name="Collision" type="StaticBody3D" parent="."]
 
 [node name="Box1" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.49, 1.24)
-shape = SubResource("BoxShape3D_ynuy4")
+shape = SubResource("BoxShape3D_j3556")
 
 [node name="Box2" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.99, 0.29)
-shape = SubResource("BoxShape3D_detpp")
+shape = SubResource("BoxShape3D_8nrxg")
 
 [node name="Box3" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 1.09, 0.18)
-shape = SubResource("BoxShape3D_rod65")
+shape = SubResource("BoxShape3D_w1xut")
 
 [node name="Box4" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.22, 1.09, 0.18)
-shape = SubResource("BoxShape3D_kg7x4")
+shape = SubResource("BoxShape3D_8lfwg")
 
 [node name="Box5" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 1.09, 1.38)
-shape = SubResource("BoxShape3D_jybp8")
+shape = SubResource("BoxShape3D_x62sw")
 
 [node name="Box6" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.22, 1.09, 1.38)
-shape = SubResource("BoxShape3D_ok3p4")
+shape = SubResource("BoxShape3D_q5c7r")

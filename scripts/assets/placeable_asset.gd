@@ -9,7 +9,7 @@ extends Node3D
 @export var display_name := ""
 ## Emprise en cellules de 20 cm (x, hauteur, z).
 @export var footprint_cells := Vector3i.ONE
-## Statistiques de génération (lecture seule, renseignées par tools/bake_assets.gd).
+## Statistiques de génération du niveau de détail le plus fin (lecture seule).
 @export var triangle_count := 0
 @export var vertex_count := 0
 

@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_g0tlw"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tree_pine_2/tree_pine_2_tree.res" id="2_6jmby"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tree_pine_2/tree_pine_2_tree_lod1.res" id="3_3ji3j"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tree_pine_2/tree_pine_2_tree_lod2.res" id="4_ue3on"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_paxdt"]
+size = Vector3(0.4, 2.5, 0.4)
+
+[node name="TreePine2" type="Node3D"]
+script = ExtResource("1_g0tlw")
+asset_id = "tree_pine_2"
+display_name = "Pin 2"
+footprint_cells = Vector3i(22, 33, 22)
+triangle_count = 14616
+vertex_count = 29232
+
+[node name="Tree" type="MeshInstance3D" parent="."]
+visibility_range_end = 20.0
+mesh = ExtResource("2_6jmby")
+
+[node name="Tree_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 20.0
+visibility_range_end = 55.0
+mesh = ExtResource("3_3ji3j")
+
+[node name="Tree_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 55.0
+mesh = ExtResource("4_ue3on")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.25, 2.2)
+shape = SubResource("BoxShape3D_paxdt")

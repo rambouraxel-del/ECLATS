@@ -1,0 +1,71 @@
+{
+	"id": "tree_fruit_1",
+	"name": "Arbre fruitier 1",
+	"group": "tree",
+	"footprint_cells": [
+		20,
+		21,
+		20
+	],
+	"size_m": [
+		4,
+		4.20000028610229,
+		4
+	],
+	"lod_ranges": [
+		20,
+		55,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 35016,
+	"triangles": 17508,
+	"triangles_lod": [
+		17508,
+		2406,
+		620
+	],
+	"solid_voxels": 14367,
+	"mesh_kb": 406,
+	"build_ms": 718,
+	"total_ms": 1039,
+	"parts": [
+		{
+			"name": "tree",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/tree_fruit_1/tree_fruit_1_tree.res",
+				"res://assets/props/tree_fruit_1/tree_fruit_1_tree_lod1.res",
+				"res://assets/props/tree_fruit_1/tree_fruit_1_tree_lod2.res"
+			],
+			"triangles": [
+				17508,
+				2406,
+				620
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				1.80000007152557,
+				0,
+				1.80000007152557
+			],
+			"size": [
+				0.400000005960464,
+				2.5,
+				0.400000005960464
+			]
+		}
+	]
+}

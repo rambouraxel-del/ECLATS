@@ -1,0 +1,95 @@
+{
+	"id": "artisan_workbench",
+	"name": "Établi d'artisan",
+	"group": "lot2",
+	"footprint_cells": [
+		10,
+		10,
+		5
+	],
+	"size_m": [
+		2,
+		2,
+		1
+	],
+	"lod_ranges": [
+		14,
+		40,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 28580,
+	"triangles": 14290,
+	"triangles_lod": [
+		14290,
+		4966,
+		1212
+	],
+	"solid_voxels": 105072,
+	"mesh_kb": 421,
+	"build_ms": 63,
+	"total_ms": 1308,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/artisan_workbench/artisan_workbench_structure.res",
+				"res://assets/props/artisan_workbench/artisan_workbench_structure_lod1.res",
+				"res://assets/props/artisan_workbench/artisan_workbench_structure_lod2.res"
+			],
+			"triangles": [
+				14290,
+				4966,
+				1212
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				0.189999997615814,
+				1.1599999666214,
+				0.25
+			],
+			"color": "ffc277",
+			"energy": 0.7,
+			"range": 3,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				2,
+				0.939999997615814,
+				0.979999959468842
+			]
+		},
+		{
+			"position": [
+				0.0399999991059303,
+				0.939999997615814,
+				0.0199999995529652
+			],
+			"size": [
+				1.91999995708466,
+				0.799999952316284,
+				0.119999997317791
+			]
+		}
+	]
+}

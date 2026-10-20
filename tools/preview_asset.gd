@@ -7,7 +7,7 @@ func _initialize() -> void:
 	await process_frame
 	var inst := AssetLibrary.instantiate(args[0])
 	var rig := LightingRig.new()
-	rig.start_preset = "presentation"
+	rig.start_preset = args[5] if args.size() > 5 else "presentation"
 	root.add_child(rig)
 	root.add_child(inst)
 	var size := (inst as PlaceableAsset).footprint_size_m()

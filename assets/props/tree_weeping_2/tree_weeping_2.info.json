@@ -1,0 +1,71 @@
+{
+	"id": "tree_weeping_2",
+	"name": "Saule pleureur 2",
+	"group": "tree",
+	"footprint_cells": [
+		26,
+		26,
+		26
+	],
+	"size_m": [
+		5.20000028610229,
+		5.20000028610229,
+		5.20000028610229
+	],
+	"lod_ranges": [
+		20,
+		55,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 79168,
+	"triangles": 39584,
+	"triangles_lod": [
+		39584,
+		6320,
+		1100
+	],
+	"solid_voxels": 27662,
+	"mesh_kb": 917,
+	"build_ms": 857,
+	"total_ms": 1654,
+	"parts": [
+		{
+			"name": "tree",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/tree_weeping_2/tree_weeping_2_tree.res",
+				"res://assets/props/tree_weeping_2/tree_weeping_2_tree_lod1.res",
+				"res://assets/props/tree_weeping_2/tree_weeping_2_tree_lod2.res"
+			],
+			"triangles": [
+				39584,
+				6320,
+				1100
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				2.40000009536743,
+				0,
+				2.40000009536743
+			],
+			"size": [
+				0.400000005960464,
+				2.5,
+				0.400000005960464
+			]
+		}
+	]
+}

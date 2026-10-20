@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_jgx4t"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ruin_column/ruin_column_structure.res" id="2_bb24l"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ruin_column/ruin_column_structure_lod1.res" id="3_iva1e"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ruin_column/ruin_column_structure_lod2.res" id="4_k3emd"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a502a"]
+size = Vector3(0.92, 1.94, 0.92)
+
+[node name="RuinColumn" type="Node3D"]
+script = ExtResource("1_jgx4t")
+asset_id = "ruin_column"
+display_name = "Colonne en ruine"
+footprint_cells = Vector3i(5, 14, 5)
+triangle_count = 9898
+vertex_count = 19796
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 12.0
+mesh = ExtResource("2_bb24l")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 12.0
+visibility_range_end = 34.0
+mesh = ExtResource("3_iva1e")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 34.0
+mesh = ExtResource("4_k3emd")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.97, 0.5)
+shape = SubResource("BoxShape3D_a502a")

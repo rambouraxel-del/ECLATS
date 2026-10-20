@@ -1,0 +1,71 @@
+{
+	"id": "supply_chest",
+	"name": "Coffre de ravitaillement",
+	"group": "prop",
+	"footprint_cells": [
+		6,
+		3,
+		3
+	],
+	"size_m": [
+		1.20000004768372,
+		0.600000023841858,
+		0.600000023841858
+	],
+	"lod_ranges": [
+		10,
+		26,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 4256,
+	"triangles": 2128,
+	"triangles_lod": [
+		2128,
+		576,
+		190
+	],
+	"solid_voxels": 48210,
+	"mesh_kb": 60,
+	"build_ms": 10,
+	"total_ms": 285,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/supply_chest/supply_chest_structure.res",
+				"res://assets/props/supply_chest/supply_chest_structure_lod1.res",
+				"res://assets/props/supply_chest/supply_chest_structure_lod2.res"
+			],
+			"triangles": [
+				2128,
+				576,
+				190
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				1.19999992847443,
+				0.579999983310699,
+				0.599999964237213
+			]
+		}
+	]
+}

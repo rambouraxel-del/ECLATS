@@ -1,0 +1,173 @@
+[gd_scene load_steps=23 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_arh44"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_banner_0.res" id="2_kvb3m"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_banner_0_lod1.res" id="3_3762u"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_banner_0_lod2.res" id="4_y5ty6"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_lantern_0.res" id="5_elv68"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_lantern_0_lod1.res" id="6_lnl04"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_lantern_0_lod2.res" id="7_n1564"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_lantern_1.res" id="8_nm88t"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_lantern_1_lod1.res" id="9_iwbww"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_lantern_1_lod2.res" id="10_2m5cn"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_hull.res" id="11_vns2j"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_hull_lod1.res" id="12_6gctk"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_hull_lod2.res" id="13_eo6kx"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_engine.res" id="14_off12"]
+[ext_resource type="Script" path="res://scripts/assets/floating_part.gd" id="15_geggk"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_main_sail.res" id="16_gxjbt"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_main_sail_lod1.res" id="17_7rkd1"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_main_sail_lod2.res" id="18_pibbe"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_fore_sail.res" id="19_25yj4"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_fore_sail_lod1.res" id="20_vpdiv"]
+[ext_resource type="ArrayMesh" path="res://assets/props/sky_ship/sky_ship_fore_sail_lod2.res" id="21_t53n8"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_e4ab3"]
+size = Vector3(10.1, 3.3, 2.5)
+
+[node name="SkyShip" type="Node3D"]
+script = ExtResource("1_arh44")
+asset_id = "sky_ship"
+display_name = "Bateau volant"
+footprint_cells = Vector3i(52, 60, 24)
+triangle_count = 26434
+vertex_count = 52868
+
+[node name="Banner0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.94, 2)
+visibility_range_end = 30.0
+mesh = ExtResource("2_kvb3m")
+
+[node name="Banner0_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.94, 2)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("3_3762u")
+
+[node name="Banner0_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.94, 2)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("4_y5ty6")
+
+[node name="Lantern0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.84, 4.12, 2.28)
+visibility_range_end = 30.0
+mesh = ExtResource("5_elv68")
+
+[node name="Lantern0_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.84, 4.12, 2.28)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("6_lnl04")
+
+[node name="Lantern0_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.84, 4.12, 2.28)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("7_n1564")
+
+[node name="Lantern1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.34, 3.82, 1.2)
+visibility_range_end = 30.0
+mesh = ExtResource("8_nm88t")
+
+[node name="Lantern1_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.34, 3.82, 1.2)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("9_iwbww")
+
+[node name="Lantern1_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.34, 3.82, 1.2)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("10_2m5cn")
+
+[node name="Hull" type="MeshInstance3D" parent="."]
+visibility_range_end = 30.0
+mesh = ExtResource("11_vns2j")
+
+[node name="Hull_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("12_6gctk")
+
+[node name="Hull_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("13_eo6kx")
+
+[node name="Engine" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, 0, 2)
+mesh = ExtResource("14_off12")
+script = ExtResource("15_geggk")
+mode = "float"
+bob_height = 0.05
+spin_speed = 0.35
+pivot = Vector3(0.4, 0.56, 0.4)
+
+[node name="MainSail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 6.1, 2.34)
+visibility_range_end = 30.0
+mesh = ExtResource("16_gxjbt")
+
+[node name="MainSail_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 6.1, 2.34)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("17_7rkd1")
+
+[node name="MainSail_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 6.1, 2.34)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("18_pibbe")
+
+[node name="ForeSail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 5.5, 2.34)
+visibility_range_end = 30.0
+mesh = ExtResource("19_25yj4")
+
+[node name="ForeSail_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 5.5, 2.34)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("20_vpdiv")
+
+[node name="ForeSail_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 5.5, 2.34)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("21_t53n8")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.3, 2.45)
+light_color = Color(1, 0.721569, 0.376471, 1)
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+
+[node name="Light2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 4, 1.35)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 0.9
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 4.0
+
+[node name="Light3" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2.8, 2.4)
+light_color = Color(0.423529, 0.784314, 1, 1)
+light_energy = 1.2
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 6.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.05, 2.45, 2.45)
+shape = SubResource("BoxShape3D_e4ab3")

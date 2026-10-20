@@ -4,6 +4,9 @@ extends RefCounted
 ## Petit outil de modélisation voxel par code (boîtes, lignes, ellipsoïdes).
 ## Les coordonnées sont en cellules de la grille du modèle (0,05 m pour les détails).
 
+## Styles de matière dont le motif dépend du sens du grain (bois, métal, tissu, écorce).
+const GRAIN_STYLES := [4, 5, 7, 14]
+
 var volume: VoxelVolume
 var palette: VoxelPalette
 
@@ -19,8 +22,24 @@ func set_cell(x: int, y: int, z: int, key: String) -> void:
 
 ## Boîte pleine, bornes incluses. key = "" pour creuser.
 func box(x0: int, y0: int, z0: int, x1: int, y1: int, z1: int, key: String) -> void:
-	volume.fill_box(Vector3i(mini(x0, x1), mini(y0, y1), mini(z0, z1)),
-			Vector3i(maxi(x0, x1), maxi(y0, y1), maxi(z0, z1)), mat(key))
+	var lo := Vector3i(mini(x0, x1), mini(y0, y1), mini(z0, z1))
+	var hi := Vector3i(maxi(x0, x1), maxi(y0, y1), maxi(z0, z1))
+	var id := mat(key)
+	volume.fill_box(lo, hi, id)
+	# Sens du grain : le plus long côté de la boîte (bois, écorce, métal, tissu).
+	if id != 0 and GRAIN_STYLES.has(palette.styles[id]):
+		var d := hi - lo + Vector3i.ONE
+		var axis := 0
+		if d.y > d[axis]:
+			axis = 1
+		if d.z > d[axis]:
+			axis = 2
+		var second := 0
+		for a in 3:
+			if a != axis:
+				second = maxi(second, d[a])
+		if d[axis] >= second * 3 / 2:
+			volume.fill_aux_box(lo, hi, axis + 1)
 
 ## Segment épais entre deux points (centres de cellules).
 func line(a: Vector3, b: Vector3, thickness: int, key: String) -> void:

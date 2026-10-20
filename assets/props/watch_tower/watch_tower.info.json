@@ -1,0 +1,136 @@
+{
+	"id": "watch_tower",
+	"name": "Tour de guet",
+	"group": "building",
+	"footprint_cells": [
+		24,
+		60,
+		24
+	],
+	"size_m": [
+		4.80000019073486,
+		12,
+		4.80000019073486
+	],
+	"lod_ranges": [
+		30,
+		80,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 35516,
+	"triangles": 17758,
+	"triangles_lod": [
+		17758,
+		5876,
+		2058
+	],
+	"solid_voxels": 94135,
+	"mesh_kb": 499,
+	"build_ms": 64,
+	"total_ms": 989,
+	"parts": [
+		{
+			"name": "banner_0",
+			"offset": [
+				3.25999999046326,
+				4.23999977111816,
+				4.33999967575073
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/watch_tower/watch_tower_banner_0.res",
+				"res://assets/props/watch_tower/watch_tower_banner_0_lod1.res",
+				"res://assets/props/watch_tower/watch_tower_banner_0_lod2.res"
+			],
+			"triangles": [
+				504,
+				138,
+				42
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_0",
+			"offset": [
+				1.33999991416931,
+				2.22000002861023,
+				4.27999973297119
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/watch_tower/watch_tower_lantern_0.res",
+				"res://assets/props/watch_tower/watch_tower_lantern_0_lod1.res",
+				"res://assets/props/watch_tower/watch_tower_lantern_0_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/watch_tower/watch_tower_structure.res",
+				"res://assets/props/watch_tower/watch_tower_structure_lod1.res",
+				"res://assets/props/watch_tower/watch_tower_structure_lod2.res"
+			],
+			"triangles": [
+				16918,
+				5626,
+				1988
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				1.5,
+				2.39999985694885,
+				4.44999980926514
+			],
+			"color": "ffb860",
+			"energy": 1,
+			"range": 4.5,
+			"shadow": false
+		},
+		{
+			"position": [
+				2.40000009536743,
+				11.6999998092651,
+				2.40000009536743
+			],
+			"color": "7fd2ff",
+			"energy": 1.4,
+			"range": 9,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0.600000023841858,
+				0,
+				0.600000023841858
+			],
+			"size": [
+				3.60000014305115,
+				8.10000038146973,
+				3.79999995231628
+			]
+		}
+	]
+}

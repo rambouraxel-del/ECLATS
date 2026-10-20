@@ -1,0 +1,95 @@
+{
+	"id": "pedestal_fountain",
+	"name": "Fontaine à piédestal",
+	"group": "prop",
+	"footprint_cells": [
+		10,
+		9,
+		10
+	],
+	"size_m": [
+		2,
+		1.80000007152557,
+		2
+	],
+	"lod_ranges": [
+		14,
+		40,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 52220,
+	"triangles": 26110,
+	"triangles_lod": [
+		26110,
+		5864,
+		1500
+	],
+	"solid_voxels": 219950,
+	"mesh_kb": 686,
+	"build_ms": 340,
+	"total_ms": 2139,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/pedestal_fountain/pedestal_fountain_structure.res",
+				"res://assets/props/pedestal_fountain/pedestal_fountain_structure_lod1.res",
+				"res://assets/props/pedestal_fountain/pedestal_fountain_structure_lod2.res"
+			],
+			"triangles": [
+				26110,
+				5864,
+				1500
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				1,
+				1.19999992847443,
+				1
+			],
+			"color": "8fe0ff",
+			"energy": 0.9,
+			"range": 4,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				2,
+				0.639999985694885,
+				2
+			]
+		},
+		{
+			"position": [
+				0.719999969005585,
+				0.620000004768372,
+				0.719999969005585
+			],
+			"size": [
+				0.560000002384186,
+				1,
+				0.560000002384186
+			]
+		}
+	]
+}

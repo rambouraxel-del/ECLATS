@@ -6,8 +6,9 @@ extends Node3D
 
 signal generated(data: IslandData)
 
-## Taille d'un chunk en voxels (32 × 0,20 m = 6,4 m).
+## Taille d'un chunk en voxels (32 × 0,20 m = 6,4 m). Plus grand = moins d'appels de dessin.
 const CHUNK := 32
+@export var chunk_size := 32
 
 @export var seed := 1234:
 	set(v):
@@ -31,6 +32,9 @@ const CHUNK := 32
 		render_style = v
 		if is_inside_tree() and data != null:
 			_rebuild_meshes()
+## Profil de génération optionnel : objet avec height(x, z, h, r) et surface(x, z, h, r, slope)
+## (voir VillageLayout). Doit être renseigné avant d'entrer dans l'arbre.
+var layout: RefCounted
 ## Générer aussi dans l'éditeur (aperçu). Peut prendre quelques secondes.
 @export var preview_in_editor := true
 
@@ -65,6 +69,11 @@ func regenerate() -> void:
 	gen.radius_m = radius_m
 	gen.underside_depth_m = underside_depth_m
 	gen.hill_height_m = hill_height_m
+	if layout != null:
+		gen.height_hook = Callable(layout, "height")
+		gen.surface_hook = Callable(layout, "surface")
+		gen.use_terrace = false
+		gen.base_height_m = layout.get("base_height_m") if layout.get("base_height_m") != null else gen.base_height_m
 	data = gen.generate()
 	_rebuild_meshes()
 	last_generation_ms = Time.get_ticks_msec() - t0
@@ -82,11 +91,11 @@ func _rebuild_meshes() -> void:
 	var origin := VoxelGrid.cell_to_world(data.origin_cell)
 	# Liste des tâches : (couche, région). Les maillages sont calculés en parallèle.
 	var jobs := []
-	for cy in range(0, size.y, CHUNK):
-		for cz in range(0, size.z, CHUNK):
-			for cx in range(0, size.x, CHUNK):
+	for cy in range(0, size.y, chunk_size):
+		for cz in range(0, size.z, chunk_size):
+			for cx in range(0, size.x, chunk_size):
 				var rmin := Vector3i(cx, cy, cz)
-				var rmax := Vector3i(mini(cx + CHUNK, size.x), mini(cy + CHUNK, size.y), mini(cz + CHUNK, size.z)) - Vector3i.ONE
+				var rmax := Vector3i(mini(cx + chunk_size, size.x), mini(cy + chunk_size, size.y), mini(cz + chunk_size, size.z)) - Vector3i.ONE
 				jobs.append([_core_root, data.core, rmin, rmax])
 				jobs.append([_surface_root, data.surface, rmin, rmax])
 	var style := render_style
@@ -104,7 +113,7 @@ func _rebuild_meshes() -> void:
 			continue
 		var rmin: Vector3i = jobs[i][2]
 		var mi := MeshInstance3D.new()
-		mi.name = "Chunk_%d_%d_%d" % [rmin.x / CHUNK, rmin.y / CHUNK, rmin.z / CHUNK]
+		mi.name = "Chunk_%d_%d_%d" % [rmin.x / chunk_size, rmin.y / chunk_size, rmin.z / chunk_size]
 		mi.mesh = mesh
 		mi.position = origin
 		(jobs[i][0] as Node3D).add_child(mi)
@@ -138,3 +147,12 @@ func count_triangles() -> int:
 		for mi in root.get_children():
 			total += VoxelMesher.triangle_count((mi as MeshInstance3D).mesh)
 	return total
+
+## Hauteur (m) du sol au point (x, z) du repère du nœud (valeur de la colonne de 20 cm).
+func surface_y_at(x: float, z: float) -> float:
+	var cell := VoxelGrid.world_to_cell(Vector3(x, 0, z))
+	var col := cell - Vector3i(data.origin_cell.x, 0, data.origin_cell.z)
+	var t := data.column_top(col.x, col.z)
+	if t < 0:
+		return NAN
+	return float(data.origin_cell.y + t + 1) * VoxelGrid.VOXEL_SIZE

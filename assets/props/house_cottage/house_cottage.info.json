@@ -1,0 +1,146 @@
+{
+	"id": "house_cottage",
+	"name": "Chaumière",
+	"group": "building",
+	"footprint_cells": [
+		31,
+		42,
+		33
+	],
+	"size_m": [
+		6.20000028610229,
+		8.40000057220459,
+		6.59999990463257
+	],
+	"lod_ranges": [
+		28,
+		75,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 32844,
+	"triangles": 16422,
+	"triangles_lod": [
+		16422,
+		4476,
+		1400
+	],
+	"solid_voxels": 97924,
+	"mesh_kb": 440,
+	"build_ms": 31,
+	"total_ms": 1032,
+	"parts": [
+		{
+			"name": "flower_box_0",
+			"offset": [
+				0.879999995231628,
+				0.5,
+				5
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_cottage/house_cottage_flower_box_0.res",
+				"res://assets/props/house_cottage/house_cottage_flower_box_0_lod1.res",
+				"res://assets/props/house_cottage/house_cottage_flower_box_0_lod2.res"
+			],
+			"triangles": [
+				5296,
+				674,
+				132
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "banner_0",
+			"offset": [
+				1.69999992847443,
+				2.20000004768372,
+				4.92000007629395
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_cottage/house_cottage_banner_0.res",
+				"res://assets/props/house_cottage/house_cottage_banner_0_lod1.res",
+				"res://assets/props/house_cottage/house_cottage_banner_0_lod2.res"
+			],
+			"triangles": [
+				504,
+				122,
+				48
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_0",
+			"offset": [
+				3.74000000953674,
+				2.22000002861023,
+				4.85999965667725
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_cottage/house_cottage_lantern_0.res",
+				"res://assets/props/house_cottage/house_cottage_lantern_0_lod1.res",
+				"res://assets/props/house_cottage/house_cottage_lantern_0_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/house_cottage/house_cottage_structure.res",
+				"res://assets/props/house_cottage/house_cottage_structure_lod1.res",
+				"res://assets/props/house_cottage/house_cottage_structure_lod2.res"
+			],
+			"triangles": [
+				10286,
+				3568,
+				1192
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				3.90000009536743,
+				2.39999985694885,
+				5.01999998092651
+			],
+			"color": "ffb860",
+			"energy": 1,
+			"range": 4.5,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0.400000005960464,
+				0,
+				0.400000005960464
+			],
+			"size": [
+				5.40000009536743,
+				4.90000009536743,
+				5.70000028610229
+			]
+		}
+	]
+}

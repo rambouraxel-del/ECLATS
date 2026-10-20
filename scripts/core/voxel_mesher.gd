@@ -14,7 +14,14 @@ extends RefCounted
 ## - LEGACY (Lot 1) : une face par voxel, teinte variée cellule par cellule, liseré
 ##   des arêtes (voxel.gdshader). Conservé pour comparer l'ancien et le nouveau rendu.
 
-enum Style { LEGACY, STYLIZED }
+## LEGACY   : Lot 1. STYLIZED : terrain (Lot 2). DETAIL : objets et bâtiments (Lot 3) =
+## STYLIZED + données de quad (CUSTOM0/1) pour les motifs de matière (fibres du bois,
+## joints, usure des arêtes, facettes des cristaux, plis des tissus).
+##   CUSTOM0 = (u, v, largeur, hauteur) du quad en mètres (u, v = position dans le quad)
+##   CUSTOM1 = (épaisseur de matière derrière la face en mètres, graine aléatoire du quad,
+##              sens du grain : 0 le long de u, 1 le long de v, 2 bois de bout, 3 inconnu)
+##   UV2.x   = style + usure * 0.98 (partie entière = style, partie fractionnaire = usure)
+enum Style { LEGACY, STYLIZED, DETAIL }
 
 # Faces : normale, axes u et v (u × v = normale), coin de base. Les tables sont
 # recréées localement à chaque appel (les constantes partagées ne sont pas sûres entre threads).
@@ -46,7 +53,11 @@ static func arrays_to_mesh(arrays: Array, style := Style.STYLIZED) -> ArrayMesh:
 	if arrays.is_empty():
 		return null
 	var mesh := ArrayMesh.new()
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	var flags := 0
+	if arrays[Mesh.ARRAY_CUSTOM0] != null:
+		flags |= Mesh.ARRAY_CUSTOM_RGBA_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT
+		flags |= Mesh.ARRAY_CUSTOM_RGB_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM1_SHIFT
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, [], {}, flags)
 	mesh.surface_set_material(0, VoxelMaterials.material_for(style))
 	return mesh
 
@@ -57,7 +68,7 @@ static func build_arrays(volume: VoxelVolume, voxel_size: float, region_min := V
 	if style == Style.LEGACY:
 		return _build_arrays_legacy(volume, voxel_size, region_min, region_max, solid_mask,
 				world_cell_offset, color_seed)
-	return _build_arrays_greedy(volume, voxel_size, region_min, region_max, solid_mask)
+	return _build_arrays_greedy(volume, voxel_size, region_min, region_max, solid_mask, style == Style.DETAIL)
 
 ## Nombre de triangles d'un maillage (toutes surfaces).
 static func triangle_count(mesh: Mesh) -> int:
@@ -70,7 +81,7 @@ static func triangle_count(mesh: Mesh) -> int:
 
 ## Maillage glouton (style STYLIZED).
 static func _build_arrays_greedy(volume: VoxelVolume, voxel_size: float, rmin: Vector3i,
-		rmax: Vector3i, solid_mask: PackedByteArray) -> Array:
+		rmax: Vector3i, solid_mask: PackedByteArray, extra := false) -> Array:
 	var palette := VoxelPalette.get_default()
 	if rmax.x < 0:
 		rmax = volume.size - Vector3i.ONE
@@ -80,6 +91,7 @@ static func _build_arrays_greedy(volume: VoxelVolume, voxel_size: float, rmin: V
 	var stride_z := sx
 	var stride_y := sx * sz
 	var data := volume.data
+	var aux := volume.aux if extra else PackedByteArray()
 	var solid := data if solid_mask.is_empty() else solid_mask
 	var rs := rmax - rmin + Vector3i.ONE
 	# Index local dans la région : lx + lz * rs.x + ly * rs.x * rs.z (pas par axe x, y, z).
@@ -144,6 +156,8 @@ static func _build_arrays_greedy(volume: VoxelVolume, voxel_size: float, rmin: V
 						var s3 := _is_solid(solid, nx + u.x * su + v.x * sv, ny + u.y * su + v.y * sv, nz + u.z * su + v.z * sv, sx, sy, sz)
 						var level := 0 if (s1 and s2) else 3 - int(s1) - int(s2) - int(s3)
 						key |= level << (8 + k * 2)
+					if not aux.is_empty():
+						key |= aux[row + x] << 16
 					masks[fi * cells + li] = key
 					var bi := (fi * maxdim + lc[ax_n[fi]]) * 4
 					var a := lc[ax_u[fi]]
@@ -159,6 +173,8 @@ static func _build_arrays_greedy(volume: VoxelVolume, voxel_size: float, rmin: V
 	var uvs := PackedVector2Array()
 	var uv2s := PackedVector2Array()
 	var indices := PackedInt32Array()
+	var custom0 := PackedFloat32Array()
+	var custom1 := PackedFloat32Array()
 	var ao_curve := PackedFloat32Array([0.56, 0.72, 0.87, 1.0])  # luminosité selon l'occlusion
 
 	# Passe 2 : fusion gloutonne des faces identiques, tranche par tranche.
@@ -213,7 +229,24 @@ static func _build_arrays_greedy(volume: VoxelVolume, voxel_size: float, rmin: V
 					var mat := key & 0xFF
 					var base: Color = palette.colors_linear[mat]
 					var uv := Vector2(palette.emission[mat], palette.roughness[mat])
-					var uv2 := Vector2(palette.styles[mat], palette.metallic[mat])
+					var uv2 := Vector2(float(palette.styles[mat]) + palette.wear[mat] * 0.98, palette.metallic[mat])
+					var depth_m := 0.0
+					var seed_q := 0.0
+					var grain_code := 3.0
+					if extra:
+						var cell := rmin + lc
+						var back := -face_n[fi]
+						var dm := 1
+						var cp := cell + back
+						while dm < 48 and cp.x >= 0 and cp.y >= 0 and cp.z >= 0 and cp.x < sx and cp.y < sy and cp.z < sz \
+								and data[cp.x + cp.z * stride_z + cp.y * stride_y] == mat:
+							dm += 1
+							cp += back
+						depth_m = dm * voxel_size
+						seed_q = VoxelGrid.hash01(cell.x, cell.y, cell.z, fi * 17 + 3)
+						var ga := (key >> 16) & 7
+						if ga > 0:
+							grain_code = 2.0 if ga - 1 == ax_n[fi] else (0.0 if ga - 1 == ax_u[fi] else 1.0)
 					var start := verts.size()
 					var lv := PackedInt32Array([0, 0, 0, 0])
 					for k in 4:
@@ -225,6 +258,9 @@ static func _build_arrays_greedy(volume: VoxelVolume, voxel_size: float, rmin: V
 						colors.append(Color(base.r, base.g, base.b, ao_curve[level]))
 						uvs.append(uv)
 						uv2s.append(uv2)
+						if extra:
+							custom0.append_array(PackedFloat32Array([c.x * w * voxel_size, c.y * h * voxel_size, w * voxel_size, h * voxel_size]))
+							custom1.append_array(PackedFloat32Array([depth_m, seed_q, grain_code]))
 					if lv[0] + lv[2] >= lv[1] + lv[3]:
 						indices.append_array([start, start + 2, start + 1, start, start + 3, start + 2])
 					else:
@@ -241,6 +277,9 @@ static func _build_arrays_greedy(volume: VoxelVolume, voxel_size: float, rmin: V
 	arrays[Mesh.ARRAY_TEX_UV] = uvs
 	arrays[Mesh.ARRAY_TEX_UV2] = uv2s
 	arrays[Mesh.ARRAY_INDEX] = indices
+	if extra:
+		arrays[Mesh.ARRAY_CUSTOM0] = custom0
+		arrays[Mesh.ARRAY_CUSTOM1] = custom1
 	return arrays
 
 static func _axis_of(v: Vector3i) -> int:

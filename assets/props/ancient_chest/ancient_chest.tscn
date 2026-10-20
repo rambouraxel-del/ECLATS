@@ -1,30 +1,46 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_hobxi"]
-[ext_resource type="ArrayMesh" path="res://assets/props/ancient_chest/ancient_chest_structure.res" id="2_5vmgs"]
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_erawu"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ancient_chest/ancient_chest_structure.res" id="2_buire"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ancient_chest/ancient_chest_structure_lod1.res" id="3_x53sc"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ancient_chest/ancient_chest_structure_lod2.res" id="4_32pej"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_yn3ly"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_rep85"]
 size = Vector3(1.2, 0.74, 0.8)
 
 [node name="AncientChest" type="Node3D"]
-script = ExtResource("1_hobxi")
+script = ExtResource("1_erawu")
 asset_id = "ancient_chest"
 display_name = "Coffre ancien"
 footprint_cells = Vector3i(6, 4, 4)
-triangle_count = 6834
-vertex_count = 13668
+triangle_count = 6844
+vertex_count = 13688
 
 [node name="Structure" type="MeshInstance3D" parent="."]
-mesh = ExtResource("2_5vmgs")
+visibility_range_end = 14.0
+mesh = ExtResource("2_buire")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_x53sc")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_32pej")
 
 [node name="Light1" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.59, 0.54, 0.84)
 light_color = Color(0.498039, 0.823529, 1, 1)
 light_energy = 0.35
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
 omni_range = 1.2
 
 [node name="Collision" type="StaticBody3D" parent="."]
 
 [node name="Box1" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.37, 0.4)
-shape = SubResource("BoxShape3D_yn3ly")
+shape = SubResource("BoxShape3D_rep85")

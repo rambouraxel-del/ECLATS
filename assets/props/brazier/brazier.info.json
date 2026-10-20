@@ -1,0 +1,104 @@
+{
+	"id": "brazier",
+	"name": "Brasero rituel",
+	"group": "prop",
+	"footprint_cells": [
+		4,
+		8,
+		4
+	],
+	"size_m": [
+		0.800000011920929,
+		1.60000002384186,
+		0.800000011920929
+	],
+	"lod_ranges": [
+		12,
+		34,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 22368,
+	"triangles": 11184,
+	"triangles_lod": [
+		11184,
+		3200,
+		790
+	],
+	"solid_voxels": 24821,
+	"mesh_kb": 293,
+	"build_ms": 15,
+	"total_ms": 432,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/brazier/brazier_structure.res",
+				"res://assets/props/brazier/brazier_structure_lod1.res",
+				"res://assets/props/brazier/brazier_structure_lod2.res"
+			],
+			"triangles": [
+				10266,
+				2742,
+				710
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "flame",
+			"offset": [
+				0,
+				1.13999998569489,
+				0
+			],
+			"animation": "",
+			"material": "crystal",
+			"meshes": [
+				"res://assets/props/brazier/brazier_flame.res",
+				"res://assets/props/brazier/brazier_flame_lod1.res",
+				"res://assets/props/brazier/brazier_flame_lod2.res"
+			],
+			"triangles": [
+				918,
+				458,
+				80
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				0.399999976158142,
+				1.43999993801117,
+				0.399999976158142
+			],
+			"color": "ffa24a",
+			"energy": 2.2,
+			"range": 7,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				0.799999952316284,
+				1.13999998569489,
+				0.799999952316284
+			]
+		}
+	]
+}

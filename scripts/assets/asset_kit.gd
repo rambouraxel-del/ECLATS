@@ -36,6 +36,105 @@ func mirror_z() -> void:
 			for x in volume.size.x:
 				volume.data[volume.index_of(x, y, z)] = src[volume.index_of(x, y, sz - 1 - z)]
 
+# ---------------------------------------------------------------- Formes de révolution
+
+## Cylindre vertical (plein, ou creux si `inner` > 0), centre (cx, cz) en cellules, de y0 à y1.
+func cyl_y(cx: float, cz: float, y0: int, y1: int, r: float, key: String, inner := 0.0) -> void:
+	var id := mat(key)
+	var ri := ceili(r) + 1
+	for z in range(floori(cz) - ri, floori(cz) + ri + 1):
+		for x in range(floori(cx) - ri, floori(cx) + ri + 1):
+			var d := Vector2(x + 0.5 - cx, z + 0.5 - cz).length()
+			if d <= r and d >= inner:
+				for y in range(y0, y1 + 1):
+					volume.set_voxel(x, y, z, id)
+
+## Anneau de maçonnerie rond : assises de `bh` cellules, blocs de `bw` cellules de long,
+## joints en pierre ombrée, tons de pierre claire variés par bloc.
+func stone_ring(cx: float, cz: float, y0: int, y1: int, r_out: float, r_in: float, bw := 12, bh := 8) -> void:
+	var ri := ceili(r_out) + 1
+	var joint := mat("stone_shade")
+	for z in range(floori(cz) - ri, floori(cz) + ri + 1):
+		for x in range(floori(cx) - ri, floori(cx) + ri + 1):
+			var dv := Vector2(x + 0.5 - cx, z + 0.5 - cz)
+			var d := dv.length()
+			if d > r_out or d < r_in:
+				continue
+			var ang := atan2(dv.y, dv.x) + PI
+			for y in range(y0, y1 + 1):
+				var row := (y - y0) / bh
+				var arc := ang * r_out
+				var seg := int((arc + (row % 2) * bw * 0.5) / bw)
+				var in_row := (y - y0) % bh
+				var in_seg := fmod(arc + (row % 2) * bw * 0.5, float(bw))
+				var key_id := joint
+				if in_row != 0 and in_seg > 1.0:
+					key_id = mat(STONE_TONES[int(VoxelGrid.hash01(seg, row, 3, 17) * 3.0) % 3])
+				volume.set_voxel(x, y, z, key_id)
+
+## Tonneau : douelles bombées, cerclage (cuivre), fonds en retrait. Axe vertical.
+func barrel(cx: float, cz: float, y0: int, height: int, r_mid: float, r_end: float, key := "wood_planks", hoop := "copper") -> void:
+	for yy in height:
+		var t := float(yy) / maxf(height - 1, 1)
+		var r := lerpf(r_end, r_mid, sin(t * PI))
+		var ri := ceili(r) + 1
+		var is_hoop := yy < 2 or yy >= height - 2 or absi(yy - height / 3) < 1 or absi(yy - 2 * height / 3) < 1
+		for z in range(floori(cz) - ri, floori(cz) + ri + 1):
+			for x in range(floori(cx) - ri, floori(cx) + ri + 1):
+				var d := Vector2(x + 0.5 - cx, z + 0.5 - cz)
+				if d.length() <= r:
+					var stave := int((atan2(d.y, d.x) + PI) / TAU * 14.0)
+					var kk := hoop if (is_hoop and d.length() > r - 1.6) else (key if stave % 2 == 0 else "wood_honey")
+					volume.set_voxel(x, y0 + yy, z, mat(kk))
+	# Fond (couvercle) : planches rayonnantes plus sombres.
+	var top := y0 + height - 1
+	cyl_y(cx, cz, top, top, r_end - 1.2, "wood_dark")
+
+## Roue de charrette dans le plan YZ (axe x) : jante, rayons, moyeu.
+func wheel_x(x0: int, cy: float, cz: float, thick: int, r: float, key := "wood_dark", hub := "copper", spokes := 8) -> void:
+	var ri := ceili(r) + 1
+	for z in range(floori(cz) - ri, floori(cz) + ri + 1):
+		for y in range(floori(cy) - ri, floori(cy) + ri + 1):
+			var d := Vector2(z + 0.5 - cz, y + 0.5 - cy)
+			var l := d.length()
+			var on_rim := l <= r and l >= r - 3.0
+			var on_hub := l <= 3.2
+			var ang := fposmod(atan2(d.y, d.x), TAU / spokes)
+			var on_spoke := l < r - 2.5 and (ang < 0.12 + 0.5 / maxf(l, 1.0) or ang > TAU / spokes - 0.12 - 0.5 / maxf(l, 1.0))
+			if on_rim or on_hub or on_spoke:
+				var kk := hub if (on_hub and l < 2.3) or (on_rim and l > r - 1.2) else key
+				for x in range(x0, x0 + thick):
+					volume.set_voxel(x, y, z, mat(kk))
+
+## Roue de charrette dans le plan XY (axe z) : jante, rayons, moyeu.
+func wheel_z(cx: float, cy: float, z0: int, thick: int, r: float, key := "wood_dark", hub := "copper", spokes := 8) -> void:
+	var ri := ceili(r) + 1
+	for y in range(floori(cy) - ri, floori(cy) + ri + 1):
+		for x in range(floori(cx) - ri, floori(cx) + ri + 1):
+			var d := Vector2(x + 0.5 - cx, y + 0.5 - cy)
+			var l := d.length()
+			var on_rim := l <= r and l >= r - 3.0
+			var on_hub := l <= 3.2
+			var ang := fposmod(atan2(d.y, d.x), TAU / spokes)
+			var w := 0.1 + 0.55 / maxf(l, 1.0)
+			var on_spoke := l < r - 2.5 and (ang < w or ang > TAU / spokes - w)
+			if on_rim or on_hub or on_spoke:
+				var kk := hub if (on_hub and l < 2.3) or (on_rim and l > r - 1.2) else key
+				for z in range(z0, z0 + thick):
+					volume.set_voxel(x, y, z, mat(kk))
+
+## Caisse en planches : cadre sombre aux angles, lattes, bande de cuivre optionnelle.
+func crate(x0: int, y0: int, z0: int, x1: int, y1: int, z1: int, key := "wood_planks", band := "") -> void:
+	planks(x0, y0, z0, x1, y1, z1, 0, 1, 4, [key, "wood_honey", key], true)
+	for c in [Vector2i(x0, z0), Vector2i(x1, z0), Vector2i(x0, z1), Vector2i(x1, z1)]:
+		box(c.x, y0, c.y, c.x, y1, c.y, "wood_dark")
+	box(x0, y0, z0, x1, y0, z1, "wood_dark")
+	box(x0, y1, z0, x1, y1, z1, "wood_dark")
+	if band != "":
+		var m := (x0 + x1) / 2
+		box(m - 1, y0, z0 - 0, m, y1, z0, band)
+		box(m - 1, y0, z1, m, y1, z1, band)
+
 # ---------------------------------------------------------------- Pierre
 
 ## Bloc de pierre claire : teinte par bloc (pas par cellule), mouchetis discret,

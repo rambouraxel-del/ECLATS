@@ -1,0 +1,93 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_nbqik"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_lantern_0.res" id="2_ffmx5"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_lantern_0_lod1.res" id="3_ahgif"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_lantern_0_lod2.res" id="4_huklp"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_lantern_1.res" id="5_bvgwr"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_lantern_1_lod1.res" id="6_ayeyx"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_lantern_1_lod2.res" id="7_fcmr0"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_structure.res" id="8_j0s4r"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_structure_lod1.res" id="9_8yvs8"]
+[ext_resource type="ArrayMesh" path="res://assets/props/pier/pier_structure_lod2.res" id="10_ahb0a"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uh2og"]
+size = Vector3(3, 0.7, 10)
+
+[node name="Pier" type="Node3D"]
+script = ExtResource("1_nbqik")
+asset_id = "pier"
+display_name = "Embarcadère"
+footprint_cells = Vector3i(15, 20, 50)
+triangle_count = 6856
+vertex_count = 13712
+
+[node name="Lantern0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 4.26, 2.34)
+visibility_range_end = 30.0
+mesh = ExtResource("2_ffmx5")
+
+[node name="Lantern0_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 4.26, 2.34)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("3_ahgif")
+
+[node name="Lantern0_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 4.26, 2.34)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("4_huklp")
+
+[node name="Lantern1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.38, 4.26, 9.34)
+visibility_range_end = 30.0
+mesh = ExtResource("5_bvgwr")
+
+[node name="Lantern1_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.38, 4.26, 9.34)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("6_ayeyx")
+
+[node name="Lantern1_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.38, 4.26, 9.34)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("7_fcmr0")
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 30.0
+mesh = ExtResource("8_j0s4r")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("9_8yvs8")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("10_ahb0a")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 4.45, 2.5)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 0.9
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+
+[node name="Light2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.55, 4.45, 9.5)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 0.9
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 2.75, 5)
+shape = SubResource("BoxShape3D_uh2og")

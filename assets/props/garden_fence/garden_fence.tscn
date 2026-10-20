@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_7cvgy"]
+[ext_resource type="ArrayMesh" path="res://assets/props/garden_fence/garden_fence_structure.res" id="2_fsbe0"]
+[ext_resource type="ArrayMesh" path="res://assets/props/garden_fence/garden_fence_structure_lod1.res" id="3_g2ds1"]
+[ext_resource type="ArrayMesh" path="res://assets/props/garden_fence/garden_fence_structure_lod2.res" id="4_7dm7w"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_047ns"]
+size = Vector3(1, 0.74, 0.12)
+
+[node name="GardenFence" type="Node3D"]
+script = ExtResource("1_7cvgy")
+asset_id = "garden_fence"
+display_name = "Clôture de jardin"
+footprint_cells = Vector3i(5, 4, 1)
+triangle_count = 1448
+vertex_count = 2896
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 8.0
+mesh = ExtResource("2_fsbe0")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 8.0
+visibility_range_end = 22.0
+mesh = ExtResource("3_g2ds1")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 22.0
+mesh = ExtResource("4_7dm7w")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.37, 0.06)
+shape = SubResource("BoxShape3D_047ns")

@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_63he1"]
+[ext_resource type="ArrayMesh" path="res://assets/props/notice_board/notice_board_structure.res" id="2_dyawx"]
+[ext_resource type="ArrayMesh" path="res://assets/props/notice_board/notice_board_structure_lod1.res" id="3_geyax"]
+[ext_resource type="ArrayMesh" path="res://assets/props/notice_board/notice_board_structure_lod2.res" id="4_780tx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_58p8g"]
+size = Vector3(1.6, 1.78, 0.28)
+
+[node name="NoticeBoard" type="Node3D"]
+script = ExtResource("1_63he1")
+asset_id = "notice_board"
+display_name = "Tableau d'affichage"
+footprint_cells = Vector3i(8, 10, 2)
+triangle_count = 4316
+vertex_count = 8632
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 12.0
+mesh = ExtResource("2_dyawx")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 12.0
+visibility_range_end = 32.0
+mesh = ExtResource("3_geyax")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 32.0
+mesh = ExtResource("4_780tx")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 1.13, 0.08)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 0.8
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 3.5
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.89, 0.14)
+shape = SubResource("BoxShape3D_58p8g")

@@ -1,0 +1,94 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_17l5p"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_banner_0.res" id="2_3d5jb"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_banner_0_lod1.res" id="3_3ckhu"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_banner_0_lod2.res" id="4_86go2"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_lantern_0.res" id="5_ocv8k"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_lantern_0_lod1.res" id="6_wlk0k"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_lantern_0_lod2.res" id="7_kd0h5"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_structure.res" id="8_7k565"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_structure_lod1.res" id="9_oggny"]
+[ext_resource type="ArrayMesh" path="res://assets/props/watch_tower/watch_tower_structure_lod2.res" id="10_wsx1m"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q5t8p"]
+size = Vector3(3.6, 8.1, 3.8)
+
+[node name="WatchTower" type="Node3D"]
+script = ExtResource("1_17l5p")
+asset_id = "watch_tower"
+display_name = "Tour de guet"
+footprint_cells = Vector3i(24, 60, 24)
+triangle_count = 17758
+vertex_count = 35516
+
+[node name="Banner0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.26, 4.24, 4.34)
+visibility_range_end = 30.0
+mesh = ExtResource("2_3d5jb")
+
+[node name="Banner0_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.26, 4.24, 4.34)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("3_3ckhu")
+
+[node name="Banner0_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.26, 4.24, 4.34)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("4_86go2")
+
+[node name="Lantern0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.34, 2.22, 4.28)
+visibility_range_end = 30.0
+mesh = ExtResource("5_ocv8k")
+
+[node name="Lantern0_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.34, 2.22, 4.28)
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("6_wlk0k")
+
+[node name="Lantern0_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.34, 2.22, 4.28)
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("7_kd0h5")
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 30.0
+mesh = ExtResource("8_7k565")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 30.0
+visibility_range_end = 80.0
+mesh = ExtResource("9_oggny")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 80.0
+mesh = ExtResource("10_wsx1m")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 2.4, 4.45)
+light_color = Color(1, 0.721569, 0.376471, 1)
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 4.5
+
+[node name="Light2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 11.7, 2.4)
+light_color = Color(0.498039, 0.823529, 1, 1)
+light_energy = 1.4
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 9.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 4.05, 2.5)
+shape = SubResource("BoxShape3D_q5t8p")

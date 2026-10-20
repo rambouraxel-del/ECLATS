@@ -1,0 +1,71 @@
+{
+	"id": "boulder_2",
+	"name": "Rocher",
+	"group": "tree",
+	"footprint_cells": [
+		22,
+		14,
+		22
+	],
+	"size_m": [
+		4.40000009536743,
+		2.79999995231628,
+		4.40000009536743
+	],
+	"lod_ranges": [
+		16,
+		45,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 26936,
+	"triangles": 13468,
+	"triangles_lod": [
+		13468,
+		1528,
+		208
+	],
+	"solid_voxels": 7291,
+	"mesh_kb": 296,
+	"build_ms": 59,
+	"total_ms": 271,
+	"parts": [
+		{
+			"name": "rock",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/boulder_2/boulder_2_rock.res",
+				"res://assets/props/boulder_2/boulder_2_rock_lod1.res",
+				"res://assets/props/boulder_2/boulder_2_rock_lod2.res"
+			],
+			"triangles": [
+				13468,
+				1528,
+				208
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				1.20000004768372,
+				0,
+				1.20000004768372
+			],
+			"size": [
+				2.10000014305115,
+				1.30000007152557,
+				2.10000014305115
+			]
+		}
+	]
+}

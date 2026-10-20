@@ -1,0 +1,83 @@
+{
+	"id": "decorative_bench",
+	"name": "Banc décoratif",
+	"group": "lot2",
+	"footprint_cells": [
+		9,
+		5,
+		3
+	],
+	"size_m": [
+		1.80000007152557,
+		1,
+		0.600000023841858
+	],
+	"lod_ranges": [
+		14,
+		40,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 11744,
+	"triangles": 5872,
+	"triangles_lod": [
+		5872,
+		1714,
+		498
+	],
+	"solid_voxels": 33226,
+	"mesh_kb": 164,
+	"build_ms": 200,
+	"total_ms": 660,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/decorative_bench/decorative_bench_structure.res",
+				"res://assets/props/decorative_bench/decorative_bench_structure_lod1.res",
+				"res://assets/props/decorative_bench/decorative_bench_structure_lod2.res"
+			],
+			"triangles": [
+				5872,
+				1714,
+				498
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				1.79999995231628,
+				0.519999980926514,
+				0.599999964237213
+			]
+		},
+		{
+			"position": [
+				0.0999999940395355,
+				0.5,
+				0
+			],
+			"size": [
+				1.63999998569489,
+				0.459999978542328,
+				0.119999997317791
+			]
+		}
+	]
+}

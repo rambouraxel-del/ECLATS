@@ -1,0 +1,53 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_tijp4"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ruin_arch/ruin_arch_structure.res" id="2_wf2dd"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ruin_arch/ruin_arch_structure_lod1.res" id="3_1k778"]
+[ext_resource type="ArrayMesh" path="res://assets/props/ruin_arch/ruin_arch_structure_lod2.res" id="4_sym0b"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0aio7"]
+size = Vector3(0.68, 1.72, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fxptq"]
+size = Vector3(0.68, 1.22, 0.8)
+
+[node name="RuinArch" type="Node3D"]
+script = ExtResource("1_tijp4")
+asset_id = "ruin_arch"
+display_name = "Arche en ruine"
+footprint_cells = Vector3i(16, 15, 4)
+triangle_count = 31064
+vertex_count = 62128
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 14.0
+mesh = ExtResource("2_wf2dd")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_1k778")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_sym0b")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.24, 1.27, 0.4)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 0.9
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 4.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34, 0.86, 0.4)
+shape = SubResource("BoxShape3D_0aio7")
+
+[node name="Box2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.86, 0.61, 0.4)
+shape = SubResource("BoxShape3D_fxptq")

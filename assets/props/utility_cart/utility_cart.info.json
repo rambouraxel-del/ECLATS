@@ -1,0 +1,71 @@
+{
+	"id": "utility_cart",
+	"name": "Charrette",
+	"group": "prop",
+	"footprint_cells": [
+		11,
+		8,
+		5
+	],
+	"size_m": [
+		2.20000004768372,
+		1.60000002384186,
+		1
+	],
+	"lod_ranges": [
+		10,
+		28,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 22260,
+	"triangles": 11130,
+	"triangles_lod": [
+		11130,
+		3432,
+		980
+	],
+	"solid_voxels": 34022,
+	"mesh_kb": 307,
+	"build_ms": 18,
+	"total_ms": 720,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/utility_cart/utility_cart_structure.res",
+				"res://assets/props/utility_cart/utility_cart_structure_lod1.res",
+				"res://assets/props/utility_cart/utility_cart_structure_lod2.res"
+			],
+			"triangles": [
+				11130,
+				3432,
+				980
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0.159999996423721,
+				0,
+				0.0399999991059303
+			],
+			"size": [
+				1.5,
+				0.819999992847443,
+				0.919999957084656
+			]
+		}
+	]
+}

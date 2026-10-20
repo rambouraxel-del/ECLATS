@@ -1,31 +1,44 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_hlnbf"]
-[ext_resource type="ArrayMesh" path="res://assets/props/decorative_bench/decorative_bench_structure.res" id="2_yq84r"]
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_lspu3"]
+[ext_resource type="ArrayMesh" path="res://assets/props/decorative_bench/decorative_bench_structure.res" id="2_dqcuj"]
+[ext_resource type="ArrayMesh" path="res://assets/props/decorative_bench/decorative_bench_structure_lod1.res" id="3_eavmn"]
+[ext_resource type="ArrayMesh" path="res://assets/props/decorative_bench/decorative_bench_structure_lod2.res" id="4_8ie20"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_yh8h3"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_kbjcd"]
 size = Vector3(1.8, 0.52, 0.6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ima7k"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_7umts"]
 size = Vector3(1.64, 0.46, 0.12)
 
 [node name="DecorativeBench" type="Node3D"]
-script = ExtResource("1_hlnbf")
+script = ExtResource("1_lspu3")
 asset_id = "decorative_bench"
 display_name = "Banc décoratif"
 footprint_cells = Vector3i(9, 5, 3)
-triangle_count = 5564
-vertex_count = 11128
+triangle_count = 5872
+vertex_count = 11744
 
 [node name="Structure" type="MeshInstance3D" parent="."]
-mesh = ExtResource("2_yq84r")
+visibility_range_end = 14.0
+mesh = ExtResource("2_dqcuj")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_eavmn")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_8ie20")
 
 [node name="Collision" type="StaticBody3D" parent="."]
 
 [node name="Box1" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.26, 0.3)
-shape = SubResource("BoxShape3D_yh8h3")
+shape = SubResource("BoxShape3D_kbjcd")
 
 [node name="Box2" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92, 0.73, 0.06)
-shape = SubResource("BoxShape3D_ima7k")
+shape = SubResource("BoxShape3D_7umts")

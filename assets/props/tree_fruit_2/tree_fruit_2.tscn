@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_u3uy2"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tree_fruit_2/tree_fruit_2_tree.res" id="2_78o2x"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tree_fruit_2/tree_fruit_2_tree_lod1.res" id="3_wbka8"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tree_fruit_2/tree_fruit_2_tree_lod2.res" id="4_qd3nc"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o0ima"]
+size = Vector3(0.4, 2.5, 0.4)
+
+[node name="TreeFruit2" type="Node3D"]
+script = ExtResource("1_u3uy2")
+asset_id = "tree_fruit_2"
+display_name = "Arbre fruitier 2"
+footprint_cells = Vector3i(21, 25, 21)
+triangle_count = 18068
+vertex_count = 36136
+
+[node name="Tree" type="MeshInstance3D" parent="."]
+visibility_range_end = 20.0
+mesh = ExtResource("2_78o2x")
+
+[node name="Tree_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 20.0
+visibility_range_end = 55.0
+mesh = ExtResource("3_wbka8")
+
+[node name="Tree_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 55.0
+mesh = ExtResource("4_qd3nc")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 1.25, 2.1)
+shape = SubResource("BoxShape3D_o0ima")

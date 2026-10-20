@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/village/colony_island.gd" id="1_colony"]
+[ext_resource type="Script" path="res://scripts/rendering/lighting_rig.gd" id="2_rig"]
+[ext_resource type="Script" path="res://scripts/camera/free_camera.gd" id="3_cam"]
+[ext_resource type="Script" path="res://scripts/rendering/voxel_clouds.gd" id="4_clouds"]
+
+[node name="ColonyIsland" type="Node3D"]
+script = ExtResource("1_colony")
+
+[node name="LightingRig" type="Node3D" parent="."]
+script = ExtResource("2_rig")
+start_preset = "village_day"
+shadow_distance = 150.0
+
+[node name="Clouds" type="Node3D" parent="."]
+script = ExtResource("4_clouds")
+
+[node name="FreeCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.97, 0.24, 0, -0.24, 0.97, 2, 15, 50)
+fov = 62.0
+near = 0.05
+far = 2500.0
+script = ExtResource("3_cam")
+mode = 1
+orbit_target = Vector3(0, 3, -1)

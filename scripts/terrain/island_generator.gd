@@ -23,6 +23,14 @@ const ROOT_MAX := 14
 
 const V := VoxelGrid.VOXEL_SIZE
 
+## Crochets de personnalisation (île habitée). Coordonnées en mètres dans le repère du nœud île.
+##   height_hook(x, z, h, r) -> h        hauteur du sol (avant quantification à 0,20 m)
+##   surface_hook(x, z, h, r, slope) -> clé de matière du dessus ("" = génération par défaut)
+## Sans crochets, la génération est strictement identique à celle des Lots 1 et 2.
+var height_hook := Callable()
+var surface_hook := Callable()
+var use_terrace := true
+
 func generate() -> IslandData:
 	var pal := VoxelPalette.get_default()
 	var m := {
@@ -69,7 +77,10 @@ func generate() -> IslandData:
 			var h := base_height_m + hill_height_m * (0.55 * (n_height.get_noise_2d(dx, dz) * 0.5 + 0.5)
 					+ 0.75 * maxf(n_hill.get_noise_2d(dx, dz), 0.0))
 			h -= smoothstep(0.78, 1.0, r) * 1.0
-			h = _terrace(h, terrace_step_m)
+			if height_hook.is_valid():
+				h = height_hook.call(dx + 0.5 * V, dz + 0.5 * V, h, r)
+			if use_terrace:
+				h = _terrace(h, terrace_step_m)
 			var depth := 1.4 + underside_depth_m * pow(1.0 - r, 1.25)
 			depth += n_under.get_noise_2d(dx, dz) * 2.2 * (1.0 - r * 0.6)
 			var spike := n_spike.get_noise_2d(dx, dz)
@@ -128,6 +139,11 @@ func generate() -> IslandData:
 				top_mat = m["grass_dry"]
 			else:
 				top_mat = m["grass"]
+			if surface_hook.is_valid():
+				var k: String = surface_hook.call(dx + 0.5 * V, dz + 0.5 * V, top_v * V, r, slope)
+				if k != "":
+					top_mat = pal.id(k)
+					rocky = k.begins_with("rock")
 			var dirt_depth := 2 + int(VoxelGrid.hash01(x, 0, z, seed) * 3.0)
 			for y in range(bottom_v, top_v + 1):
 				var vy := y + y_off

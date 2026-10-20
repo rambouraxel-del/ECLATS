@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_7kmbb"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crystal_cluster/crystal_cluster_structure.res" id="2_d4ctp"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crystal_cluster/crystal_cluster_structure_lod1.res" id="3_6qiq4"]
+[ext_resource type="ArrayMesh" path="res://assets/props/crystal_cluster/crystal_cluster_structure_lod2.res" id="4_7seh6"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_imf6m"]
+size = Vector3(1.4, 0.62, 1.4)
+
+[node name="CrystalCluster" type="Node3D"]
+script = ExtResource("1_7kmbb")
+asset_id = "crystal_cluster"
+display_name = "Amas de cristaux"
+footprint_cells = Vector3i(7, 9, 7)
+triangle_count = 21422
+vertex_count = 42844
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 14.0
+mesh = ExtResource("2_d4ctp")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_6qiq4")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_7seh6")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.68, 0.8, 0.68)
+light_color = Color(0.498039, 0.823529, 1, 1)
+light_energy = 0.9
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 4.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.31, 0.7)
+shape = SubResource("BoxShape3D_imf6m")

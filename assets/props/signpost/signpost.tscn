@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_iowpr"]
+[ext_resource type="ArrayMesh" path="res://assets/props/signpost/signpost_structure.res" id="2_uv2hb"]
+[ext_resource type="ArrayMesh" path="res://assets/props/signpost/signpost_structure_lod1.res" id="3_7ptlx"]
+[ext_resource type="ArrayMesh" path="res://assets/props/signpost/signpost_structure_lod2.res" id="4_nstbi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_318nb"]
+size = Vector3(0.8, 2.26, 0.8)
+
+[node name="Signpost" type="Node3D"]
+script = ExtResource("1_iowpr")
+asset_id = "signpost"
+display_name = "Panneau directionnel"
+footprint_cells = Vector3i(4, 12, 4)
+triangle_count = 4448
+vertex_count = 8896
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 12.0
+mesh = ExtResource("2_uv2hb")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 12.0
+visibility_range_end = 34.0
+mesh = ExtResource("3_7ptlx")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 34.0
+mesh = ExtResource("4_nstbi")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.58, 1.37, 0.36)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 0.9
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 4.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 1.13, 0.4)
+shape = SubResource("BoxShape3D_318nb")

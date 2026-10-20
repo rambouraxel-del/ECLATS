@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_wlhh7"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tool_rack/tool_rack_structure.res" id="2_678ef"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tool_rack/tool_rack_structure_lod1.res" id="3_8ef08"]
+[ext_resource type="ArrayMesh" path="res://assets/props/tool_rack/tool_rack_structure_lod2.res" id="4_tb1b2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h8oag"]
+size = Vector3(1, 1.38, 0.28)
+
+[node name="ToolRack" type="Node3D"]
+script = ExtResource("1_wlhh7")
+asset_id = "tool_rack"
+display_name = "Râtelier d'outils"
+footprint_cells = Vector3i(5, 7, 2)
+triangle_count = 3610
+vertex_count = 7220
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 10.0
+mesh = ExtResource("2_678ef")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 10.0
+visibility_range_end = 28.0
+mesh = ExtResource("3_8ef08")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 28.0
+mesh = ExtResource("4_tb1b2")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.69, 0.14)
+shape = SubResource("BoxShape3D_h8oag")

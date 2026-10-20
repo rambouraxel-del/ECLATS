@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_okex5"]
+[ext_resource type="ArrayMesh" path="res://assets/props/vegetable_bed/vegetable_bed_structure.res" id="2_djq0y"]
+[ext_resource type="ArrayMesh" path="res://assets/props/vegetable_bed/vegetable_bed_structure_lod1.res" id="3_70rw4"]
+[ext_resource type="ArrayMesh" path="res://assets/props/vegetable_bed/vegetable_bed_structure_lod2.res" id="4_osbcb"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tie0y"]
+size = Vector3(2, 0.5, 1)
+
+[node name="VegetableBed" type="Node3D"]
+script = ExtResource("1_okex5")
+asset_id = "vegetable_bed"
+display_name = "Carré de potager"
+footprint_cells = Vector3i(10, 3, 5)
+triangle_count = 9920
+vertex_count = 19840
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 10.0
+mesh = ExtResource("2_djq0y")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 10.0
+visibility_range_end = 26.0
+mesh = ExtResource("3_70rw4")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 26.0
+mesh = ExtResource("4_osbcb")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.25, 0.5)
+shape = SubResource("BoxShape3D_tie0y")

@@ -1,5 +1,5 @@
 {
-	"_doc": "Préréglages d'éclairage partagés par toutes les scènes (touche L pour passer au suivant). Couleurs en sRGB. sun_angle = hauteur du soleil en degrés au-dessus de l'horizon, sun_heading = direction en degrés (0 = nord).",
+	"_doc": "Préréglages d'éclairage partagés par toutes les scènes (touche L pour passer au suivant). Couleurs en sRGB. sun_angle = hauteur du soleil en degrés au-dessus de l'horizon, sun_heading = direction en degrés (0 = nord). Champs Lot 3 : lamp_scale (intensité des lumières d'objets), lamp_emission (verres de lanternes/fenêtres), cloud_light / cloud_shadow / cloud_cover (nuages), stars (0-1), moon (0-1).",
 	"presets": [
 		{
 			"key": "day",
@@ -16,7 +16,9 @@
 			"exposure": 0.95,
 			"fog_color": "#c4dbee",
 			"fog_density": 0.0012,
-			"glow": 0.6
+			"glow": 0.6,
+			"lamp_scale": 0.0,
+			"lamp_emission": 0.35
 		},
 		{
 			"key": "golden",
@@ -33,7 +35,9 @@
 			"exposure": 1.0,
 			"fog_color": "#e9c6a4",
 			"fog_density": 0.0015,
-			"glow": 0.8
+			"glow": 0.8,
+			"lamp_scale": 0.0,
+			"lamp_emission": 0.35
 		},
 		{
 			"key": "overcast",
@@ -50,7 +54,9 @@
 			"exposure": 0.95,
 			"fog_color": "#d3d8de",
 			"fog_density": 0.0,
-			"glow": 0.2
+			"glow": 0.2,
+			"lamp_scale": 0.0,
+			"lamp_emission": 0.35
 		},
 		{
 			"key": "dusk",
@@ -67,7 +73,9 @@
 			"exposure": 1.1,
 			"fog_color": "#6d5a73",
 			"fog_density": 0.002,
-			"glow": 1.1
+			"glow": 1.1,
+			"lamp_scale": 0.0,
+			"lamp_emission": 0.35
 		},
 		{
 			"key": "presentation",
@@ -84,7 +92,81 @@
 			"exposure": 1.0,
 			"fog_color": "#e9dccb",
 			"fog_density": 0.0,
-			"glow": 0.5
+			"glow": 0.5,
+			"lamp_scale": 0.0,
+			"lamp_emission": 0.35
+		},
+		{
+			"key": "village_day",
+			"name": "Village · plein jour",
+			"sun_color": "#fff0d6",
+			"sun_energy": 1.05,
+			"sun_angle": 50,
+			"sun_heading": 32,
+			"sky_top": "#5f95d8",
+			"sky_horizon": "#bcd6ee",
+			"ground_bottom": "#7f9cc6",
+			"ground_horizon": "#d9e3f0",
+			"ambient_energy": 0.62,
+			"exposure": 0.92,
+			"fog_color": "#cfe0ef",
+			"fog_density": 0.0012,
+			"glow": 0.5,
+			"lamp_scale": 0.1,
+			"lamp_emission": 0.12,
+			"cloud_light": "#ffffff",
+			"cloud_shadow": "#9fb0cc",
+			"cloud_cover": 0.5,
+			"stars": 0.0,
+			"moon": 0.0
+		},
+		{
+			"key": "village_sunset",
+			"name": "Village · coucher de soleil",
+			"sun_color": "#ff9a55",
+			"sun_energy": 1.0,
+			"sun_angle": 8,
+			"sun_heading": 248,
+			"sky_top": "#47589f",
+			"sky_horizon": "#f3a56c",
+			"ground_bottom": "#8a5f80",
+			"ground_horizon": "#eeb08a",
+			"ambient_energy": 0.5,
+			"exposure": 0.98,
+			"fog_color": "#e5ac88",
+			"fog_density": 0.0026,
+			"glow": 0.9,
+			"lamp_scale": 0.75,
+			"lamp_emission": 1.0,
+			"cloud_light": "#ffc48c",
+			"cloud_shadow": "#8c5f86",
+			"cloud_cover": 0.6,
+			"stars": 0.12,
+			"moon": 0.0
+		},
+		{
+			"key": "village_night",
+			"name": "Village · nuit",
+			"sun_color": "#9fb8ff",
+			"sun_energy": 0.5,
+			"sun_angle": 38,
+			"sun_heading": 115,
+			"sky_top": "#0a1030",
+			"sky_horizon": "#233559",
+			"ground_bottom": "#10172f",
+			"ground_horizon": "#2b3a60",
+			"ambient_energy": 0.5,
+			"exposure": 1.1,
+			"fog_color": "#1d2b4c",
+			"fog_density": 0.0028,
+			"glow": 1.3,
+			"lamp_scale": 1.5,
+			"lamp_emission": 1.9,
+			"cloud_light": "#7385b0",
+			"cloud_shadow": "#27315a",
+			"cloud_cover": 0.45,
+			"stars": 1.0,
+			"moon": 1.0
 		}
 	]
 }

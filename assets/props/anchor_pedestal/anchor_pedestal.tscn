@@ -1,32 +1,45 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=10 format=3]
 
-[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_cykjg"]
-[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_structure.res" id="2_kp18h"]
-[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_anchor_crystal.res" id="3_2k6bi"]
-[ext_resource type="Script" path="res://scripts/assets/floating_part.gd" id="4_8ftny"]
-[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_orbiting_shards.res" id="5_7u2py"]
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_eqv3k"]
+[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_structure.res" id="2_kts7m"]
+[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_structure_lod1.res" id="3_rfb2g"]
+[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_structure_lod2.res" id="4_fqchc"]
+[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_anchor_crystal.res" id="5_54u70"]
+[ext_resource type="Script" path="res://scripts/assets/floating_part.gd" id="6_jgq3k"]
+[ext_resource type="ArrayMesh" path="res://assets/props/anchor_pedestal/anchor_pedestal_orbiting_shards.res" id="7_acbms"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_2gta7"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_l3pov"]
 size = Vector3(1.6, 0.36, 1.6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_sd5dp"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_rfx7r"]
 size = Vector3(0.8, 1.06, 0.8)
 
 [node name="AnchorPedestal" type="Node3D"]
-script = ExtResource("1_cykjg")
+script = ExtResource("1_eqv3k")
 asset_id = "anchor_pedestal"
 display_name = "Piédestal d'Ancre"
 footprint_cells = Vector3i(8, 12, 8)
-triangle_count = 26964
-vertex_count = 53928
+triangle_count = 26978
+vertex_count = 53956
 
 [node name="Structure" type="MeshInstance3D" parent="."]
-mesh = ExtResource("2_kp18h")
+visibility_range_end = 14.0
+mesh = ExtResource("2_kts7m")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 14.0
+visibility_range_end = 40.0
+mesh = ExtResource("3_rfb2g")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 40.0
+mesh = ExtResource("4_fqchc")
 
 [node name="AnchorCrystal" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.56, 1.44, 0.56)
-mesh = ExtResource("3_2k6bi")
-script = ExtResource("4_8ftny")
+mesh = ExtResource("5_54u70")
+script = ExtResource("6_jgq3k")
 mode = "float"
 bob_height = 0.05
 spin_speed = 0.35
@@ -34,8 +47,8 @@ pivot = Vector3(0.24, 0.48, 0.24)
 
 [node name="OrbitingShards" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
-mesh = ExtResource("5_7u2py")
-script = ExtResource("4_8ftny")
+mesh = ExtResource("7_acbms")
+script = ExtResource("6_jgq3k")
 mode = "orbit"
 bob_height = 0.05
 spin_speed = 0.35
@@ -45,20 +58,26 @@ pivot = Vector3(0.8, 0.24, 0.8)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 1.92, 0.8)
 light_color = Color(0.423529, 0.784314, 1, 1)
 light_energy = 2.4
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
 omni_range = 7.0
 
 [node name="Light2" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.44, 0.8)
 light_color = Color(0.423529, 0.784314, 1, 1)
 light_energy = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
 omni_range = 2.5
 
 [node name="Collision" type="StaticBody3D" parent="."]
 
 [node name="Box1" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.18, 0.8)
-shape = SubResource("BoxShape3D_2gta7")
+shape = SubResource("BoxShape3D_l3pov")
 
 [node name="Box2" type="CollisionShape3D" parent="Collision"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.89, 0.8)
-shape = SubResource("BoxShape3D_sd5dp")
+shape = SubResource("BoxShape3D_rfx7r")

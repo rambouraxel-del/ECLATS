@@ -1,0 +1,71 @@
+{
+	"id": "tool_rack",
+	"name": "Râtelier d'outils",
+	"group": "prop",
+	"footprint_cells": [
+		5,
+		7,
+		2
+	],
+	"size_m": [
+		1,
+		1.39999997615814,
+		0.400000005960464
+	],
+	"lod_ranges": [
+		10,
+		28,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 7220,
+	"triangles": 3610,
+	"triangles_lod": [
+		3610,
+		740,
+		344
+	],
+	"solid_voxels": 16436,
+	"mesh_kb": 96,
+	"build_ms": 7,
+	"total_ms": 219,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/tool_rack/tool_rack_structure.res",
+				"res://assets/props/tool_rack/tool_rack_structure_lod1.res",
+				"res://assets/props/tool_rack/tool_rack_structure_lod2.res"
+			],
+			"triangles": [
+				3610,
+				740,
+				344
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				1,
+				1.37999999523163,
+				0.280000001192093
+			]
+		}
+	]
+}

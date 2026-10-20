@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_kbckk"]
+[ext_resource type="ArrayMesh" path="res://assets/props/balustrade/balustrade_structure.res" id="2_4gdxw"]
+[ext_resource type="ArrayMesh" path="res://assets/props/balustrade/balustrade_structure_lod1.res" id="3_i0apj"]
+[ext_resource type="ArrayMesh" path="res://assets/props/balustrade/balustrade_structure_lod2.res" id="4_mjus7"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7y7bk"]
+size = Vector3(1, 0.58, 0.2)
+
+[node name="Balustrade" type="Node3D"]
+script = ExtResource("1_kbckk")
+asset_id = "balustrade"
+display_name = "Balustrade"
+footprint_cells = Vector3i(5, 5, 2)
+triangle_count = 1230
+vertex_count = 2460
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 10.0
+mesh = ExtResource("2_4gdxw")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 10.0
+visibility_range_end = 26.0
+mesh = ExtResource("3_i0apj")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 26.0
+mesh = ExtResource("4_mjus7")
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.29, 0.1)
+shape = SubResource("BoxShape3D_7y7bk")

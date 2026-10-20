@@ -1,0 +1,83 @@
+{
+	"id": "crystal_lamp",
+	"name": "Lampadaire à éclat",
+	"group": "prop",
+	"footprint_cells": [
+		4,
+		14,
+		3
+	],
+	"size_m": [
+		0.800000011920929,
+		2.79999995231628,
+		0.600000023841858
+	],
+	"lod_ranges": [
+		12,
+		34,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 9932,
+	"triangles": 4966,
+	"triangles_lod": [
+		4966,
+		1534,
+		340
+	],
+	"solid_voxels": 17206,
+	"mesh_kb": 139,
+	"build_ms": 26,
+	"total_ms": 290,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/crystal_lamp/crystal_lamp_structure.res",
+				"res://assets/props/crystal_lamp/crystal_lamp_structure_lod1.res",
+				"res://assets/props/crystal_lamp/crystal_lamp_structure_lod2.res"
+			],
+			"triangles": [
+				4966,
+				1534,
+				340
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				0.620000004768372,
+				1.77999997138977,
+				0.239999994635582
+			],
+			"color": "ffb860",
+			"energy": 1.6,
+			"range": 6.5,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0.0399999991059303,
+				0,
+				0.0399999991059303
+			],
+			"size": [
+				0.519999980926514,
+				2.5,
+				0.459999978542328
+			]
+		}
+	]
+}

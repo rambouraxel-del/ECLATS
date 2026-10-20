@@ -19,7 +19,7 @@ func _initialize() -> void:
 		args.remove_at(2)
 	if args.size() >= 4 and args[2] == "view":
 		cam.set_process(false)
-		inst.call("_go_to_view", int(args[3]))
+		inst.call("_go_view" if inst.has_method("_go_view") else "_go_to_view", int(args[3]))
 		if args.size() >= 5:
 			inst.get_node("LightingRig").apply_preset_key(args[4])
 		args = PackedStringArray()
@@ -35,5 +35,10 @@ func _initialize() -> void:
 		await process_frame
 	var img := root.get_viewport().get_texture().get_image()
 	img.save_png(out)
+	var ri := RenderingServer
+	print("rendu : %d objets, %d primitives, %d appels de dessin" % [
+		ri.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME),
+		ri.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
+		ri.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
 	print("saved ", out)
 	quit()

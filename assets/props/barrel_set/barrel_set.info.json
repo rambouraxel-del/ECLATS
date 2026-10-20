@@ -1,0 +1,71 @@
+{
+	"id": "barrel_set",
+	"name": "Tonneaux et caisse",
+	"group": "prop",
+	"footprint_cells": [
+		7,
+		5,
+		5
+	],
+	"size_m": [
+		1.39999997615814,
+		1,
+		1
+	],
+	"lod_ranges": [
+		10,
+		28,
+		0
+	],
+	"instanceable": true,
+	"ground_y": 0,
+	"vertices": 31732,
+	"triangles": 15866,
+	"triangles_lod": [
+		15866,
+		4326,
+		744
+	],
+	"solid_voxels": 51438,
+	"mesh_kb": 413,
+	"build_ms": 68,
+	"total_ms": 712,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/barrel_set/barrel_set_structure.res",
+				"res://assets/props/barrel_set/barrel_set_structure_lod1.res",
+				"res://assets/props/barrel_set/barrel_set_structure_lod2.res"
+			],
+			"triangles": [
+				15866,
+				4326,
+				744
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [],
+	"colliders": [
+		{
+			"position": [
+				0,
+				0,
+				0
+			],
+			"size": [
+				1.39999997615814,
+				1.01999998092651,
+				1
+			]
+		}
+	]
+}

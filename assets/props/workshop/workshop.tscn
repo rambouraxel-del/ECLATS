@@ -1,0 +1,138 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_foauu"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_flower_box_0.res" id="2_divpb"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_flower_box_0_lod1.res" id="3_gtt5t"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_flower_box_0_lod2.res" id="4_d3vop"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_banner_0.res" id="5_5k1ss"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_banner_0_lod1.res" id="6_cjas0"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_banner_0_lod2.res" id="7_1jkg3"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_lantern_0.res" id="8_af3t2"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_lantern_0_lod1.res" id="9_rbfix"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_lantern_0_lod2.res" id="10_a5qvd"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_lantern_1.res" id="11_yh3b3"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_lantern_1_lod1.res" id="12_o5k1g"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_lantern_1_lod2.res" id="13_n4i0c"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_structure.res" id="14_wttyt"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_structure_lod1.res" id="15_hjit4"]
+[ext_resource type="ArrayMesh" path="res://assets/props/workshop/workshop_structure_lod2.res" id="16_f8xok"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4hje1"]
+size = Vector3(6.8, 5.7, 3.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d2upn"]
+size = Vector3(1.7, 5.7, 1.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_t6i21"]
+size = Vector3(1.7, 5.7, 1.7)
+
+[node name="Workshop" type="Node3D"]
+script = ExtResource("1_foauu")
+asset_id = "workshop"
+display_name = "Atelier"
+footprint_cells = Vector3i(38, 46, 32)
+triangle_count = 18536
+vertex_count = 37072
+
+[node name="FlowerBox0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 3.3, 6)
+visibility_range_end = 28.0
+mesh = ExtResource("2_divpb")
+
+[node name="FlowerBox0_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 3.3, 6)
+visibility_range_begin = 28.0
+visibility_range_end = 75.0
+mesh = ExtResource("3_gtt5t")
+
+[node name="FlowerBox0_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 3.3, 6)
+cast_shadow = 0
+visibility_range_begin = 75.0
+mesh = ExtResource("4_d3vop")
+
+[node name="Banner0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 2.34, 5.92)
+visibility_range_end = 28.0
+mesh = ExtResource("5_5k1ss")
+
+[node name="Banner0_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 2.34, 5.92)
+visibility_range_begin = 28.0
+visibility_range_end = 75.0
+mesh = ExtResource("6_cjas0")
+
+[node name="Banner0_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 2.34, 5.92)
+cast_shadow = 0
+visibility_range_begin = 75.0
+mesh = ExtResource("7_1jkg3")
+
+[node name="Lantern0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.64, 2.12, 5.94)
+visibility_range_end = 28.0
+mesh = ExtResource("8_af3t2")
+
+[node name="Lantern0_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.64, 2.12, 5.94)
+visibility_range_begin = 28.0
+visibility_range_end = 75.0
+mesh = ExtResource("9_rbfix")
+
+[node name="Lantern0_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.64, 2.12, 5.94)
+cast_shadow = 0
+visibility_range_begin = 75.0
+mesh = ExtResource("10_a5qvd")
+
+[node name="Lantern1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.64, 2.12, 5.94)
+visibility_range_end = 28.0
+mesh = ExtResource("11_yh3b3")
+
+[node name="Lantern1_LOD1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.64, 2.12, 5.94)
+visibility_range_begin = 28.0
+visibility_range_end = 75.0
+mesh = ExtResource("12_o5k1g")
+
+[node name="Lantern1_LOD2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.64, 2.12, 5.94)
+cast_shadow = 0
+visibility_range_begin = 75.0
+mesh = ExtResource("13_n4i0c")
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 28.0
+mesh = ExtResource("14_wttyt")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 28.0
+visibility_range_end = 75.0
+mesh = ExtResource("15_hjit4")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 75.0
+mesh = ExtResource("16_f8xok")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 2.3, 6.1)
+light_color = Color(1, 0.721569, 0.376471, 1)
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 2.85, 2.35)
+shape = SubResource("BoxShape3D_4hje1")
+
+[node name="Box2" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 2.85, 5.15)
+shape = SubResource("BoxShape3D_d2upn")
+
+[node name="Box3" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.35, 2.85, 5.15)
+shape = SubResource("BoxShape3D_t6i21")

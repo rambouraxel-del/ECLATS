@@ -1,130 +1,1817 @@
 {
 	"artisan_workbench": {
+		"id": "artisan_workbench",
 		"name": "Établi d'artisan",
+		"group": "lot2",
+		"footprint_cells": [
+			10,
+			10,
+			5
+		],
 		"size_m": [
 			2,
 			2,
 			1
 		],
-		"vertices": 28584,
-		"triangles": 14292,
-		"solid_microvoxels": 105072,
-		"mesh_kb": 171,
-		"build_ms": 51,
-		"total_ms": 763,
-		"parts": [
-			{
-				"name": "structure",
-				"vertices": 28584,
-				"triangles": 14292,
-				"file_kb": 171
-			}
-		]
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 28580,
+		"triangles": 14290,
+		"triangles_lod": [
+			14290,
+			4966,
+			1212
+		],
+		"solid_voxels": 105072,
+		"mesh_kb": 421,
+		"build_ms": 63,
+		"total_ms": 1308
 	},
 	"ancient_chest": {
+		"id": "ancient_chest",
 		"name": "Coffre ancien",
+		"group": "lot2",
+		"footprint_cells": [
+			6,
+			4,
+			4
+		],
 		"size_m": [
 			1.20000004768372,
 			0.800000011920929,
 			0.800000011920929
 		],
-		"vertices": 13668,
-		"triangles": 6834,
-		"solid_microvoxels": 62361,
-		"mesh_kb": 79,
-		"build_ms": 47,
-		"total_ms": 338,
-		"parts": [
-			{
-				"name": "structure",
-				"vertices": 13668,
-				"triangles": 6834,
-				"file_kb": 79
-			}
-		]
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 13688,
+		"triangles": 6844,
+		"triangles_lod": [
+			6844,
+			1508,
+			310
+		],
+		"solid_voxels": 62361,
+		"mesh_kb": 179,
+		"build_ms": 53,
+		"total_ms": 571
 	},
 	"anchor_pedestal": {
+		"id": "anchor_pedestal",
 		"name": "Piédestal d'Ancre",
+		"group": "lot2",
+		"footprint_cells": [
+			8,
+			12,
+			8
+		],
 		"size_m": [
 			1.60000002384186,
 			2.40000009536743,
 			1.60000002384186
 		],
-		"vertices": 53928,
-		"triangles": 26964,
-		"solid_microvoxels": 142156,
-		"mesh_kb": 324,
-		"build_ms": 165,
-		"total_ms": 939,
-		"parts": [
-			{
-				"name": "structure",
-				"vertices": 49656,
-				"triangles": 24828,
-				"file_kb": 299
-			},
-			{
-				"name": "anchor_crystal",
-				"vertices": 3344,
-				"triangles": 1672,
-				"file_kb": 18
-			},
-			{
-				"name": "orbiting_shards",
-				"vertices": 928,
-				"triangles": 464,
-				"file_kb": 5
-			}
-		]
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 53956,
+		"triangles": 26978,
+		"triangles_lod": [
+			26978,
+			6980,
+			1150
+		],
+		"solid_voxels": 142156,
+		"mesh_kb": 716,
+		"build_ms": 176,
+		"total_ms": 1619
 	},
 	"market_stall": {
+		"id": "market_stall",
 		"name": "Étal de marchand",
+		"group": "lot2",
+		"footprint_cells": [
+			12,
+			13,
+			8
+		],
 		"size_m": [
 			2.40000009536743,
 			2.60000014305115,
 			1.60000002384186
 		],
-		"vertices": 90764,
-		"triangles": 45382,
-		"solid_microvoxels": 250405,
-		"mesh_kb": 531,
-		"build_ms": 114,
-		"total_ms": 2111,
-		"parts": [
-			{
-				"name": "structure",
-				"vertices": 63440,
-				"triangles": 31720,
-				"file_kb": 376
-			},
-			{
-				"name": "canopy",
-				"vertices": 27324,
-				"triangles": 13662,
-				"file_kb": 154
-			}
-		]
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 90780,
+		"triangles": 45390,
+		"triangles_lod": [
+			45390,
+			13556,
+			3654
+		],
+		"solid_voxels": 250405,
+		"mesh_kb": 1252,
+		"build_ms": 142,
+		"total_ms": 3922
 	},
 	"decorative_bench": {
+		"id": "decorative_bench",
 		"name": "Banc décoratif",
+		"group": "lot2",
+		"footprint_cells": [
+			9,
+			5,
+			3
+		],
 		"size_m": [
 			1.80000007152557,
 			1,
 			0.600000023841858
 		],
-		"vertices": 11128,
-		"triangles": 5564,
-		"solid_microvoxels": 33226,
-		"mesh_kb": 65,
-		"build_ms": 90,
-		"total_ms": 352,
-		"parts": [
-			{
-				"name": "structure",
-				"vertices": 11128,
-				"triangles": 5564,
-				"file_kb": 65
-			}
-		]
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 11744,
+		"triangles": 5872,
+		"triangles_lod": [
+			5872,
+			1714,
+			498
+		],
+		"solid_voxels": 33226,
+		"mesh_kb": 164,
+		"build_ms": 200,
+		"total_ms": 660
+	},
+	"tree_oak_1": {
+		"id": "tree_oak_1",
+		"name": "Chêne 1",
+		"group": "tree",
+		"footprint_cells": [
+			39,
+			19,
+			39
+		],
+		"size_m": [
+			7.80000019073486,
+			3.79999995231628,
+			7.80000019073486
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 77436,
+		"triangles": 38718,
+		"triangles_lod": [
+			38718,
+			6350,
+			1556
+		],
+		"solid_voxels": 33942,
+		"mesh_kb": 930,
+		"build_ms": 835,
+		"total_ms": 1614
+	},
+	"tree_pine_1": {
+		"id": "tree_pine_1",
+		"name": "Pin 1",
+		"group": "tree",
+		"footprint_cells": [
+			22,
+			33,
+			22
+		],
+		"size_m": [
+			4.40000009536743,
+			6.59999990463257,
+			4.40000009536743
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 30964,
+		"triangles": 15482,
+		"triangles_lod": [
+			15482,
+			4614,
+			728
+		],
+		"solid_voxels": 19397,
+		"mesh_kb": 401,
+		"build_ms": 700,
+		"total_ms": 1111
+	},
+	"tree_oak_2": {
+		"id": "tree_oak_2",
+		"name": "Chêne 2",
+		"group": "tree",
+		"footprint_cells": [
+			35,
+			22,
+			35
+		],
+		"size_m": [
+			7,
+			4.40000009536743,
+			7
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 83732,
+		"triangles": 41866,
+		"triangles_lod": [
+			41866,
+			7234,
+			1820
+		],
+		"solid_voxels": 33982,
+		"mesh_kb": 1018,
+		"build_ms": 837,
+		"total_ms": 1637
+	},
+	"tree_parasol_1": {
+		"id": "tree_parasol_1",
+		"name": "Arbre parasol 1",
+		"group": "tree",
+		"footprint_cells": [
+			34,
+			27,
+			34
+		],
+		"size_m": [
+			6.80000019073486,
+			5.40000009536743,
+			6.80000019073486
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 57940,
+		"triangles": 28970,
+		"triangles_lod": [
+			28970,
+			4426,
+			1096
+		],
+		"solid_voxels": 26061,
+		"mesh_kb": 686,
+		"build_ms": 923,
+		"total_ms": 1553
+	},
+	"tree_weeping_1": {
+		"id": "tree_weeping_1",
+		"name": "Saule pleureur 1",
+		"group": "tree",
+		"footprint_cells": [
+			27,
+			22,
+			27
+		],
+		"size_m": [
+			5.40000009536743,
+			4.40000009536743,
+			5.40000009536743
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 80176,
+		"triangles": 40088,
+		"triangles_lod": [
+			40088,
+			6122,
+			1090
+		],
+		"solid_voxels": 27731,
+		"mesh_kb": 920,
+		"build_ms": 791,
+		"total_ms": 1526
+	},
+	"tree_birch_1": {
+		"id": "tree_birch_1",
+		"name": "Bouleau 1",
+		"group": "tree",
+		"footprint_cells": [
+			27,
+			32,
+			27
+		],
+		"size_m": [
+			5.40000009536743,
+			6.40000009536743,
+			5.40000009536743
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 35424,
+		"triangles": 17712,
+		"triangles_lod": [
+			17712,
+			3330,
+			778
+		],
+		"solid_voxels": 14351,
+		"mesh_kb": 438,
+		"build_ms": 803,
+		"total_ms": 1224
+	},
+	"tree_fruit_1": {
+		"id": "tree_fruit_1",
+		"name": "Arbre fruitier 1",
+		"group": "tree",
+		"footprint_cells": [
+			20,
+			21,
+			20
+		],
+		"size_m": [
+			4,
+			4.20000028610229,
+			4
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 35016,
+		"triangles": 17508,
+		"triangles_lod": [
+			17508,
+			2406,
+			620
+		],
+		"solid_voxels": 14367,
+		"mesh_kb": 406,
+		"build_ms": 718,
+		"total_ms": 1039
+	},
+	"tree_fruit_2": {
+		"id": "tree_fruit_2",
+		"name": "Arbre fruitier 2",
+		"group": "tree",
+		"footprint_cells": [
+			21,
+			25,
+			21
+		],
+		"size_m": [
+			4.20000028610229,
+			5,
+			4.20000028610229
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 36136,
+		"triangles": 18068,
+		"triangles_lod": [
+			18068,
+			2516,
+			608
+		],
+		"solid_voxels": 14582,
+		"mesh_kb": 421,
+		"build_ms": 773,
+		"total_ms": 1122
+	},
+	"water_well": {
+		"id": "water_well",
+		"name": "Puits",
+		"group": "prop",
+		"footprint_cells": [
+			7,
+			11,
+			7
+		],
+		"size_m": [
+			1.39999997615814,
+			2.20000004768372,
+			1.39999997615814
+		],
+		"lod_ranges": [
+			12,
+			34,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 41400,
+		"triangles": 20700,
+		"triangles_lod": [
+			20700,
+			6970,
+			1610
+		],
+		"solid_voxels": 107965,
+		"mesh_kb": 589,
+		"build_ms": 250,
+		"total_ms": 1591
+	},
+	"mooring_post": {
+		"id": "mooring_post",
+		"name": "Bitte d'amarrage",
+		"group": "prop",
+		"footprint_cells": [
+			5,
+			6,
+			4
+		],
+		"size_m": [
+			1,
+			1.20000004768372,
+			0.800000011920929
+		],
+		"lod_ranges": [
+			10,
+			28,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 17048,
+		"triangles": 8524,
+		"triangles_lod": [
+			8524,
+			2352,
+			290
+		],
+		"solid_voxels": 32407,
+		"mesh_kb": 211,
+		"build_ms": 30,
+		"total_ms": 344
+	},
+	"balustrade": {
+		"id": "balustrade",
+		"name": "Balustrade",
+		"group": "prop",
+		"footprint_cells": [
+			5,
+			5,
+			2
+		],
+		"size_m": [
+			1,
+			1,
+			0.400000005960464
+		],
+		"lod_ranges": [
+			10,
+			26,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 2460,
+		"triangles": 1230,
+		"triangles_lod": [
+			1230,
+			612,
+			140
+		],
+		"solid_voxels": 8004,
+		"mesh_kb": 41,
+		"build_ms": 1,
+		"total_ms": 88
+	},
+	"large_planter": {
+		"id": "large_planter",
+		"name": "Grande jardinière",
+		"group": "prop",
+		"footprint_cells": [
+			8,
+			5,
+			3
+		],
+		"size_m": [
+			1.60000002384186,
+			1,
+			0.600000023841858
+		],
+		"lod_ranges": [
+			10,
+			28,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 35652,
+		"triangles": 17826,
+		"triangles_lod": [
+			17826,
+			2414,
+			380
+		],
+		"solid_voxels": 53735,
+		"mesh_kb": 406,
+		"build_ms": 43,
+		"total_ms": 552
+	},
+	"canopy_kiosk": {
+		"id": "canopy_kiosk",
+		"name": "Kiosque à auvent",
+		"group": "prop",
+		"footprint_cells": [
+			11,
+			12,
+			7
+		],
+		"size_m": [
+			2.20000004768372,
+			2.40000009536743,
+			1.39999997615814
+		],
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 41428,
+		"triangles": 20714,
+		"triangles_lod": [
+			20714,
+			6144,
+			2162
+		],
+		"solid_voxels": 150863,
+		"mesh_kb": 583,
+		"build_ms": 61,
+		"total_ms": 2068
+	},
+	"utility_cart": {
+		"id": "utility_cart",
+		"name": "Charrette",
+		"group": "prop",
+		"footprint_cells": [
+			11,
+			8,
+			5
+		],
+		"size_m": [
+			2.20000004768372,
+			1.60000002384186,
+			1
+		],
+		"lod_ranges": [
+			10,
+			28,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 22260,
+		"triangles": 11130,
+		"triangles_lod": [
+			11130,
+			3432,
+			980
+		],
+		"solid_voxels": 34022,
+		"mesh_kb": 307,
+		"build_ms": 18,
+		"total_ms": 720
+	},
+	"barrel_set": {
+		"id": "barrel_set",
+		"name": "Tonneaux et caisse",
+		"group": "prop",
+		"footprint_cells": [
+			7,
+			5,
+			5
+		],
+		"size_m": [
+			1.39999997615814,
+			1,
+			1
+		],
+		"lod_ranges": [
+			10,
+			28,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 31732,
+		"triangles": 15866,
+		"triangles_lod": [
+			15866,
+			4326,
+			744
+		],
+		"solid_voxels": 51438,
+		"mesh_kb": 413,
+		"build_ms": 68,
+		"total_ms": 712
+	},
+	"shrine_marker": {
+		"id": "shrine_marker",
+		"name": "Sanctuaire",
+		"group": "prop",
+		"footprint_cells": [
+			6,
+			12,
+			6
+		],
+		"size_m": [
+			1.20000004768372,
+			2.40000009536743,
+			1.20000004768372
+		],
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 38388,
+		"triangles": 19194,
+		"triangles_lod": [
+			19194,
+			3852,
+			608
+		],
+		"solid_voxels": 105995,
+		"mesh_kb": 482,
+		"build_ms": 84,
+		"total_ms": 1055
+	},
+	"crate_stack": {
+		"id": "crate_stack",
+		"name": "Caisses empilées",
+		"group": "prop",
+		"footprint_cells": [
+			5,
+			5,
+			5
+		],
+		"size_m": [
+			1,
+			1,
+			1
+		],
+		"lod_ranges": [
+			10,
+			26,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 7592,
+		"triangles": 3796,
+		"triangles_lod": [
+			3796,
+			1062,
+			390
+		],
+		"solid_voxels": 31000,
+		"mesh_kb": 103,
+		"build_ms": 7,
+		"total_ms": 284
+	},
+	"garden_fence": {
+		"id": "garden_fence",
+		"name": "Clôture de jardin",
+		"group": "prop",
+		"footprint_cells": [
+			5,
+			4,
+			1
+		],
+		"size_m": [
+			1,
+			0.800000011920929,
+			0.200000002980232
+		],
+		"lod_ranges": [
+			8,
+			22,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 2896,
+		"triangles": 1448,
+		"triangles_lod": [
+			1448,
+			362,
+			98
+		],
+		"solid_voxels": 3816,
+		"mesh_kb": 37,
+		"build_ms": 2,
+		"total_ms": 84
+	},
+	"vegetable_bed": {
+		"id": "vegetable_bed",
+		"name": "Carré de potager",
+		"group": "prop",
+		"footprint_cells": [
+			10,
+			3,
+			5
+		],
+		"size_m": [
+			2,
+			0.600000023841858,
+			1
+		],
+		"lod_ranges": [
+			10,
+			26,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 19840,
+		"triangles": 9920,
+		"triangles_lod": [
+			9920,
+			4224,
+			490
+		],
+		"solid_voxels": 56905,
+		"mesh_kb": 267,
+		"build_ms": 21,
+		"total_ms": 630
+	},
+	"crystal_lamp": {
+		"id": "crystal_lamp",
+		"name": "Lampadaire à éclat",
+		"group": "prop",
+		"footprint_cells": [
+			4,
+			14,
+			3
+		],
+		"size_m": [
+			0.800000011920929,
+			2.79999995231628,
+			0.600000023841858
+		],
+		"lod_ranges": [
+			12,
+			34,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 9932,
+		"triangles": 4966,
+		"triangles_lod": [
+			4966,
+			1534,
+			340
+		],
+		"solid_voxels": 17206,
+		"mesh_kb": 139,
+		"build_ms": 26,
+		"total_ms": 290
+	},
+	"banner_stand": {
+		"id": "banner_stand",
+		"name": "Porte-bannière",
+		"group": "prop",
+		"footprint_cells": [
+			6,
+			12,
+			2
+		],
+		"size_m": [
+			1.20000004768372,
+			2.40000009536743,
+			0.400000005960464
+		],
+		"lod_ranges": [
+			12,
+			32,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 5624,
+		"triangles": 2812,
+		"triangles_lod": [
+			2812,
+			990,
+			302
+		],
+		"solid_voxels": 10848,
+		"mesh_kb": 82,
+		"build_ms": 10,
+		"total_ms": 251
+	},
+	"signpost": {
+		"id": "signpost",
+		"name": "Panneau directionnel",
+		"group": "prop",
+		"footprint_cells": [
+			4,
+			12,
+			4
+		],
+		"size_m": [
+			0.800000011920929,
+			2.40000009536743,
+			0.800000011920929
+		],
+		"lod_ranges": [
+			12,
+			34,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 8896,
+		"triangles": 4448,
+		"triangles_lod": [
+			4448,
+			1278,
+			508
+		],
+		"solid_voxels": 21640,
+		"mesh_kb": 129,
+		"build_ms": 9,
+		"total_ms": 369
+	},
+	"notice_board": {
+		"id": "notice_board",
+		"name": "Tableau d'affichage",
+		"group": "prop",
+		"footprint_cells": [
+			8,
+			10,
+			2
+		],
+		"size_m": [
+			1.60000002384186,
+			2,
+			0.400000005960464
+		],
+		"lod_ranges": [
+			12,
+			32,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 8632,
+		"triangles": 4316,
+		"triangles_lod": [
+			4316,
+			1170,
+			282
+		],
+		"solid_voxels": 34244,
+		"mesh_kb": 118,
+		"build_ms": 16,
+		"total_ms": 438
+	},
+	"pedestal_fountain": {
+		"id": "pedestal_fountain",
+		"name": "Fontaine à piédestal",
+		"group": "prop",
+		"footprint_cells": [
+			10,
+			9,
+			10
+		],
+		"size_m": [
+			2,
+			1.80000007152557,
+			2
+		],
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 52220,
+		"triangles": 26110,
+		"triangles_lod": [
+			26110,
+			5864,
+			1500
+		],
+		"solid_voxels": 219950,
+		"mesh_kb": 686,
+		"build_ms": 340,
+		"total_ms": 2139
+	},
+	"brazier": {
+		"id": "brazier",
+		"name": "Brasero rituel",
+		"group": "prop",
+		"footprint_cells": [
+			4,
+			8,
+			4
+		],
+		"size_m": [
+			0.800000011920929,
+			1.60000002384186,
+			0.800000011920929
+		],
+		"lod_ranges": [
+			12,
+			34,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 22368,
+		"triangles": 11184,
+		"triangles_lod": [
+			11184,
+			3200,
+			790
+		],
+		"solid_voxels": 24821,
+		"mesh_kb": 293,
+		"build_ms": 15,
+		"total_ms": 432
+	},
+	"forge": {
+		"id": "forge",
+		"name": "Forge",
+		"group": "prop",
+		"footprint_cells": [
+			11,
+			10,
+			8
+		],
+		"size_m": [
+			2.20000004768372,
+			2,
+			1.60000002384186
+		],
+		"lod_ranges": [
+			14,
+			38,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 46696,
+		"triangles": 23348,
+		"triangles_lod": [
+			23348,
+			4562,
+			1624
+		],
+		"solid_voxels": 164929,
+		"mesh_kb": 614,
+		"build_ms": 104,
+		"total_ms": 1590
+	},
+	"tool_rack": {
+		"id": "tool_rack",
+		"name": "Râtelier d'outils",
+		"group": "prop",
+		"footprint_cells": [
+			5,
+			7,
+			2
+		],
+		"size_m": [
+			1,
+			1.39999997615814,
+			0.400000005960464
+		],
+		"lod_ranges": [
+			10,
+			28,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 7220,
+		"triangles": 3610,
+		"triangles_lod": [
+			3610,
+			740,
+			344
+		],
+		"solid_voxels": 16436,
+		"mesh_kb": 96,
+		"build_ms": 7,
+		"total_ms": 219
+	},
+	"storage_rack": {
+		"id": "storage_rack",
+		"name": "Étagère de stockage",
+		"group": "prop",
+		"footprint_cells": [
+			8,
+			9,
+			3
+		],
+		"size_m": [
+			1.60000002384186,
+			1.80000007152557,
+			0.600000023841858
+		],
+		"lod_ranges": [
+			12,
+			32,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 33708,
+		"triangles": 16854,
+		"triangles_lod": [
+			16854,
+			3994,
+			1240
+		],
+		"solid_voxels": 85014,
+		"mesh_kb": 431,
+		"build_ms": 29,
+		"total_ms": 966
+	},
+	"supply_chest": {
+		"id": "supply_chest",
+		"name": "Coffre de ravitaillement",
+		"group": "prop",
+		"footprint_cells": [
+			6,
+			3,
+			3
+		],
+		"size_m": [
+			1.20000004768372,
+			0.600000023841858,
+			0.600000023841858
+		],
+		"lod_ranges": [
+			10,
+			26,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 4256,
+		"triangles": 2128,
+		"triangles_lod": [
+			2128,
+			576,
+			190
+		],
+		"solid_voxels": 48210,
+		"mesh_kb": 60,
+		"build_ms": 10,
+		"total_ms": 285
+	},
+	"materials_crate": {
+		"id": "materials_crate",
+		"name": "Caisse à matériaux",
+		"group": "prop",
+		"footprint_cells": [
+			5,
+			3,
+			3
+		],
+		"size_m": [
+			1,
+			0.600000023841858,
+			0.600000023841858
+		],
+		"lod_ranges": [
+			10,
+			26,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 5156,
+		"triangles": 2578,
+		"triangles_lod": [
+			2578,
+			1168,
+			276
+		],
+		"solid_voxels": 21951,
+		"mesh_kb": 84,
+		"build_ms": 9,
+		"total_ms": 220
+	},
+	"teleport_anchor": {
+		"id": "teleport_anchor",
+		"name": "Plateforme d'Ancre",
+		"group": "prop",
+		"footprint_cells": [
+			26,
+			6,
+			26
+		],
+		"size_m": [
+			5.20000028610229,
+			1.20000004768372,
+			5.20000028610229
+		],
+		"lod_ranges": [
+			16,
+			44,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 55432,
+		"triangles": 27716,
+		"triangles_lod": [
+			27716,
+			3238,
+			1132
+		],
+		"solid_voxels": 37284,
+		"mesh_kb": 637,
+		"build_ms": 99,
+		"total_ms": 1026
+	},
+	"crystal_cluster": {
+		"id": "crystal_cluster",
+		"name": "Amas de cristaux",
+		"group": "prop",
+		"footprint_cells": [
+			7,
+			9,
+			7
+		],
+		"size_m": [
+			1.39999997615814,
+			1.80000007152557,
+			1.39999997615814
+		],
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 42844,
+		"triangles": 21422,
+		"triangles_lod": [
+			21422,
+			4492,
+			1018
+		],
+		"solid_voxels": 78123,
+		"mesh_kb": 554,
+		"build_ms": 164,
+		"total_ms": 1046
+	},
+	"ruin_column": {
+		"id": "ruin_column",
+		"name": "Colonne en ruine",
+		"group": "prop",
+		"footprint_cells": [
+			5,
+			14,
+			5
+		],
+		"size_m": [
+			1,
+			2.79999995231628,
+			1
+		],
+		"lod_ranges": [
+			12,
+			34,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 19796,
+		"triangles": 9898,
+		"triangles_lod": [
+			9898,
+			2556,
+			490
+		],
+		"solid_voxels": 82157,
+		"mesh_kb": 260,
+		"build_ms": 138,
+		"total_ms": 803
+	},
+	"ruin_arch": {
+		"id": "ruin_arch",
+		"name": "Arche en ruine",
+		"group": "prop",
+		"footprint_cells": [
+			16,
+			15,
+			4
+		],
+		"size_m": [
+			3.20000004768372,
+			3,
+			0.800000011920929
+		],
+		"lod_ranges": [
+			14,
+			40,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 62128,
+		"triangles": 31064,
+		"triangles_lod": [
+			31064,
+			5258,
+			1704
+		],
+		"solid_voxels": 202477,
+		"mesh_kb": 772,
+		"build_ms": 223,
+		"total_ms": 2277
+	},
+	"house_colonist": {
+		"id": "house_colonist",
+		"name": "Maison de colon",
+		"group": "building",
+		"footprint_cells": [
+			40,
+			52,
+			35
+		],
+		"size_m": [
+			8,
+			10.4000005722046,
+			7
+		],
+		"lod_ranges": [
+			28,
+			75,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 74408,
+		"triangles": 37204,
+		"triangles_lod": [
+			37204,
+			7580,
+			1516
+		],
+		"solid_voxels": 299541,
+		"mesh_kb": 912,
+		"build_ms": 132,
+		"total_ms": 2511
+	},
+	"house_cottage": {
+		"id": "house_cottage",
+		"name": "Chaumière",
+		"group": "building",
+		"footprint_cells": [
+			31,
+			42,
+			33
+		],
+		"size_m": [
+			6.20000028610229,
+			8.40000057220459,
+			6.59999990463257
+		],
+		"lod_ranges": [
+			28,
+			75,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 32844,
+		"triangles": 16422,
+		"triangles_lod": [
+			16422,
+			4476,
+			1400
+		],
+		"solid_voxels": 97924,
+		"mesh_kb": 440,
+		"build_ms": 31,
+		"total_ms": 1032
+	},
+	"workshop": {
+		"id": "workshop",
+		"name": "Atelier",
+		"group": "building",
+		"footprint_cells": [
+			38,
+			46,
+			32
+		],
+		"size_m": [
+			7.59999990463257,
+			9.19999980926514,
+			6.40000009536743
+		],
+		"lod_ranges": [
+			28,
+			75,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 37072,
+		"triangles": 18536,
+		"triangles_lod": [
+			18536,
+			4810,
+			1196
+		],
+		"solid_voxels": 226290,
+		"mesh_kb": 486,
+		"build_ms": 43,
+		"total_ms": 1773
+	},
+	"warehouse": {
+		"id": "warehouse",
+		"name": "Entrepôt du port",
+		"group": "building",
+		"footprint_cells": [
+			41,
+			45,
+			40
+		],
+		"size_m": [
+			8.19999980926514,
+			9,
+			8
+		],
+		"lod_ranges": [
+			28,
+			75,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 26476,
+		"triangles": 13238,
+		"triangles_lod": [
+			13238,
+			4070,
+			1354
+		],
+		"solid_voxels": 256129,
+		"mesh_kb": 367,
+		"build_ms": 60,
+		"total_ms": 2030
+	},
+	"watch_tower": {
+		"id": "watch_tower",
+		"name": "Tour de guet",
+		"group": "building",
+		"footprint_cells": [
+			24,
+			60,
+			24
+		],
+		"size_m": [
+			4.80000019073486,
+			12,
+			4.80000019073486
+		],
+		"lod_ranges": [
+			30,
+			80,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 35516,
+		"triangles": 17758,
+		"triangles_lod": [
+			17758,
+			5876,
+			2058
+		],
+		"solid_voxels": 94135,
+		"mesh_kb": 499,
+		"build_ms": 64,
+		"total_ms": 989
+	},
+	"pier": {
+		"id": "pier",
+		"name": "Embarcadère",
+		"group": "building",
+		"footprint_cells": [
+			15,
+			20,
+			50
+		],
+		"size_m": [
+			3,
+			4,
+			10
+		],
+		"lod_ranges": [
+			30,
+			80,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 3,
+		"vertices": 13712,
+		"triangles": 6856,
+		"triangles_lod": [
+			6856,
+			3264,
+			870
+		],
+		"solid_voxels": 14478,
+		"mesh_kb": 209,
+		"build_ms": 30,
+		"total_ms": 381
+	},
+	"sky_ship": {
+		"id": "sky_ship",
+		"name": "Bateau volant",
+		"group": "vehicle",
+		"footprint_cells": [
+			52,
+			60,
+			24
+		],
+		"size_m": [
+			10.4000005722046,
+			12,
+			4.80000019073486
+		],
+		"lod_ranges": [
+			30,
+			80,
+			0
+		],
+		"instanceable": false,
+		"ground_y": 0,
+		"vertices": 52868,
+		"triangles": 26434,
+		"triangles_lod": [
+			26434,
+			8260,
+			1546
+		],
+		"solid_voxels": 109507,
+		"mesh_kb": 720,
+		"build_ms": 171,
+		"total_ms": 2685
+	},
+	"boulder_1": {
+		"id": "boulder_1",
+		"name": "Rocher",
+		"group": "tree",
+		"footprint_cells": [
+			16,
+			11,
+			16
+		],
+		"size_m": [
+			3.20000004768372,
+			2.20000004768372,
+			3.20000004768372
+		],
+		"lod_ranges": [
+			16,
+			45,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 10784,
+		"triangles": 5392,
+		"triangles_lod": [
+			5392,
+			754,
+			164
+		],
+		"solid_voxels": 2920,
+		"mesh_kb": 125,
+		"build_ms": 44,
+		"total_ms": 191
+	},
+	"boulder_2": {
+		"id": "boulder_2",
+		"name": "Rocher",
+		"group": "tree",
+		"footprint_cells": [
+			22,
+			14,
+			22
+		],
+		"size_m": [
+			4.40000009536743,
+			2.79999995231628,
+			4.40000009536743
+		],
+		"lod_ranges": [
+			16,
+			45,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 26936,
+		"triangles": 13468,
+		"triangles_lod": [
+			13468,
+			1528,
+			208
+		],
+		"solid_voxels": 7291,
+		"mesh_kb": 296,
+		"build_ms": 59,
+		"total_ms": 271
+	},
+	"boulder_3": {
+		"id": "boulder_3",
+		"name": "Rocher",
+		"group": "tree",
+		"footprint_cells": [
+			12,
+			9,
+			12
+		],
+		"size_m": [
+			2.40000009536743,
+			1.80000007152557,
+			2.40000009536743
+		],
+		"lod_ranges": [
+			16,
+			45,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 2756,
+		"triangles": 1378,
+		"triangles_lod": [
+			1378,
+			302,
+			76
+		],
+		"solid_voxels": 697,
+		"mesh_kb": 36,
+		"build_ms": 5,
+		"total_ms": 36
+	},
+	"boulder_4": {
+		"id": "boulder_4",
+		"name": "Rocher",
+		"group": "tree",
+		"footprint_cells": [
+			28,
+			17,
+			28
+		],
+		"size_m": [
+			5.59999990463257,
+			3.40000009536743,
+			5.59999990463257
+		],
+		"lod_ranges": [
+			16,
+			45,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 34476,
+		"triangles": 17238,
+		"triangles_lod": [
+			17238,
+			1938,
+			364
+		],
+		"solid_voxels": 10103,
+		"mesh_kb": 380,
+		"build_ms": 79,
+		"total_ms": 437
+	},
+	"tree_oak_3": {
+		"id": "tree_oak_3",
+		"name": "Chêne 3",
+		"group": "tree",
+		"footprint_cells": [
+			38,
+			23,
+			38
+		],
+		"size_m": [
+			7.59999990463257,
+			4.59999990463257,
+			7.59999990463257
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 98168,
+		"triangles": 49084,
+		"triangles_lod": [
+			49084,
+			7760,
+			1920
+		],
+		"solid_voxels": 42781,
+		"mesh_kb": 1172,
+		"build_ms": 1163,
+		"total_ms": 2141
+	},
+	"tree_parasol_2": {
+		"id": "tree_parasol_2",
+		"name": "Arbre parasol 2",
+		"group": "tree",
+		"footprint_cells": [
+			37,
+			30,
+			37
+		],
+		"size_m": [
+			7.40000009536743,
+			6,
+			7.40000009536743
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 81156,
+		"triangles": 40578,
+		"triangles_lod": [
+			40578,
+			5550,
+			1342
+		],
+		"solid_voxels": 37392,
+		"mesh_kb": 940,
+		"build_ms": 955,
+		"total_ms": 1742
+	},
+	"tree_pine_2": {
+		"id": "tree_pine_2",
+		"name": "Pin 2",
+		"group": "tree",
+		"footprint_cells": [
+			22,
+			33,
+			22
+		],
+		"size_m": [
+			4.40000009536743,
+			6.59999990463257,
+			4.40000009536743
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 29232,
+		"triangles": 14616,
+		"triangles_lod": [
+			14616,
+			4450,
+			706
+		],
+		"solid_voxels": 18868,
+		"mesh_kb": 379,
+		"build_ms": 733,
+		"total_ms": 1175
+	},
+	"tree_weeping_2": {
+		"id": "tree_weeping_2",
+		"name": "Saule pleureur 2",
+		"group": "tree",
+		"footprint_cells": [
+			26,
+			26,
+			26
+		],
+		"size_m": [
+			5.20000028610229,
+			5.20000028610229,
+			5.20000028610229
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 79168,
+		"triangles": 39584,
+		"triangles_lod": [
+			39584,
+			6320,
+			1100
+		],
+		"solid_voxels": 27662,
+		"mesh_kb": 917,
+		"build_ms": 857,
+		"total_ms": 1654
+	},
+	"tree_birch_2": {
+		"id": "tree_birch_2",
+		"name": "Bouleau 2",
+		"group": "tree",
+		"footprint_cells": [
+			20,
+			30,
+			20
+		],
+		"size_m": [
+			4,
+			6,
+			4
+		],
+		"lod_ranges": [
+			20,
+			55,
+			0
+		],
+		"instanceable": true,
+		"ground_y": 0,
+		"vertices": 25684,
+		"triangles": 12842,
+		"triangles_lod": [
+			12842,
+			2508,
+			656
+		],
+		"solid_voxels": 10340,
+		"mesh_kb": 322,
+		"build_ms": 711,
+		"total_ms": 962
 	}
 }

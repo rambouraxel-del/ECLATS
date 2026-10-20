@@ -1,0 +1,179 @@
+{
+	"id": "warehouse",
+	"name": "Entrepôt du port",
+	"group": "building",
+	"footprint_cells": [
+		41,
+		45,
+		40
+	],
+	"size_m": [
+		8.19999980926514,
+		9,
+		8
+	],
+	"lod_ranges": [
+		28,
+		75,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 26476,
+	"triangles": 13238,
+	"triangles_lod": [
+		13238,
+		4070,
+		1354
+	],
+	"solid_voxels": 256129,
+	"mesh_kb": 367,
+	"build_ms": 60,
+	"total_ms": 2030,
+	"parts": [
+		{
+			"name": "hoist_0",
+			"offset": [
+				3.83999991416931,
+				1.63999998569489,
+				7.79999971389771
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/warehouse/warehouse_hoist_0.res",
+				"res://assets/props/warehouse/warehouse_hoist_0_lod1.res",
+				"res://assets/props/warehouse/warehouse_hoist_0_lod2.res"
+			],
+			"triangles": [
+				1946,
+				710,
+				196
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "banner_0",
+			"offset": [
+				2.39999985694885,
+				2.24000000953674,
+				6.1399998664856
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/warehouse/warehouse_banner_0.res",
+				"res://assets/props/warehouse/warehouse_banner_0_lod1.res",
+				"res://assets/props/warehouse/warehouse_banner_0_lod2.res"
+			],
+			"triangles": [
+				488,
+				126,
+				56
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_0",
+			"offset": [
+				2.44000005722046,
+				2.8199999332428,
+				6.07999992370605
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/warehouse/warehouse_lantern_0.res",
+				"res://assets/props/warehouse/warehouse_lantern_0_lod1.res",
+				"res://assets/props/warehouse/warehouse_lantern_0_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_1",
+			"offset": [
+				5.44000005722046,
+				2.8199999332428,
+				6.07999992370605
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/warehouse/warehouse_lantern_1.res",
+				"res://assets/props/warehouse/warehouse_lantern_1_lod1.res",
+				"res://assets/props/warehouse/warehouse_lantern_1_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/warehouse/warehouse_structure.res",
+				"res://assets/props/warehouse/warehouse_structure_lod1.res",
+				"res://assets/props/warehouse/warehouse_structure_lod2.res"
+			],
+			"triangles": [
+				10132,
+				3010,
+				1046
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				2.59999990463257,
+				3,
+				6.23000001907349
+			],
+			"color": "ffb860",
+			"energy": 1.1,
+			"range": 5.5,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0.400000005960464,
+				0,
+				0.400000005960464
+			],
+			"size": [
+				7.40000009536743,
+				5.09999990463257,
+				5.80000019073486
+			]
+		},
+		{
+			"position": [
+				1.70000004768372,
+				0,
+				6.20000028610229
+			],
+			"size": [
+				4.80000019073486,
+				0.5,
+				1.20000004768372
+			]
+		}
+	]
+}

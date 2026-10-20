@@ -4,17 +4,15 @@
 
 [resource]
 shader = ExtResource("1_shader")
-shader_parameter/zone_scale = 0.22
-shader_parameter/zone_strength = 0.13
-shader_parameter/grain_scale = 18.0
-shader_parameter/grain_strength = 0.035
-shader_parameter/grass_dry_tint = Vector3(1.25, 1.12, 0.62)
-shader_parameter/grass_dry_amount = 0.35
-shader_parameter/soil_color = Vector3(0.235, 0.13, 0.072)
+shader_parameter/use_quad_data = false
+shader_parameter/tex_strength = 1.0
+shader_parameter/zone_strength = 0.12
+shader_parameter/grass_dry_tint = Vector3(1.25, 1.1, 0.62)
 shader_parameter/grass_side_cover = 0.36
-shader_parameter/terrain_voxel = 0.2
+shader_parameter/soil_color = Vector3(0.235, 0.13, 0.072)
 shader_parameter/ao_strength = 1.0
 shader_parameter/emission_multiplier = 1.0
+shader_parameter/lamp_emission = 0.35
 shader_parameter/crystal_pulse = 0.0
 shader_parameter/sway_strength = 0.0
 shader_parameter/sway_range = 1.0

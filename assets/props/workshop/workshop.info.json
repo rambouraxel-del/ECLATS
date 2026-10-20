@@ -1,0 +1,191 @@
+{
+	"id": "workshop",
+	"name": "Atelier",
+	"group": "building",
+	"footprint_cells": [
+		38,
+		46,
+		32
+	],
+	"size_m": [
+		7.59999990463257,
+		9.19999980926514,
+		6.40000009536743
+	],
+	"lod_ranges": [
+		28,
+		75,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 37072,
+	"triangles": 18536,
+	"triangles_lod": [
+		18536,
+		4810,
+		1196
+	],
+	"solid_voxels": 226290,
+	"mesh_kb": 486,
+	"build_ms": 43,
+	"total_ms": 1773,
+	"parts": [
+		{
+			"name": "flower_box_0",
+			"offset": [
+				1.17999994754791,
+				3.29999995231628,
+				6
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/workshop/workshop_flower_box_0.res",
+				"res://assets/props/workshop/workshop_flower_box_0_lod1.res",
+				"res://assets/props/workshop/workshop_flower_box_0_lod2.res"
+			],
+			"triangles": [
+				5316,
+				704,
+				128
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "banner_0",
+			"offset": [
+				1.29999995231628,
+				2.33999991416931,
+				5.92000007629395
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/workshop/workshop_banner_0.res",
+				"res://assets/props/workshop/workshop_banner_0_lod1.res",
+				"res://assets/props/workshop/workshop_banner_0_lod2.res"
+			],
+			"triangles": [
+				504,
+				122,
+				48
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_0",
+			"offset": [
+				1.63999998569489,
+				2.11999988555908,
+				5.94000005722046
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/workshop/workshop_lantern_0.res",
+				"res://assets/props/workshop/workshop_lantern_0_lod1.res",
+				"res://assets/props/workshop/workshop_lantern_0_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "lantern_1",
+			"offset": [
+				5.6399998664856,
+				2.11999988555908,
+				5.94000005722046
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/workshop/workshop_lantern_1.res",
+				"res://assets/props/workshop/workshop_lantern_1_lod1.res",
+				"res://assets/props/workshop/workshop_lantern_1_lod2.res"
+			],
+			"triangles": [
+				336,
+				112,
+				28
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/workshop/workshop_structure.res",
+				"res://assets/props/workshop/workshop_structure_lod1.res",
+				"res://assets/props/workshop/workshop_structure_lod2.res"
+			],
+			"triangles": [
+				12044,
+				3760,
+				964
+			],
+			"grid": 0.1
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				1.80000007152557,
+				2.29999995231628,
+				6.09999990463257
+			],
+			"color": "ffb860",
+			"energy": 1,
+			"range": 5,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0.400000005960464,
+				0,
+				0.400000005960464
+			],
+			"size": [
+				6.80000019073486,
+				5.70000028610229,
+				3.90000009536743
+			]
+		},
+		{
+			"position": [
+				0.400000005960464,
+				0,
+				4.30000019073486
+			],
+			"size": [
+				1.70000004768372,
+				5.70000028610229,
+				1.70000004768372
+			]
+		},
+		{
+			"position": [
+				5.5,
+				0,
+				4.30000019073486
+			],
+			"size": [
+				1.70000004768372,
+				5.70000028610229,
+				1.70000004768372
+			]
+		}
+	]
+}

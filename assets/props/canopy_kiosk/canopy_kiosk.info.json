@@ -1,0 +1,152 @@
+{
+	"id": "canopy_kiosk",
+	"name": "Kiosque à auvent",
+	"group": "prop",
+	"footprint_cells": [
+		11,
+		12,
+		7
+	],
+	"size_m": [
+		2.20000004768372,
+		2.40000009536743,
+		1.39999997615814
+	],
+	"lod_ranges": [
+		14,
+		40,
+		0
+	],
+	"instanceable": false,
+	"ground_y": 0,
+	"vertices": 41428,
+	"triangles": 20714,
+	"triangles_lod": [
+		20714,
+		6144,
+		2162
+	],
+	"solid_voxels": 150863,
+	"mesh_kb": 583,
+	"build_ms": 61,
+	"total_ms": 2068,
+	"parts": [
+		{
+			"name": "structure",
+			"offset": [
+				0,
+				0,
+				0
+			],
+			"animation": "",
+			"material": "props",
+			"meshes": [
+				"res://assets/props/canopy_kiosk/canopy_kiosk_structure.res",
+				"res://assets/props/canopy_kiosk/canopy_kiosk_structure_lod1.res",
+				"res://assets/props/canopy_kiosk/canopy_kiosk_structure_lod2.res"
+			],
+			"triangles": [
+				10542,
+				3402,
+				1496
+			],
+			"grid": 0.02
+		},
+		{
+			"name": "canopy",
+			"offset": [
+				0,
+				2.25999999046326,
+				0
+			],
+			"animation": "",
+			"material": "cloth",
+			"meshes": [
+				"res://assets/props/canopy_kiosk/canopy_kiosk_canopy.res",
+				"res://assets/props/canopy_kiosk/canopy_kiosk_canopy_lod1.res",
+				"res://assets/props/canopy_kiosk/canopy_kiosk_canopy_lod2.res"
+			],
+			"triangles": [
+				10172,
+				2742,
+				666
+			],
+			"grid": 0.02
+		}
+	],
+	"lights": [
+		{
+			"position": [
+				2,
+				1.68999993801117,
+				1.24000000953674
+			],
+			"color": "ffb860",
+			"energy": 1,
+			"range": 4.5,
+			"shadow": false
+		}
+	],
+	"colliders": [
+		{
+			"position": [
+				0.239999994635582,
+				0,
+				0.759999990463257
+			],
+			"size": [
+				1.71999990940094,
+				0.85999995470047,
+				0.579999983310699
+			]
+		},
+		{
+			"position": [
+				0.0399999991059303,
+				0,
+				0.0399999991059303
+			],
+			"size": [
+				0.280000001192093,
+				1.93999993801117,
+				0.280000001192093
+			]
+		},
+		{
+			"position": [
+				1.87999999523163,
+				0,
+				0.0399999991059303
+			],
+			"size": [
+				0.280000001192093,
+				1.93999993801117,
+				0.280000001192093
+			]
+		},
+		{
+			"position": [
+				0.0399999991059303,
+				0,
+				1.03999996185303
+			],
+			"size": [
+				0.280000001192093,
+				1.93999993801117,
+				0.280000001192093
+			]
+		},
+		{
+			"position": [
+				1.87999999523163,
+				0,
+				1.03999996185303
+			],
+			"size": [
+				0.280000001192093,
+				1.93999993801117,
+				0.280000001192093
+			]
+		}
+	]
+}

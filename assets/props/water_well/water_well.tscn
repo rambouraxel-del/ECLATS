@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/assets/placeable_asset.gd" id="1_mtsm8"]
+[ext_resource type="ArrayMesh" path="res://assets/props/water_well/water_well_structure.res" id="2_edqyc"]
+[ext_resource type="ArrayMesh" path="res://assets/props/water_well/water_well_structure_lod1.res" id="3_hliks"]
+[ext_resource type="ArrayMesh" path="res://assets/props/water_well/water_well_structure_lod2.res" id="4_34e56"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_eu0a6"]
+size = Vector3(1.4, 0.82, 1.4)
+
+[node name="WaterWell" type="Node3D"]
+script = ExtResource("1_mtsm8")
+asset_id = "water_well"
+display_name = "Puits"
+footprint_cells = Vector3i(7, 11, 7)
+triangle_count = 20700
+vertex_count = 41400
+
+[node name="Structure" type="MeshInstance3D" parent="."]
+visibility_range_end = 12.0
+mesh = ExtResource("2_edqyc")
+
+[node name="Structure_LOD1" type="MeshInstance3D" parent="."]
+visibility_range_begin = 12.0
+visibility_range_end = 34.0
+mesh = ExtResource("3_hliks")
+
+[node name="Structure_LOD2" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+visibility_range_begin = 34.0
+mesh = ExtResource("4_34e56")
+
+[node name="Light1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.32, 1.36, 0.6)
+light_color = Color(1, 0.721569, 0.376471, 1)
+light_energy = 0.9
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_shadow = 14.0
+omni_range = 4.0
+
+[node name="Collision" type="StaticBody3D" parent="."]
+
+[node name="Box1" type="CollisionShape3D" parent="Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.41, 0.7)
+shape = SubResource("BoxShape3D_eu0a6")
