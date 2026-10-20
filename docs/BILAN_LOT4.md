@@ -94,8 +94,8 @@ et la validation GPU. Les 3,4 M de primitives de la vue « place » viennent sur
 | Suite | Contenu | Résultat |
 |---|---|---|
 | `tests/run_checks.gd` (Lots 1 à 3) | 180 contrôles conservés (palette, grille, maillage, assets, pixels 2 cm, LOD, instanciation, plan de village, ambiances, scènes) | **180 / 180** |
-| `tests/run_checks_lot4.gd` (rapide) | graines, terrain (3 profils, déterminisme, cœur), placement (refus, exceptions, accès), terrassement, 12 bâtiments × 2 graines (visitabilité, style), 7 espèces d'arbres, pente, 12 rochers, 4 bateaux, ponton, environnement | **120 / 120** |
-| `… -- --monde` | 4 îles complètes (2 habitées, 1 verdoyante, 1 rocheuse) : 0 erreur de validation, présence de la colonie / du port / du bateau, déterminisme (signature identique) | **+15, 135 / 135** |
+| `tests/run_checks_lot4.gd` (rapide) | graines, terrain (3 profils, déterminisme, cœur), placement (refus, exceptions, accès), terrassement, 12 bâtiments × 2 graines (visitabilité, style), 7 espèces d'arbres × 3 graines × 3 pentes, 12 rochers, 4 bateaux, ponton, environnement | **121 / 121** |
+| `… -- --monde` | 4 îles complètes (2 habitées, 1 verdoyante, 1 rocheuse) : 0 erreur de validation, présence de la colonie / du port / du bateau, déterminisme (signature identique) | **+15, 136 / 136** |
 | `tools/world_report.gd` | diagnostic multi-graines (JSON) | 0 erreur sur les graines 1 à 4 (habitée) |
 
 Le validateur contrôle : cœur fixe respecté, cellules de terrain isolées, intersections de volumes durs, objets

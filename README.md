@@ -31,7 +31,7 @@ des planches de concept (`docs/references/`).
 1. Télécharger **Godot 4.3 (ou plus récent, 4.x) — version standard**, pas « .NET » :
    <https://godotengine.org/download/windows/> puis dézipper (aucune installation).
 2. Récupérer le projet : bouton **Code → Download ZIP** sur GitHub (branche
-   `claude/nifty-pascal-km2czc`), ou `git clone` puis `git checkout claude/nifty-pascal-km2czc`.
+   `claude/nifty-pascal-km2czc` ; **Lot 4 : branche `claude/lot4-generation-coherente`**), ou `git clone` puis `git checkout claude/lot4-generation-coherente`.
 3. Lancer `Godot_v4.x-stable_win64.exe` → **Importer** → choisir le fichier `project.godot`
    du dossier → **Importer et éditer**. Le premier import prend quelques secondes.
 4. Appuyer sur **F5** (ou le bouton ▶ en haut à droite) : le laboratoire s'ouvre.
@@ -82,8 +82,8 @@ Sous Windows (PowerShell, depuis le dossier du projet) :
 Sous Linux / CI : `GODOT=/chemin/godot tools/check.sh`. La même vérification tourne
 automatiquement sur GitHub à chaque push (`.github/workflows/godot-check.yml`).
 Elle importe le projet en mode headless puis lance `tests/run_checks.gd` (180 contrôles, Lots 1 à 3) et
-`tests/run_checks_lot4.gd` (120 contrôles rapides du Lot 4). `ECLATS_MONDE=1 tools/check.sh` (ou `check.ps1 -Monde`)
-ajoute la validation d'îles complètes sur plusieurs graines et profils (+ 15 contrôles, ≈ 8 min sans GPU).
+`tests/run_checks_lot4.gd` (121 contrôles rapides du Lot 4). `ECLATS_MONDE=1 tools/check.sh` (ou `check.ps1 -Monde`)
+ajoute la validation d'îles complètes sur plusieurs graines et profils (+ 15 contrôles, ≈ 10 min sans GPU).
 
 Diagnostic d'une génération (rapport lisible + JSON) :
 `godot --headless -s tools/world_report.gd -- settled 1,2,3 rapport.json --determinisme`.
