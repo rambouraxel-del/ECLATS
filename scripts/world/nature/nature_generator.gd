@@ -97,12 +97,13 @@ func _tree_spec(pl: Dictionary) -> PlacementSpec:
 	var cr: AABB = pl["crown"]
 	if cr.size.x > 0.0:
 		var ext := maxf(maxf(absf(cr.position.x), cr.end.x), maxf(absf(cr.position.z), cr.end.z))
+		ext += 0.35                    # la couronne garde aussi une marge autour des constructions
 		s.soft = [AABB(Vector3(-ext, cr.position.y, -ext), Vector3(ext * 2.0, cr.size.y, ext * 2.0))]
 	s.support = "ground"
 	s.support_fraction = 0.7
 	s.gap_tolerance_m = 0.2
 	s.embed_max_m = 0.4
-	s.clearance_m = 0.45
+	s.clearance_m = 0.7            # marge simple autour des façades, chemins, marches et mobilier
 	s.cliff_margin_m = 0.7
 	s.soft_overlap_max = 0.5
 	s.allowed_zones = PackedInt32Array([TerrainField.Zone.NATURAL])
@@ -166,7 +167,7 @@ func _rock_spec(pl: Dictionary) -> PlacementSpec:
 	s.support_fraction = 0.6
 	s.gap_tolerance_m = 0.3
 	s.embed_max_m = float(pl["embed"]) + 0.2
-	s.clearance_m = 0.3
+	s.clearance_m = 0.75           # volume de rocher + marge : ruines, marches et façades restent dégagées
 	s.cliff_margin_m = 0.5
 	s.allowed_zones = PackedInt32Array([TerrainField.Zone.NATURAL])
 	s.snap_m = 0.2

@@ -31,7 +31,8 @@ static func plan(family: String, seed: int) -> Dictionary:
 	var p := {"family": family, "seed": seed, "tone": tone, "tone_ids": tone_ids, "embed": 0.3, "overhang_ok": false}
 	match family:
 		"boulder":
-			var s := rng.randf_range(1.0, 2.6)
+			# quelques gros volumes lisibles (un sur trois), le reste de taille moyenne : plus de petits cailloux
+			var s := rng.randf_range(2.1, 3.0) if rng.randf() < 0.34 else rng.randf_range(1.3, 1.9)
 			p["radii"] = Vector3(s * rng.randf_range(0.8, 1.2), s * rng.randf_range(0.55, 0.9), s * rng.randf_range(0.8, 1.2))
 			p["size"] = Vector3(p["radii"].x * 2.1, p["radii"].y * 1.7, p["radii"].z * 2.1)
 			p["embed"] = p["radii"].y * 0.35
@@ -104,12 +105,29 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 				if vol.get_voxel(x, y, z) != 0:
 					if y + 1 >= vol.size.y or vol.get_voxel(x, y + 1, z) == 0:
 						var yy := lo.y + float(y) * C
-						if yy > -0.05 and VoxelGrid.hash01(x, z, 17, seed) < 0.42 and nz.get_noise_3d(float(x) * 2.0, 0.0, float(z) * 2.0) > -0.2:
+						# mousse par plaques : seulement là où un bruit basse fréquence est fort, jamais sur toute la surface
+						if yy > -0.05 and VoxelGrid.hash01(x, z, 17, seed) < 0.7 and nz.get_noise_3d(float(x) * 0.5, 3.0, float(z) * 0.5) > 0.22:
 							vol.set_voxel(x, y, z, moss)
 					break
+	if pl["family"] == "boulder" or pl["family"] == "outcrop":
+		_chips(vol, lo, pl, tone_ids, seed)
 	var removed := VoxelShapes.keep_anchored(vol, int((0.05 - lo.y) / C))
 	var b := VoxelShapes.bounds(vol)
 	return {"volume": vol, "origin": lo, "plan": pl, "stats": {"cells": vol.count_solid(), "floating_removed": removed, "bounds": b}}
+
+## Quelques éclats (2 à 3) au pied du rocher, posés au niveau du sol et collés au volume : détritus localisés.
+static func _chips(vol: VoxelVolume, lo: Vector3, pl: Dictionary, tone_ids: Array, seed: int) -> void:
+	var size: Vector3 = pl["size"]
+	var rng := WorldRng.stream(seed, "chips")
+	for k in rng.randi_range(2, 3):
+		var a := rng.randf() * TAU
+		var r := minf(size.x, size.z) * 0.5 * rng.randf_range(0.8, 1.05)
+		var c := Vector3(cos(a) * r, 0.04, sin(a) * r)
+		var rad := Vector3(rng.randf_range(0.14, 0.26), rng.randf_range(0.1, 0.18), rng.randf_range(0.14, 0.26))
+		var mat: int = tone_ids[rng.randi() % tone_ids.size()]
+		var pick := func(_x: int, _y: int, _z: int, d: float) -> int:
+			return mat if d <= 1.0 else 0
+		VoxelShapes.ellipsoid_pick(vol, lo, C, c, rad, pick)
 
 static func _plug(vol: VoxelVolume, lo: Vector3, pl: Dictionary, ground: Dictionary, pal: VoxelPalette, tone_ids: Array, seed: int) -> void:
 	# pour chaque colonne occupée au pied, combler jusqu'à 60 cm sous le sol local

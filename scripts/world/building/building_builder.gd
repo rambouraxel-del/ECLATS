@@ -158,6 +158,13 @@ func _annex_top(a: P.Annex, x: int) -> int:
 
 # ------------------------------------------------------------------ ossature de bois (style « colombage »)
 
+## Une ouverture de ce mur (même étage) recouvre-t-elle l'intervalle [u0, u1] le long de la paroi ?
+func _opening_in(w: P.Wall, u0: int, u1: int) -> bool:
+	for o in plan.openings:
+		if o.floor == w.floor and o.axis == w.axis and o.p == w.p and o.u <= u1 and o.u + o.w - 1 >= u0:
+			return true
+	return false
+
 func _timber_frame() -> void:
 	if not plan.style["timber"]:
 		return
@@ -179,6 +186,12 @@ func _timber_frame() -> void:
 		while u < w.u1 - 10:
 			posts.append(u)
 			u += rng.randi_range(12, 22)
+		# les poteaux évitent les ouvertures (fenêtres et portes restent dans leur travée)
+		var kept: Array[int] = []
+		for pu in posts:
+			if pu == w.u0 or pu == w.u1 - 1 or not _opening_in(w, pu - 1, pu + 2):
+				kept.append(pu)
+		posts = kept
 		posts.sort()
 		for pu in posts:
 			for t in w.thickness:
@@ -201,20 +214,22 @@ func _timber_frame() -> void:
 						set_cell(x, ry, z, frame)
 		# croix de Saint-André irrégulières : pas toutes les travées
 		for i in range(posts.size() - 1):
-			if rng.randf() < 0.4 and posts[i + 1] - posts[i] >= 12:
+			if rng.randf() < 0.4 and posts[i + 1] - posts[i] >= 12 and not _opening_in(w, posts[i], posts[i + 1] + 1):
 				var ua := posts[i] + 2
 				var ub := posts[i + 1] - 1
 				var flip := rng.randf() < 0.5
 				var n := top_y - 1 - sill_y - 1
+				# diagonale CONTINUE : à chaque rang, on remplit toutes les cellules entre la position du rang et celle du suivant
 				for k in range(n):
-					var uu := ua + int(round(float(k) * float(ub - ua) / float(n)))
-					if flip:
-						uu = ub - (uu - ua)
-					for t in w.thickness:
-						var x := uu if w.axis == 2 else w.p + t
-						var z := w.p + t if w.axis == 2 else uu
-						if vol.get_voxel(x, sill_y + 1 + k, z) != 0:
-							set_cell(x, sill_y + 1 + k, z, frame)
+					var ua0 := ua + int(round(float(k) * float(ub - ua) / float(n)))
+					var ua1 := ua + int(round(float(k + 1) * float(ub - ua) / float(n)))
+					for uu0 in range(ua0, maxi(ua1, ua0 + 1)):
+						var uu := (ub - (uu0 - ua)) if flip else uu0
+						for t in w.thickness:
+							var x := uu if w.axis == 2 else w.p + t
+							var z := w.p + t if w.axis == 2 else uu
+							if vol.get_voxel(x, sill_y + 1 + k, z) != 0:
+								set_cell(x, sill_y + 1 + k, z, frame)
 
 # ------------------------------------------------------------------ planchers
 
@@ -402,10 +417,8 @@ func _gables_and_roofs() -> void:
 	var length_cells := (plan.W if r["axis"] == 0 else plan.D) + 2 * 2
 	var start_cells := (plan.mx if r["axis"] == 0 else plan.mz) - 2
 	var segs: Array = [[0.0, 1.0, r["material"]]]
-	if r["patch"]:
-		var u0: float = r["patch_u"]
-		var l: float = r["patch_len"]
-		segs = [[0.0, u0, r["material"]], [u0, minf(u0 + l, 1.0), r["alt_material"]], [minf(u0 + l, 1.0), 1.0, r["material"]]]
+	# (plus de bande de réparation en matériau différent : sur un pan entier elle se lisait comme une bande accidentelle ;
+	#  la variation de teinte des couvertures vient du shader)
 	for s in segs:
 		if s[1] - s[0] <= 0.001:
 			continue
@@ -463,7 +476,9 @@ func _patches() -> void:
 				for t in w.thickness:
 					var x := u + du if w.axis == 2 else w.p + t
 					var z := w.p + t if w.axis == 2 else u + du
-					if vol.get_voxel(x, yy + dy, z) != 0:
+					# la plaque ne remplace que de l'enduit : ni ossature, ni moellons, ni encadrements
+					var cur := vol.get_voxel(x, yy + dy, z)
+					if cur != 0 and String(pal.keys[cur]).begins_with("plaster_worn"):
 						set_cell(x, yy + dy, z, patch_mat)
 
 # ------------------------------------------------------------------ ouvertures

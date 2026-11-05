@@ -34,6 +34,7 @@ var _tween: Tween
 var _presets_by_key := {}
 
 func _ready() -> void:
+	add_to_group("environment_manager")
 	cfg = load_config()
 	rig = get_node_or_null("LightingRig") as LightingRig
 	if rig == null:
@@ -83,6 +84,7 @@ func apply_key(key: String) -> void:
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
 	current_key = key
+	_sync_time(key)
 	var p := _preset(key)
 	_blend_to = p
 	_apply(p, key)
@@ -101,7 +103,9 @@ func transition_to(key: String, seconds := 3.0) -> void:
 		mixed["emission_scale"] = lerpf(_emission_for(_blend_from), _emission_for(target), k)
 		_blend_to = mixed if k < 1.0 else target
 		_apply_dict(mixed), 0.0, 1.0, seconds)
-	_tween.finished.connect(func() -> void: ambiance_changed.emit(key))
+	_tween.finished.connect(func() -> void:
+		_sync_time(key)
+		ambiance_changed.emit(key))
 
 ## Heure du jour 0 → 1 (0 = nuit profonde, 0.17 = aube, 0.38-0.66 = plein jour, 0.82 = coucher, 1 = nuit).
 func set_time_of_day(t: float) -> void:
@@ -127,6 +131,23 @@ func set_time_of_day(t: float) -> void:
 	current_key = a["preset"] if k < 0.5 else b["preset"]
 	_apply_dict(mixed)
 
+## Heure du jour (0-1) correspondant à une ambiance, d'après les clés de config/environment.json.
+func _sync_time(key: String) -> void:
+	var best := -1.0
+	for k in cfg.get("time_keys", []):
+		if k["preset"] == key:
+			var t := float(k["t"])
+			if best < 0.0 or (key == "village_day" and absf(t - 0.52) < absf(best - 0.52)):
+				best = t
+	if best >= 0.0:
+		time_of_day = best
+
+## Texte du HUD : ambiance réellement appliquée et heure correspondante (0 = minuit, 0,5 = midi).
+func hud_label() -> String:
+	var hour := time_of_day * 24.0
+	var name := String(_preset(current_key).get("name", current_key))
+	return "%s · %02d h %02d" % [name, int(hour) % 24, int((hour - floorf(hour)) * 60.0)]
+
 func _emission_for(p: Dictionary) -> float:
 	var table: Dictionary = cfg.get("emission_scale", {})
 	return float(table.get(p.get("key", ""), table.get("default", 0.35)))
@@ -138,6 +159,7 @@ func _apply(p: Dictionary, key: String) -> void:
 
 func _apply_dict(p: Dictionary) -> void:
 	rig.interior_min = float(cfg.get("interior_lamp_min", 0.0))
+	rig.interior_max = float(cfg.get("interior_lamp_max", 99.0))
 	var q := p.duplicate()
 	var glow_cap := float(cfg.get("glow", {}).get("intensity_cap", 1.0))
 	q["glow"] = minf(float(q.get("glow", 0.5)), glow_cap)

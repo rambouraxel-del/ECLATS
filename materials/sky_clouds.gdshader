@@ -85,5 +85,8 @@ void sky() {
 		vec4 cl = cloud_layer(uv * 0.2, sun2, sea_cover, cloud_block * 1.25);
 		col = mix(col, cl.rgb, cl.a * smoothstep(0.0, 0.14, t) * 0.9);
 	}
+	// coupure ciel / brume adoucie : les deux horizons se fondent dans une bande d'une dizaine de degrés
+	float hz = 1.0 - smoothstep(0.0, 0.09, abs(up));
+	col = mix(col, mix(ground_horizon, sky_horizon, 0.5), hz * 0.85);
 	COLOR = col;
 }

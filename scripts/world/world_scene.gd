@@ -131,10 +131,55 @@ func _view(n: int) -> Array:
 		0: return [Vector3(pc.x - 40, 12, pc.y - 40), Vector3(pc.x, 2, pc.y)]
 	return [Vector3(0, 30, 50), Vector3(0, 2, 0)]
 
+## Vue prédéfinie sans village : centre et point haut de l'île (les vues colonie / port / sanctuaire n'existent pas).
+func _view_natural(n: int) -> Array:
+	var f := world.field
+	var hi := 0
+	for i in f.n * f.n:
+		if f.top[i] > f.top[hi]:
+			hi = i
+	var hm := f.center_m(hi % f.n, hi / f.n)
+	var hy := float(f.top[hi] + 1) * VoxelGrid.VOXEL_SIZE
+	match n:
+		1: return [Vector3(10, 36, 48), Vector3(0, 1, 0)]
+		2, 4: return [Vector3(hm.x - 8.0, hy + 5.0, hm.y + 9.0), Vector3(hm.x, hy, hm.y)]
+		7:
+			if not world.trees.is_empty():
+				var tp: Vector3 = world.trees[0]["pos"]
+				return [tp + Vector3(10, 5.5, 11), tp + Vector3(0, 1.8, 0)]
+		8:
+			if not world.rocks.is_empty():
+				var rp: Vector3 = world.rocks[0]["pos"]
+				return [rp + Vector3(7, 4.0, 7.5), rp + Vector3(0, 1.0, 0)]
+		9: return [Vector3(90, 40, 150), Vector3(0, 0, 0)]
+		0: return [Vector3(-40, 12, -40), Vector3(0, 2, 0)]
+	return [Vector3(0, 30, 50), Vector3(0, 2, 0)]
+
+## Repousse une caméra qui démarre DANS un feuillage (couronne d'arbre) : elle recule vers l'extérieur et monte
+## jusqu'à être dégagée (8 essais de 1,5 m).
+func _clear_of_foliage(from: Vector3, to: Vector3) -> Vector3:
+	var p := from
+	var away := Vector3(from.x - to.x, 0.0, from.z - to.z).normalized()
+	for k in 8:
+		var inside := false
+		for t in world.trees:
+			var cr: AABB = t["plan"]["crown"]
+			if cr.size.x <= 0.0:
+				continue
+			var tp: Vector3 = t["pos"]
+			var box := AABB(tp + cr.position, cr.size).grow(0.5)
+			if box.has_point(p):
+				inside = true
+				break
+		if not inside:
+			break
+		p += away * 1.5 + Vector3(0, 1.0, 0)
+	return p
+
 func _go_view(n: int) -> void:
-	var v := _view(n)
+	var v := _view(n) if (world != null and not world.settlement.plaza.is_empty()) else (_view_natural(n) if world != null else [])
 	if cam and not v.is_empty():
-		cam.look_from(v[0], v[1])
+		cam.look_from(_clear_of_foliage(v[0], v[1]) if world != null else v[0], v[1])
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey

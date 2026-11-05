@@ -6,6 +6,9 @@ extends RefCounted
 ## PropScatter pour les assets cuits.
 
 const C := VoxelGrid.STRUCTURE_SIZE
+## Décalage sub-centimétrique des arbres et rochers : aucune face de bois ou de pierre n'est coplanaire avec une face du terrain
+## (sol à 20 cm, objets à 10 cm) → plus de scintillement (z-fighting) au contact bois / terre / pierre.
+const DEZFIGHT := Vector3(0.013, 0.011, 0.017)
 
 ## Construit les nœuds sous `parent`. Renvoie les références utiles.
 static func create(world: WorldData, parent: Node3D) -> Dictionary:
@@ -55,11 +58,11 @@ static func create(world: WorldData, parent: Node3D) -> Dictionary:
 	root.add_child(nat)
 	for t in world.trees:
 		var n := VoxelObjectView.create_node("%s_%d" % [t["species"], t["seed"] % 10000], t["parts"], t["arrays"], [34.0, 95.0])
-		n.transform = Transform3D(Basis(Vector3.UP, t["rot"]), t["pos"])
+		n.transform = Transform3D(Basis(Vector3.UP, t["rot"]), (t["pos"] as Vector3) + DEZFIGHT)
 		nat.add_child(n)
 	for r in world.rocks:
 		var n := VoxelObjectView.create_node("%s_%d" % [r["family"], r["seed"] % 10000], r["parts"], r["arrays"], [40.0, 110.0], true)
-		n.transform = r["xform"]
+		n.transform = (r["xform"] as Transform3D).translated(DEZFIGHT)
 		nat.add_child(n)
 	_plants_nodes(world, nat)
 	# assets cuits (décor)

@@ -186,6 +186,17 @@ static func ground_grid(field: TerrainField, base: Vector3, half := 2.0) -> Dict
 			h[ix + iz * n] = (g - base.y) if not is_nan(g) else NAN
 	return {"half": half, "step": step, "n": n, "h": h}
 
+## Y a-t-il du sol (et pas du vide) au point (x, z) relatif au pied ?
+static func has_ground(g: Dictionary, x: float, z: float) -> bool:
+	if g.is_empty():
+		return true
+	var step: float = g["step"]
+	var half: float = g["half"]
+	var n: int = g["n"]
+	var ix := clampi(int(round((x + half) / step)), 0, n - 1)
+	var iz := clampi(int(round((z + half) / step)), 0, n - 1)
+	return not is_nan((g["h"] as PackedFloat32Array)[ix + iz * n])
+
 static func ground_at(g: Dictionary, x: float, z: float) -> float:
 	if g.is_empty():
 		return 0.0
@@ -207,7 +218,7 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 	var seed: int = pl["seed"]
 	var rng := WorldRng.stream(seed, "tree_raster")
 	var bark_id := pal.id(def["bark"])
-	var root_id := pal.id("root") if def["bark"] != "bark_birch" else pal.id("bark_dark")
+	var root_id := bark_id        # les racines héritent de la palette de l'essence (bouleau clair, troncs sombres…)
 	# --- bois ---
 	var wood_aabb: AABB = pl["wood_aabb"]
 	var r_base: float = pl["trunk_r"]
@@ -237,11 +248,15 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 		var ang := ra + TAU * float(k) / float(nroots) + rng.randf_range(-0.3, 0.3)
 		var dist := rng.randf_range(0.75, 1.25) + r_base
 		var dir := Vector2.from_angle(ang)
+		# la racine se raccourcit tant que sa pointe n'a pas de sol dessous (bord de falaise) : elle s'ancre toujours
+		while dist > r_base + 0.25 and not has_ground(ground, dir.x * dist, dir.y * dist):
+			dist *= 0.8
 		var tip_xz := dir * dist
-		var tip_y := ground_at(ground, tip_xz.x, tip_xz.y) - 0.08
+		var tip_y := ground_at(ground, tip_xz.x, tip_xz.y) - 0.1
 		var mid_xz := dir * (dist * 0.5)
-		var mid_y := maxf(ground_at(ground, mid_xz.x, mid_xz.y), 0.0) + 0.1
-		var p0 := Vector3(dir.x * r_base * 0.7, 0.45, dir.y * r_base * 0.7)
+		var mid_y := ground_at(ground, mid_xz.x, mid_xz.y) + 0.12       # suit la hauteur réelle du sol (pente comprise)
+		var base_xz := dir * r_base * 0.7
+		var p0 := Vector3(base_xz.x, maxf(ground_at(ground, base_xz.x, base_xz.y) + 0.35, 0.2), base_xz.y)
 		var p1 := Vector3(mid_xz.x, mid_y, mid_xz.y)
 		var p2 := Vector3(tip_xz.x, tip_y, tip_xz.y)
 		VoxelShapes.capsule(wood, lo, C, p0, p1, r_base * 0.45, r_base * 0.3, root_id)

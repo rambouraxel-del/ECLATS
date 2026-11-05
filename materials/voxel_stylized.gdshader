@@ -171,7 +171,7 @@ vec3 stone_surface(Ctx c, vec3 base, float rough_k, inout float rough) {
 	vec3 col = base * (0.94 + 0.12 * h);
 	// Mouchetis : taches de 2 à 6 pixels, 5 niveaux de gris-beige.
 	float m = ps(vnoise(c.pc, 5.0, s + 1.0) * 0.6 + rnd2(c.pc, s + 2.0) * 0.4, 4.0);
-	col *= 1.0 + c.amp * (m - 0.5) * 0.3;
+	col *= 1.0 + c.amp * (m - 0.5) * 0.2;
 	// Pores : pixels isolés plus sombres, éclats clairs.
 	float r = rnd2(c.pc, s + 3.0);
 	col *= r > 0.965 ? 1.0 - 0.22 * c.amp : (r < 0.02 ? 1.0 + 0.16 * c.amp : 1.0);
@@ -207,7 +207,7 @@ vec3 rock_surface(Ctx c, vec3 base, inout float rough) {
 	vec3 col = base * (0.88 + 0.2 * bt * c.amp + 0.1 * (1.0 - c.amp));
 	// Grain minéral : tons voisins posterisés + éclats clairs (micas) et sombres.
 	float g = ps(vnoise(c.pc, 3.0, s + 2.0) * 0.5 + rnd2(c.pc, s + 3.0) * 0.5, 3.0);
-	col *= 1.0 + c.amp * (g - 0.5) * 0.26;
+	col *= 1.0 + c.amp * (g - 0.5) * 0.18;
 	float r = rnd2(c.pc, s + 4.0);
 	col *= r > 0.975 ? 1.0 + 0.3 * c.amp : (r < 0.03 ? 1.0 - 0.28 * c.amp : 1.0);
 	// Fissures profondes.
@@ -268,6 +268,10 @@ vec3 cobble_surface(Ctx c, vec3 base, inout float rough) {
 			joint = vec3(0.11, 0.2, 0.05) * (0.8 + r * 0.6);
 		}
 		return mix(base * 0.7, joint, clamp(c.amp, 0.0, 1.0));
+	}
+	// joint en creux : le pavé s'assombrit légèrement au bord (1 pixel), côté ombre, comme un chanfrein
+	if (w.y < 1.5) {
+		col *= 0.9 + 0.1 * smoothstep(0.5, 1.5, w.y);
 	}
 	col = moss_layer(c, col, c.wear * 0.35 * c.amp, 12.0);
 	rough = 0.92;
@@ -571,14 +575,14 @@ vec3 roof_surface(Ctx c, vec3 base, int style, inout float rough) {
 	if (style == 11 && base.r > base.b * 1.4) {
 		col *= cx < 1.0 || cx > cw - 1.5 ? 0.82 : (cx > cw * 0.35 && cx < cw * 0.65 ? 1.08 : 1.0);
 	}
-	col *= 1.0 + c.amp * (rnd2(c.pc, 5.0) - 0.5) * 0.14;
+	col *= 1.0 + c.amp * (rnd2(c.pc, 5.0) - 0.5) * 0.08;
 	if (style == 16) {
 		float fib = rnd2(vec2(floor(c.gp.x), ci), 6.0);
 		col *= 1.0 + c.amp * (fib - 0.5) * 0.18;
 	}
 	// Joint entre tuiles et bord bas ombré.
 	if (cx < 0.5 || (use_quad_data && c.up > 0.5 && c.qpx.y < 0.5 + 0.0)) {
-		col *= 1.0 - 0.28 * c.amp;
+		col *= 1.0 - 0.2 * c.amp;
 	}
 	col = moss_layer(c, col, c.wear * 0.6 * c.amp, 5.0 + id);
 	rough = style == 11 ? 0.62 : 0.85;
@@ -654,7 +658,7 @@ void fragment() {
 	vec2 pl = plane_uv(v_lpos, n);
 	// Empreinte d'un pixel d'écran en mètres : estompe les nuances trop fines.
 	float fp = max(length(dFdx(pl)), length(dFdy(pl)));
-	c.amp = tex_strength * (1.0 - smoothstep(0.012, 0.04, fp));
+	c.amp = tex_strength * (1.0 - smoothstep(0.008, 0.026, fp));      // les nuances de pixel s'estompent plus tôt : moins de moiré
 	c.ampz = tex_strength * (1.0 - smoothstep(0.06, 0.25, fp));
 	c.pc = floor(pl / PIX);
 	c.layer = floor(dot(abs(n), v_lpos) * 100.0 + 0.5);

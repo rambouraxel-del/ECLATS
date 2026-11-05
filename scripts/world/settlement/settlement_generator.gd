@@ -67,6 +67,7 @@ func generate() -> void:
 	_gardens()
 	_plaza_props()
 	_market_props()
+	field.remove_small_blocks(6, occ.tag)        # blocs isolés laissés par les terrassements
 
 # ------------------------------------------------------------------ place
 
@@ -441,10 +442,15 @@ func _garden_beside(h: Dictionary) -> bool:
 	var res: PlacementResult = h["res"]
 	var plan: BuildingPlan = h["plan"]
 	var half := res.spec.half_extents(res.yaw)
-	var gw := 4.4
-	var gd := 3.2
+	# parcelle et rangs propres à la graine : taille, écartement des lits, côté essayé en premier
+	var gw := rng.randf_range(3.6, 5.6)
+	var gd := rng.randf_range(2.8, 4.2)
+	var row_gap := rng.randf_range(1.45, 1.9)
 	var max_cut: int = profile.g("settlement.max_cut_cells", 6)
-	for side in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, -1)]:
+	var sides: Array = [Vector2(1, 0), Vector2(-1, 0), Vector2(0, -1)]
+	if rng.randf() < 0.5:
+		sides.reverse()
+	for side in sides:
 		# les côtés sont exprimés dans le repère du bâtiment (arrière = -z local)
 		var d3 := res.basis() * Vector3(side.x, 0, side.y)
 		var dir := Vector2(d3.x, d3.z)
@@ -462,13 +468,13 @@ func _garden_beside(h: Dictionary) -> bool:
 		gardens.append({"rect": rect, "center": center, "owner": owner, "level": ev["target"], "house": h["plan"].seed})
 		# lits de légumes (2 × 1 m) en rangées, posés par le placement universel
 		var yaw := 0 if hw >= hd else 1
-		var nrow := int(floor((hd * 2.0 if yaw == 0 else hw * 2.0) / 1.5))
+		var nrow := int(floor((hd * 2.0 if yaw == 0 else hw * 2.0) / row_gap))
 		for r in nrow:
 			var pos := center
 			if yaw == 0:
-				pos.y = center.y - hd + 0.75 + float(r) * 1.5
+				pos.y = center.y - hd + 0.75 + float(r) * row_gap
 			else:
-				pos.x = center.x - hw + 0.75 + float(r) * 1.5
+				pos.x = center.x - hw + 0.75 + float(r) * row_gap
 			_place_asset("vegetable_bed", pos, yaw, {"owner": owner, "zones": [TerrainField.Zone.GARDEN], "tags": [PlacementSpec.TAG_GARDEN], "clearance": 0.0}, "garden")
 		return true
 	return false
@@ -486,7 +492,10 @@ func _plaza_props() -> void:
 		_place_asset_near("crystal_lamp", c + Vector2(cos(a), sin(a)) * (pr - 0.9), 0.8, opt, "plaza")
 	for k in 3:
 		var a := float(k) * TAU / 3.0 + rng.randf() * 0.5
-		_place_asset_near("decorative_bench", c + Vector2(cos(a), sin(a)) * (pr - 1.4), 1.0, opt, "plaza")
+		# un banc garde 90 cm libres tout autour (accès, assise) : rien de dur ne se pose à moins
+		var bench_opt := opt.duplicate()
+		bench_opt["clearance"] = 0.9
+		_place_asset_near("decorative_bench", c + Vector2(cos(a), sin(a)) * (pr - 1.4), 1.0, bench_opt, "plaza")
 
 func _market_props() -> void:
 	var c: Vector2 = plaza["center"]

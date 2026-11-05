@@ -136,18 +136,18 @@ static func frame_transform(port: Dictionary) -> Transform3D:
 static func build_pier(port: Dictionary, seed: int) -> Dictionary:
 	var pal := VoxelPalette.get_default()
 	var rng := WorldRng.stream(seed, "pier")
-	var X0 := 13                    # cellules : x de -13 à 12
+	var X0 := 20                    # cellules : x de -20 à 25 (la passerelle déborde du tablier jusqu'au bateau)
 	var Z0 := 12                    # z de -12 à ...
 	var NZ := int((PIER_LEN + 1.4) / C) + 2
 	var Y0 := 8                     # y de -8
 	var NY := 8 + 34
-	var vol := VoxelVolume.new(Vector3i(26, NY, NZ))
+	var vol := VoxelVolume.new(Vector3i(46, NY, NZ))
 	var m := func(key: String) -> int: return pal.id(key)
 	var put := func(x: int, y: int, z: int, key: String) -> void:
 		var ix := x + X0
 		var iy := y + Y0
 		var iz := z + Z0
-		if ix >= 0 and iy >= 0 and iz >= 0 and ix < 26 and iy < NY and iz < NZ:
+		if ix >= 0 and iy >= 0 and iz >= 0 and ix < 46 and iy < NY and iz < NZ:
 			vol.set_voxel(ix, iy, iz, m.call(key))
 	var box := func(x0: int, y0: int, z0: int, x1: int, y1: int, z1: int, key: String) -> void:
 		for z in range(z0, z1 + 1):
@@ -196,12 +196,17 @@ static func build_pier(port: Dictionary, seed: int) -> Dictionary:
 	if side != 0:
 		var gz := (gap0 + gap1) / 2
 		var gx0 := 11 if side > 0 else -12
-		for k in range(0, 9):
+		# 7 planches : du bord du tablier jusqu'au flanc du bateau (à 62 cm du ponton), garde-corps sur les deux rives
+		for k in range(0, 7):
 			var gxx := gx0 + k * side
 			box.call(gxx, -1, gz - 4, gxx, -1, gz + 5, "floor_planks" if k % 2 == 0 else "wood_aged")
+			box.call(gxx, -3, gz - 4, gxx, -2, gz - 3, "wood_aged_dark")        # lisses sous les planches
+			box.call(gxx, -3, gz + 4, gxx, -2, gz + 5, "wood_aged_dark")
 		for gzz in [gz - 4, gz + 5]:
-			for k in range(0, 9):
-				box.call(gx0 + k * side, -2, gzz, gx0 + k * side, -2, gzz, "wood_aged_dark")
+			box.call(gx0 + 6 * side, 0, gzz, gx0 + 6 * side, 6, gzz, "wood_aged_dark")   # montant côté bateau
+			for k in range(0, 7):
+				box.call(gx0 + k * side, 6, gzz, gx0 + k * side, 6, gzz, "wood_aged")     # main courante
+				box.call(gx0 + k * side, 2, gzz, gx0 + k * side, 2, gzz, "wood_aged_dark") # lisse basse
 	# portiques haubanés : deux poteaux sur la plateforme, traverse supérieure et jambes de force
 	var tower_z := -9
 	var tower_h := 32

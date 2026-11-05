@@ -107,7 +107,7 @@
 		{"key": "shingle_aged", "name": "Bardeaux vieillis", "color": "#6f5b45", "variation": 0.04, "roughness": 0.9, "emission": 0, "style": "shingle", "metallic": 0, "wear": 0.92},
 		{"key": "floor_planks", "name": "Plancher", "color": "#85694a", "variation": 0.04, "roughness": 0.85, "emission": 0, "style": "wood", "metallic": 0, "wear": 0.7},
 		{"key": "floor_earth", "name": "Sol battu", "color": "#7b6249", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "soil", "metallic": 0, "wear": 0.5},
-		{"key": "floor_flag", "name": "Dallage", "color": "#8a8274", "variation": 0.04, "roughness": 0.9, "emission": 0, "style": "cobble", "metallic": 0, "wear": 0.7},
+		{"key": "floor_flag", "name": "Dallage", "color": "#8a8274", "variation": 0.04, "roughness": 0.9, "emission": 0, "style": "cobble", "metallic": 0, "wear": 0.12},
 		{"key": "cloth_brown", "name": "Toile brune", "color": "#86704f", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.6},
 		{"key": "cloth_ochre", "name": "Toile ocre", "color": "#ab8748", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.5},
 		{"key": "cloth_faded_blue", "name": "Toile bleue passée", "color": "#5f7a93", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.5},

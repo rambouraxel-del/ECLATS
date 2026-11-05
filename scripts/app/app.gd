@@ -67,7 +67,10 @@ func _process(_delta: float) -> void:
 		if cam is FreeCamera:
 			var fc := cam as FreeCamera
 			lines.append("Caméra : %s   vitesse %.1f m/s" % ["orbite" if fc.mode == FreeCamera.Mode.ORBIT else "vol libre", fc.move_speed])
-	if rig:
+	var envm := get_tree().get_first_node_in_group("environment_manager") as EnvironmentManager
+	if envm != null:
+		lines.append("Éclairage : %s" % envm.hud_label())         # ambiance et heure réellement appliquées (fondus, cycle)
+	elif rig:
 		lines.append("Éclairage : %s" % rig.current_name())
 	lines.append("")
 	lines.append("ZQSD/WASD bouger · souris regarder · Espace/Ctrl monter/descendre · Shift accélérer")

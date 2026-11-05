@@ -24,6 +24,8 @@ var world_env: WorldEnvironment
 var lamp_scale := 0.0
 ## Intensité minimale des lumières INTÉRIEURES (pièces de bâtiments) : lisibles même en plein jour.
 var interior_min := 0.0
+## Plafond des lumières intérieures (évite de gros halos de nuit quand lamp_scale monte).
+var interior_max := 99.0
 ## Matériaux de nuages à teinter selon l'ambiance (renseignés par VoxelClouds).
 var cloud_materials: Array[ShaderMaterial] = []
 var sky_material: ShaderMaterial
@@ -174,6 +176,6 @@ func refresh_lamps() -> void:
 		var base: float = l.get_meta("base_energy")
 		var sc := lamp_scale
 		if l.get_meta("interior", false):
-			sc = maxf(lamp_scale, interior_min)
+			sc = clampf(maxf(lamp_scale, interior_min), 0.0, interior_max)
 		l.light_energy = base * sc
 		l.visible = sc > 0.02

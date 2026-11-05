@@ -150,3 +150,65 @@ func to_image() -> Image:
 				c = c.lerp(zone_colors[z], 0.75)
 			img.set_pixel(cx, cz, c)
 	return img
+
+## Supprime les petits blocs isolés laissés par le nivellement : toute zone NATURELLE de colonnes de même hauteur,
+## de `max_size` colonnes au plus, entourée de colonnes plus hautes ou plus basses, prend la hauteur de son voisinage
+## le plus proche (jamais sous le cœur fixe : passe par set_top). Renvoie le nombre de colonnes modifiées.
+func remove_small_blocks(max_size: int, reserved := PackedByteArray()) -> int:
+	var seen := PackedByteArray()
+	seen.resize(n * n)
+	var changed := 0
+	for s0 in n * n:
+		if top[s0] == NO_GROUND or seen[s0] == 1 or zone[s0] != Zone.NATURAL:
+			continue
+		var h := top[s0]
+		var comp: Array[int] = [s0]
+		seen[s0] = 1
+		var k := 0
+		var ok := true
+		var neigh := {}
+		while k < comp.size():
+			var i: int = comp[k]
+			k += 1
+			for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				var x: int = i % n + o.x
+				var z: int = i / n + o.y
+				if x < 0 or z < 0 or x >= n or z >= n:
+					continue
+				var j := x + z * n
+				if top[j] == NO_GROUND:
+					ok = false          # touche le vide : bord de falaise, on n'y touche pas
+				elif top[j] == h and zone[j] == Zone.NATURAL:
+					if seen[j] == 0:
+						seen[j] = 1
+						comp.append(j)
+						if comp.size() > max_size:
+							ok = false
+				elif top[j] == h:
+					ok = false          # touche une zone aménagée
+				else:
+					neigh[top[j]] = int(neigh.get(top[j], 0)) + 1
+			if not ok and comp.size() > max_size:
+				break
+		if not ok or comp.size() > max_size or neigh.is_empty():
+			continue
+		if not reserved.is_empty():
+			var held := false
+			for i in comp:
+				if reserved[i] != 0:
+					held = true
+					break
+			if held:
+				continue        # emprise réservée (objet posé) : le sol ne bouge plus
+		var best := h
+		var best_n := 0
+		for v in neigh:
+			if neigh[v] > best_n or (neigh[v] == best_n and absi(v - h) < absi(best - h)):
+				best_n = neigh[v]
+				best = v
+		if absi(best - h) > 2:
+			continue
+		for i in comp:
+			if set_top(i % n, i / n, best):
+				changed += 1
+	return changed

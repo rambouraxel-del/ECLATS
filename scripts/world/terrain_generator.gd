@@ -333,13 +333,25 @@ func _quantize() -> void:
 	# force des paliers (0 = pente continue, 1 = marches pleines) : les plateaux planifiés sont déjà à un multiple
 	# du pas et ne bougent pas ; les pentes naturelles gardent une partie de leur inclinaison (moins de « gâteaux de mariage »)
 	var strength := clampf(float(profile.g("relief.terrace_strength", 1.0)), 0.0, 1.0)
+	# Rupture des étages concentriques : le niveau des paliers dérive lentement d'un endroit à l'autre (bruit basse
+	# fréquence) et la largeur des marches varie ; l'effet s'estompe sur les plateaux planifiés (masque _flat), qui
+	# restent parfaitement plats. Même règle pour toutes les graines.
+	var drift := WorldRng.noise(field.seed, "terrace_drift", 0.05, 2)
+	var width := WorldRng.noise(field.seed, "terrace_width", 0.12, 2)
 	for i in n * n:
 		if field.top[i] == TerrainField.NO_GROUND:
 			continue
-		var t := _heights[i] / step
+		var free := 1.0 - _flat[i]
+		var cx := float(i % n)
+		var cz := float(i / n)
+		var h := _heights[i] + drift.get_noise_2d(cx, cz) * 0.5 * step * free
+		var w := width.get_noise_2d(cx, cz) * free
+		var t := h / step
 		var f := t - floorf(t)
-		var q := (floorf(t) + _smooth((f - 0.3) / 0.4)) * step
-		q = lerpf(_heights[i], q, strength)
+		var edge0 := 0.3 + w * 0.16
+		var span := clampf(0.4 + w * 0.3, 0.18, 0.7)
+		var q := (floorf(t) + _smooth((f - edge0) / span)) * step
+		q = lerpf(h, q, strength)
 		field.top[i] = maxi(roundi(q / V) - 1, 2)
 
 # ------------------------------------------------------------------ 6. nettoyage
@@ -387,6 +399,7 @@ func _cleanup() -> void:
 		if changed == 0:
 			break
 	report["cleaned_columns"] = changed_total
+	report["small_blocks_removed"] = field.remove_small_blocks(6)
 
 # ------------------------------------------------------------------ 3. espaces habitables
 

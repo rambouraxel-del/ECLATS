@@ -43,6 +43,8 @@ func build(p_seed: int, cfg := {}) -> void:
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		mi.position = Vector3(cos(a) * d, rng.randf_range(height_range.x, height_range.y), sin(a) * d)
 		mi.rotation.y = rng.randf() * TAU
+		# silhouettes variées : étirement horizontal et profondeur propres à chaque île (plates, allongées, en toupie)
+		mi.scale = Vector3(rng.randf_range(0.7, 1.5), rng.randf_range(0.55, 1.5), rng.randf_range(0.7, 1.5))
 		add_child(mi)
 
 ## Île polaire : N secteurs × M anneaux. Dessus bombé bruité, rebord, dessous en cône irrégulier.
@@ -59,7 +61,7 @@ func _island_mesh(sub_seed: int, R: float) -> ArrayMesh:
 	var p2 := rng.randf() * TAU
 	var p3 := rng.randf() * TAU
 	var top_h := R * rng.randf_range(0.14, 0.3)
-	var depth := R * rng.randf_range(0.8, 1.5)
+	var depth := R * rng.randf_range(0.5, 1.9)
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var grass_a := Color(0.36, 0.52, 0.30)
