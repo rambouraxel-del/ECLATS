@@ -190,7 +190,6 @@ func _rocks() -> void:
 		var fam: String = fams[rng.randi() % fams.size()]
 		var seed := WorldRng.sub_seed(w.seed, "rock:%d" % guard)
 		var pl := RockGenerator.plan(fam, seed)
-		var spec := _rock_spec(pl)
 		var center := Vector2.ZERO
 		var radius := 3.0
 		if fam == "outcrop":
@@ -203,6 +202,10 @@ func _rocks() -> void:
 			center = _free_natural_point(1.0, [], 0.0)
 			if center.x == INF:
 				continue
+		# gabarit réduit près des passages (routes, cours, marches : cellules réservées à moins de 2,5 m du centre)
+		if _near_passage(center, 2.5):
+			RockGenerator.shrink(pl, 0.6)
+		var spec := _rock_spec(pl)
 		var res := placement.find_and_place(spec, center, radius, rng, {"samples": 30, "skip_access": true})
 		if not res.ok:
 			continue
@@ -210,6 +213,15 @@ func _rocks() -> void:
 		w.rocks.append({"kind": "rock", "family": fam, "seed": seed, "plan": pl, "res": res, "ground": ground, "pos": res.pos,
 			"xform": Transform3D(res.basis(), res.pos), "item": res.item_index})
 		placed += 1
+
+func _near_passage(p: Vector2, r: float) -> bool:
+	var c := field.col_of_m(p.x, p.y)
+	var k := int(r / V)
+	for dz in range(-k, k + 1, 2):
+		for dx in range(-k, k + 1, 2):
+			if occ.tag_at(c.x + dx, c.y + dz) == PlacementSpec.TAG_ROAD:
+				return true
+	return false
 
 ## Point du bord de l'île (légèrement en retrait) sur un rayon tiré au hasard.
 func _rim_point(inset: float) -> Vector2:

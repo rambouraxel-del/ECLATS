@@ -296,6 +296,11 @@ vec3 soil_surface(Ctx c, vec3 base, inout float rough) {
 	float s = sl(c, 51.0);
 	float p = ps(vnoise(c.pc, 6.0, s) * 0.55 + rnd2(c.pc, s + 1.0) * 0.45, 4.0);
 	vec3 col = base * (0.84 + 0.3 * mix(0.5, p, c.amp));
+	// Détail de terre à petite échelle (contraste discret) : mottes de 2-3 pixels, clairs et sombres, et grains isolés.
+	float clod = vnoise(c.pc, 3.0, s + 7.0);
+	col *= 1.0 + c.amp * (clod - 0.5) * 0.16;
+	float grain = rnd2(c.pc, s + 8.0);
+	col *= grain > 0.94 ? 1.0 + 0.1 * c.amp : (grain < 0.05 ? 1.0 - 0.12 * c.amp : 1.0);
 	// Humidité : plaques plus sombres.
 	float wet = vnoise(c.pc, 26.0, s + 2.0);
 	if (wet > 0.62 - c.wear * 0.15) {

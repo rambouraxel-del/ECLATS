@@ -249,18 +249,21 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 		var dist := rng.randf_range(0.75, 1.25) + r_base
 		var dir := Vector2.from_angle(ang)
 		# la racine se raccourcit tant que sa pointe n'a pas de sol dessous (bord de falaise) : elle s'ancre toujours
-		while dist > r_base + 0.25 and not has_ground(ground, dir.x * dist, dir.y * dist):
-			dist *= 0.8
+		while dist > r_base + 0.25 and (not has_ground(ground, dir.x * dist, dir.y * dist) or absf(ground_at(ground, dir.x * dist, dir.y * dist) - ground_at(ground, dir.x * dist * 0.5, dir.y * dist * 0.5)) > 0.45):
+			dist *= 0.8          # pas de pointe au-dessus du vide ni d'un à-pic : la racine se raccourcit
 		var tip_xz := dir * dist
-		var tip_y := ground_at(ground, tip_xz.x, tip_xz.y) - 0.1
+		var tip_y := ground_at(ground, tip_xz.x, tip_xz.y) - 0.14
 		var mid_xz := dir * (dist * 0.5)
-		var mid_y := ground_at(ground, mid_xz.x, mid_xz.y) + 0.12       # suit la hauteur réelle du sol (pente comprise)
+		var mid_y := ground_at(ground, mid_xz.x, mid_xz.y) + 0.05       # suit la hauteur réelle du sol (pente comprise)
 		var base_xz := dir * r_base * 0.7
 		var p0 := Vector3(base_xz.x, maxf(ground_at(ground, base_xz.x, base_xz.y) + 0.35, 0.2), base_xz.y)
 		var p1 := Vector3(mid_xz.x, mid_y, mid_xz.y)
 		var p2 := Vector3(tip_xz.x, tip_y, tip_xz.y)
 		VoxelShapes.capsule(wood, lo, C, p0, p1, r_base * 0.45, r_base * 0.3, root_id)
-		VoxelShapes.capsule(wood, lo, C, p1, p2, r_base * 0.3, 0.07, root_id)
+		var q_xz := dir * (dist * 0.78)                       # point intermédiaire enterré : la pointe épouse le sol
+		var p15 := Vector3(q_xz.x, ground_at(ground, q_xz.x, q_xz.y) - 0.03, q_xz.y)
+		VoxelShapes.capsule(wood, lo, C, p1, p15, r_base * 0.3, r_base * 0.2, root_id)
+		VoxelShapes.capsule(wood, lo, C, p15, p2, r_base * 0.2, 0.07, root_id)
 	# marques d'écorce du bouleau
 	if def.get("marks", false):
 		var dark := pal.id("bark_dark")

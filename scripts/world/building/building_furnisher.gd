@@ -282,12 +282,16 @@ static func build_kit(kind: String, s: Vector2i, seed: int, rng: RandomNumberGen
 			k.box(W - 3, 0, 0, W - 1, 7, 2, "wood_aged_dark")
 			k.box(0, 0, D - 3, 2, 4, D - 1, "wood_aged_dark")
 			k.box(W - 3, 0, D - 3, W - 1, 4, D - 1, "wood_aged_dark")
-			k.box(0, 8, 0, W - 1, 11, 3, "wood_aged")          # tête de lit
+			k.box(0, 8, 0, W - 1, 27, 2, "wood_aged")          # tête de lit (planche haute)
+			k.box(0, 24, 0, W - 1, 27, 3, "wood_aged_dark")     # chapeau de la tête de lit
 			k.box(0, 3, 0, W - 1, 6, D - 1, "wood_aged_dark")   # cadre
 			k.box(2, 7, 4, W - 3, 10, D - 3, "sack_cloth")      # paillasse
 			var blanket: String = ["cloth_brown", "cloth_faded_blue", "cloth_ochre"][rng.randi() % 3]
-			k.box(1, 10, int(D * 0.45), W - 2, 12, D - 2, blanket)
-			k.box(3, 10, 6, W - 4, 13, 18, "paper")              # oreiller
+			k.box(1, 10, int(D * 0.4), W - 2, 12, D - 2, blanket)
+			k.box(0, 5, int(D * 0.4), 0, 11, D - 3, blanket)       # retombé de couverture sur les côtés
+			k.box(W - 1, 5, int(D * 0.4), W - 1, 11, D - 3, blanket)
+			k.box(1, 6, D - 2, W - 2, 12, D - 2, blanket)         # retombé au pied du lit
+			k.box(5, 10, 4, W - 6, 13, 12, "paper")              # oreiller court
 		"chest":
 			k.box(0, 0, 0, W - 1, 15, D - 1, "wood_aged")
 			k.box(0, 0, 0, W - 1, 1, D - 1, "wood_aged_dark")

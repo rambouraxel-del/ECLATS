@@ -338,6 +338,8 @@ func _quantize() -> void:
 	# restent parfaitement plats. Même règle pour toutes les graines.
 	var drift := WorldRng.noise(field.seed, "terrace_drift", 0.05, 2)
 	var width := WorldRng.noise(field.seed, "terrace_width", 0.12, 2)
+	var rise := WorldRng.noise(field.seed, "terrace_rise", 0.035, 2)       # hauteur des ressauts variable (pas × 0,7 à × 1,3)
+	var brk := WorldRng.noise(field.seed, "terrace_break", 0.08, 2)        # paliers interrompus : là, la pente redevient continue
 	for i in n * n:
 		if field.top[i] == TerrainField.NO_GROUND:
 			continue
@@ -346,12 +348,14 @@ func _quantize() -> void:
 		var cz := float(i / n)
 		var h := _heights[i] + drift.get_noise_2d(cx, cz) * 0.5 * step * free
 		var w := width.get_noise_2d(cx, cz) * free
-		var t := h / step
+		var step_k := step * (1.0 + 0.3 * rise.get_noise_2d(cx, cz) * free)
+		var t := h / step_k
 		var f := t - floorf(t)
 		var edge0 := 0.3 + w * 0.16
 		var span := clampf(0.4 + w * 0.3, 0.18, 0.7)
-		var q := (floorf(t) + _smooth((f - edge0) / span)) * step
-		q = lerpf(h, q, strength)
+		var q := (floorf(t) + _smooth((f - edge0) / span)) * step_k
+		var s_loc := strength * (1.0 - 0.8 * _smooth((brk.get_noise_2d(cx, cz) - 0.12) / 0.3) * free)
+		q = lerpf(h, q, s_loc)
 		field.top[i] = maxi(roundi(q / V) - 1, 2)
 
 # ------------------------------------------------------------------ 6. nettoyage

@@ -67,7 +67,8 @@ func generate() -> void:
 	_gardens()
 	_plaza_props()
 	_market_props()
-	field.remove_small_blocks(6, occ.tag)        # blocs isolés laissés par les terrassements
+	field.remove_small_blocks(6, occ.tag)
+	_soften_edges()        # blocs isolés laissés par les terrassements
 
 # ------------------------------------------------------------------ place
 
@@ -518,6 +519,40 @@ func _market_props() -> void:
 			_place_asset_near(id, l, 3.0, o2, "port")
 
 # ------------------------------------------------------------------ pose d'assets cuits
+
+## Raccords herbe / terre / pavés : bordures COURTES et IRRÉGULIÈRES (une à deux colonnes, tirage par colonne) au lieu
+## d'une limite rectiligne. L'herbe voisine d'un chemin ou d'une place se piétine, le bord du pavage se mêle de terre.
+func _soften_edges() -> void:
+	var grass := {}
+	for k in ["grass", "grass_lush", "grass_trim", "grass_wild"]:
+		grass[pal.id(k)] = true
+	var trampled := pal.id("grass_trampled")
+	var dirt := pal.id("path_dirt")
+	var n := field.n
+	for cz in range(1, n - 1):
+		for cx in range(1, n - 1):
+			var i := cx + cz * n
+			if field.top[i] == TerrainField.NO_GROUND:
+				continue
+			var z := field.zone[i]
+			var h := VoxelGrid.hash01(cx, cz, 91, seed)
+			var near_built := false
+			var near_nat := false
+			for o in WorldNav.NEIGH:
+				var j: int = (cx + o.x) + (cz + o.y) * n
+				if field.top[j] == TerrainField.NO_GROUND:
+					continue
+				var zj := field.zone[j]
+				if zj == TerrainField.Zone.PLAZA or zj == TerrainField.Zone.ROAD or zj == TerrainField.Zone.PLOT or zj == TerrainField.Zone.PORT:
+					near_built = true
+				elif zj == TerrainField.Zone.NATURAL:
+					near_nat = true
+			if z == TerrainField.Zone.NATURAL and near_built and grass.has(int(field.material[i])) and h < 0.62:
+				field.material[i] = trampled
+			elif (z == TerrainField.Zone.PLAZA or z == TerrainField.Zone.ROAD) and near_nat and h < 0.35:
+				field.material[i] = dirt
+			elif z == TerrainField.Zone.PLOT and near_nat and h < 0.4:
+				field.material[i] = trampled
 
 func _spec_for_asset(id: String, opt: Dictionary) -> PlacementSpec:
 	var info := AssetLibrary.info(id)

@@ -177,9 +177,12 @@ static func build_pier(port: Dictionary, seed: int) -> Dictionary:
 		var x := -12 if sx < 0 else 10
 		var open_side: bool = (sx == side)
 		for z in range(1, deck_end + 1, 16):
+			if open_side and z + 1 >= gap0 - 1 and z <= gap1 + 1:
+				continue          # pas de poteau dans l'ouverture : l'arrivée de la passerelle est dégagée
 			box.call(x, 0, z, x + 1, 8, z + 1, "wood_aged_dark")
 		var last_post := deck_end - 1
-		box.call(x, 0, last_post, x + 1, 8, last_post + 1, "wood_aged_dark")
+		if not (open_side and last_post >= gap0 - 1 and last_post <= gap1 + 1):
+			box.call(x, 0, last_post, x + 1, 8, last_post + 1, "wood_aged_dark")
 		for z in range(1, deck_end + 1):
 			if open_side and z >= gap0 and z <= gap1:
 				continue
@@ -269,7 +272,7 @@ static func moor(port: Dictionary, ship: Dictionary) -> Dictionary:
 	var gap_cells := (44 + 62) / 2
 	var gz := float(gap_cells) * C                       # position de la passerelle le long du ponton (m)
 	var B: float = ship["B"]
-	var ship_open_z := -0.15                             # ouverture du bastingage dans le repère du bateau
+	var ship_open_z: float = float(ship.get("open_z", -0.15))     # ouverture du bastingage dans le repère du bateau
 	var lateral := side * (PIER_W * 0.5 + B * 0.5 + 0.62)
 	var pos2 := rim + axis * (gz - ship_open_z) + perp * lateral
 	var deck_y: float = float(port["deck_top"]) - 0.28

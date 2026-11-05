@@ -65,16 +65,26 @@ func air(x0: int, y0: int, z0: int, x1: int, y1: int, z1: int) -> void:
 func set_cell(x: int, y: int, z: int, key: String) -> void:
 	vol.set_voxel(x, y, z, mat(key))
 
+## Variation de teinte des moellons : amas organiques (bruit 3D + léger grain) et non plus plaques rectangulaires de
+## 1,2 × 0,8 m, qui découpaient les façades en rectangles gris et beiges alors que le motif de pierre restait continu.
+var _stone_noise: FastNoiseLite
+
+func _stone_pick(x: int, y_rel: int, z: int, salt: int) -> float:
+	if _stone_noise == null:
+		_stone_noise = WorldRng.noise(plan.seed, "stone_tint", 0.07, 2)
+	var n := _stone_noise.get_noise_3d(float(x) + float(salt) * 37.0, float(y_rel) * 1.6, float(z))
+	return clampf(0.5 + n * 0.75 + (VoxelGrid.hash01(x, y_rel, z, plan.seed + salt) - 0.5) * 0.12, 0.0, 1.0)
+
 func wall_key(f: int, y_rel: int, x: int, z: int) -> String:
 	var st: Dictionary = plan.style
 	if f == 0 and y_rel < int(st["low_height"]):
 		# variantes de moellons par plaques de 1,2 m : l'œil lit des reprises, pas un aplat
-		var pick := VoxelGrid.hash01(x / 12, y_rel / 8, z / 12, plan.seed)
-		return st["wall_low"] if pick < 0.7 else "stone_rubble_dark" if pick < 0.88 else "stone_rubble_warm"
+		var pick := _stone_pick(x, y_rel, z, 0)
+		return st["wall_low"] if pick < 0.72 else "stone_rubble_dark" if pick < 0.88 else "stone_rubble_warm"
 	var up: String = st["wall_up"]
 	if st["wall_style"] == "stone":
-		var pick := VoxelGrid.hash01(x / 12, y_rel / 8, z / 12, plan.seed + 3)
-		return up if pick < 0.7 else "stone_rubble_dark" if pick < 0.85 else "stone_rubble_warm"
+		var pick := _stone_pick(x, y_rel, z, 3)
+		return up if pick < 0.72 else "stone_rubble_dark" if pick < 0.86 else "stone_rubble_warm"
 	return up
 
 # ------------------------------------------------------------------ toiture : hauteurs (pour murs et pignons)
@@ -473,6 +483,11 @@ func _patches() -> void:
 		var yy := y0 + rng.randi_range(6, maxi(P.CLEAR - ph - 2, 7))
 		for du in pw:
 			for dy in ph:
+				# plaque irrégulière (ellipse + grain) et non plus rectangle net
+				var ex := (float(du) + 0.5 - float(pw) * 0.5) / (float(pw) * 0.5)
+				var ey := (float(dy) + 0.5 - float(ph) * 0.5) / (float(ph) * 0.5)
+				if ex * ex + ey * ey > 0.75 + 0.5 * VoxelGrid.hash01(u + du, yy + dy, w.p, plan.seed):
+					continue
 				for t in w.thickness:
 					var x := u + du if w.axis == 2 else w.p + t
 					var z := w.p + t if w.axis == 2 else u + du
@@ -671,6 +686,14 @@ func _rooms_info() -> void:
 		else:
 			rect = Rect2(Vector2(b["x0"] - o.w, b["z0"]) * C, Vector2(o.w * 2 + o.thickness, o.w) * C)
 		model.door_clear.append({"floor": o.floor, "rect": rect})
+	# Dégagement aux deux extrémités de l'escalier (pied et tête), sur les deux niveaux : réservé avant le mobilier.
+	if plan.stair != null:
+		var st: P.StairPlan = plan.stair
+		var foot := Rect2(Vector2(st.x0, st.z0 + st.l) * C, Vector2(st.w, 10) * C)
+		var head := Rect2(Vector2(st.x0, st.z0 - 10) * C, Vector2(st.w, 10) * C)
+		for f in plan.floors:
+			model.door_clear.append({"floor": f, "rect": foot})
+			model.door_clear.append({"floor": f, "rect": head})
 
 func _checks() -> void:
 	var c := model.checks

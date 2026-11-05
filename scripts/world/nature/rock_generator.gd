@@ -109,11 +109,47 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 						if yy > -0.05 and VoxelGrid.hash01(x, z, 17, seed) < 0.7 and nz.get_noise_3d(float(x) * 0.5, 3.0, float(z) * 0.5) > 0.22:
 							vol.set_voxel(x, y, z, moss)
 					break
+	if pl["family"] != "ruin":
+		_despike(vol)
 	if pl["family"] == "boulder" or pl["family"] == "outcrop":
 		_chips(vol, lo, pl, tone_ids, seed)
 	var removed := VoxelShapes.keep_anchored(vol, int((0.05 - lo.y) / C))
 	var b := VoxelShapes.bounds(vol)
 	return {"volume": vol, "origin": lo, "plan": pl, "stats": {"cells": vol.count_solid(), "floating_removed": removed, "bounds": b}}
+
+## Retire les petites pointes : une cellule exposée qui ne tient que par une seule face voisine (deux passes).
+static func _despike(vol: VoxelVolume) -> void:
+	for pass_i in 2:
+		var kill: Array[int] = []
+		for y in range(1, vol.size.y - 1):
+			for z in range(1, vol.size.z - 1):
+				for x in range(1, vol.size.x - 1):
+					if vol.get_voxel(x, y, z) == 0:
+						continue
+					var n := 0
+					for o in [Vector3i(1, 0, 0), Vector3i(-1, 0, 0), Vector3i(0, 1, 0), Vector3i(0, -1, 0), Vector3i(0, 0, 1), Vector3i(0, 0, -1)]:
+						if vol.get_voxel(x + o.x, y + o.y, z + o.z) != 0:
+							n += 1
+					if n <= 1:
+						kill.append(vol.index_of(x, y, z))
+		for i in kill:
+			vol.data[i] = 0
+
+## Réduit le gabarit d'un plan de rocher (près des passages).
+static func shrink(pl: Dictionary, k: float) -> void:
+	match pl["family"]:
+		"boulder":
+			pl["radii"] = (pl["radii"] as Vector3) * k
+			pl["size"] = (pl["size"] as Vector3) * k
+			pl["embed"] = float(pl["embed"]) * k
+		"outcrop":
+			pl["w"] = float(pl["w"]) * k
+			pl["d"] = float(pl["d"]) * k
+			pl["size"] = Vector3(float(pl["w"]) * 1.05, (pl["size"] as Vector3).y * k, float(pl["d"]) * 1.05)
+		"formation":
+			pl["spread"] = float(pl["spread"]) * k
+			pl["max_h"] = float(pl["max_h"]) * k
+			pl["size"] = Vector3(float(pl["spread"]) * 2.0 + 1.6, float(pl["max_h"]), float(pl["spread"]) * 2.0 + 1.6)
 
 ## Quelques éclats (2 à 3) au pied du rocher, posés au niveau du sol et collés au volume : détritus localisés.
 static func _chips(vol: VoxelVolume, lo: Vector3, pl: Dictionary, tone_ids: Array, seed: int) -> void:
@@ -158,8 +194,10 @@ static func _boulder(vol: VoxelVolume, lo: Vector3, pl: Dictionary, pal: VoxelPa
 	var c := Vector3(0, radii.y * 0.45, 0)
 	var pick := func(x: int, y: int, z: int, d: float) -> int:
 		var yy: float = lo.y + float(y) * C
-		var wob := nz.get_noise_3d(float(x) * 0.7, float(y) * 0.7, float(z) * 0.7) * 0.28
-		if d + wob > 1.0:
+		var wob := nz.get_noise_3d(float(x) * 0.4, float(y) * 0.4, float(z) * 0.4) * 0.2      # bosses douces, peu de pointes
+		# flancs moins verticaux : la base s'évase (le rayon effectif grandit sous le centre du volume)
+		var dd := d * lerpf(1.0, 0.8, clampf((c.y - yy) / maxf(radii.y, 0.1), 0.0, 1.0))
+		if dd + wob > 1.0:
 			return 0
 		return _mat_for_height(tone_ids, yy, seed, band_h, warp)
 	VoxelShapes.ellipsoid_pick(vol, lo, C, c, radii, pick)

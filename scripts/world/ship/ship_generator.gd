@@ -101,8 +101,8 @@ static func build(seed: int, scale_len := 1.0) -> Dictionary:
 		for side in [-1, 1]:
 			var x: int = hc * side
 			var opening: bool = iz >= gap0 and iz <= gap1
-			# poteaux tous les 1,2 m, lisse haute, lisse basse ajourée
-			if (iz % 12) == 0:
+			# poteaux tous les 1,2 m (jamais dans l'ouverture d'embarquement), lisse haute, lisse basse ajourée
+			if (iz % 12) == 0 and not (iz >= gap0 - 1 and iz <= gap1 + 1):
 				for iy in range(base, base + 9):
 					put.call(x, iy, iz, ids["b"])
 			if not opening:
@@ -268,7 +268,7 @@ static func build(seed: int, scale_len := 1.0) -> Dictionary:
 	var hull_aabb := AABB(Vector3(-B_m * 0.5 - 1.2, -D_m - 0.9, -L_m * 0.5 - 0.3), Vector3(B_m + 2.4, D_m + 0.9 + castle_m + 1.0 + mast_h[0], L_m + 3.0))
 	var res := {"seed": seed, "L": L_m, "B": B_m, "D": D_m, "volume": vol, "origin": origin, "grid": C, "sails": sails, "ropes": ropes, "masts": masts, "yards": yards,
 		"lights": lights, "aabb": hull_aabb, "deck_y": 0.0, "bow_z": bow_z, "bowsprit": [bs_a, bs_b], "removed_floating": removed, "wood_components": comps,
-		"cleat_x": B_m * 0.5, "ids": ids}
+		"cleat_x": B_m * 0.5, "ids": ids, "open_z": float(gap0 + gap1) * 0.5 * C}
 	return res
 
 ## Panneau de voile : tissu de 2 cm (une cellule d'épaisseur + bombement), couleurs par pièces cousues,

@@ -172,10 +172,10 @@ static func _layout_house_large(p: BuildingPlan, rng: RandomNumberGenerator, ix0
 	st.l = BuildingPlan.STEP_RUN * (BuildingPlan.FLOOR_H / BuildingPlan.STEP_RISE)   # 39
 	st.dir = -1
 	st.x0 = a + 1
-	st.z0 = iz1 - st.l + 1 - 2                    # marche 1 au sud, laisse 2 cellules de palier au pied
+	# Le pied de l'escalier reste NORD du seuil des portes du rez-de-chaussée (10 cellules de dégagement au sud) :
+	# les portes ne débouchent jamais sur les premières marches ; la tête de l'escalier laisse la place d'une porte d'étage.
+	st.z0 = maxi(iz1 - 11 - st.l + 1, iz0 + 6)
 	st.from_floor = 0
-	if st.z0 < iz0 + 6:
-		st.z0 = iz0 + 6
 	p.stair = st
 	var door_z := iz1 - BuildingPlan.DOOR_INT_W - 1
 	_int_door_x(p, a, door_z, 0, hall.id, bay0.id, 2)
@@ -183,11 +183,11 @@ static func _layout_house_large(p: BuildingPlan, rng: RandomNumberGenerator, ix0
 	_main_door(p, rng, ix0 + 6, a - main_w - 4, main_w, hall.id)
 	# Étage : deux chambres et le palier de la cage.
 	var ch1 := _room(p, 1, ix0, iz0, a - 1, iz1, "chamber", "floor_planks")
-	var bay1 := _room(p, 1, a + 1, iz0, b - 1, iz1, "landing", "floor_planks")
+	var bay1 := _room(p, 1, a + 1, iz0, b - 1, st.z0 + 2, "landing", "floor_planks")   # palier : seule la partie nord, hors trémie
 	var ch2 := _room(p, 1, b + 1, iz0, ix1, iz1, "chamber", "floor_planks")
 	_partition_x(p, a, iz0, iz1, 1, 2)
 	_partition_x(p, b, iz0, iz1, 1, 1)
-	var door_up := iz0 + 2
+	var door_up := iz0
 	_int_door_x(p, a, door_up, 1, ch1.id, bay1.id, 2)
 	_int_door_x(p, b, door_up, 1, bay1.id, ch2.id, 1)
 	p.hearth = {"room": hall.id, "side": "W", "x": ix0, "z": (iz0 + iz1) / 2 - 7, "w": 14, "d": 7, "h": 17}
