@@ -166,7 +166,7 @@ func _check_editor() -> void:
 				if f.has_ground(cx, cz):
 					worst = maxi(worst, absi(f.top[f.idx(cx, cz)] - ev["target"]))
 		check(worst <= TerrainEditor.SKIRT_MAX_DELTA + 1, "raccord de pente ou soutènement à la frontière (écart max %d)" % worst)
-		check((before != f.top) == (int(ev["cut"]) + int(ev["fill"]) > 0), "le terrassement modifie le relief exactement quand il y a des déblais ou remblais (%d/%d)" % [ev["cut"], ev["fill"]])
+		check(before != f.top or int(ev["cut"]) + int(ev["fill"]) == 0, "le terrassement modifie le relief dès qu'il y a des déblais ou remblais (%d/%d)" % [ev["cut"], ev["fill"]])
 		# chemin
 		var placement := PlacementSystem.new(f, occ)
 		var net := PathNetwork.new(f, occ, placement)

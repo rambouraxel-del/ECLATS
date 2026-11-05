@@ -514,6 +514,8 @@ vec3 rubble_surface(Ctx c, vec3 base, inout float rough) {
 	float id = use_small ? small.z : big.z;
 	float edge = use_small ? small.y : big.y;
 	vec3 col = base * (0.7 + 0.55 * ps(id, 4.0));
+	// Teinte propre à chaque moellon (légèrement chaude ou froide) : la variation suit les pierres, pas des zones
+	col *= mix(vec3(0.98, 0.99, 1.02), vec3(1.03, 1.0, 0.95), fract(id * 7.31));
 	// Chaque pierre est un peu plus claire en haut qu'en bas (relief suggéré par pixels).
 	col *= 1.0 + c.amp * (rnd2(c.pc, s + 1.0) - 0.5) * 0.18;
 	if (edge < 0.9) {
@@ -574,7 +576,8 @@ vec3 roof_surface(Ctx c, vec3 base, int style, inout float rough) {
 	float id = rnd2(vec2(ci, floor(c.seed * 64.0)), 3.0);
 	vec3 col = base * (0.84 + 0.3 * ps(id, 3.0));
 	if (c.up < 0.5) {
-		col *= 0.74;            // contremarche à l'ombre de la tuile du dessus
+		// contremarches et dessous : teinte plate à l'ombre (ni stries, ni mousse, ni pixels verts sous les toits)
+		return base * 0.7 * (0.96 + 0.08 * rnd2(floor(c.pc / 4.0), 7.0));
 	}
 	// Relief de tuile canal (terre cuite) : colonne centrale plus claire, bords plus sombres.
 	if (style == 11 && base.r > base.b * 1.4) {

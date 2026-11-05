@@ -145,3 +145,21 @@ static func keep_largest(vol: VoxelVolume) -> int:
 			vol.data[i] = 0
 		removed += comps[k].size()
 	return removed
+
+## Retire les cellules qui ne tiennent que par `max_faces` faces voisines ou moins (pointes, cellules isolées).
+static func despike(vol: VoxelVolume, max_faces: int, passes := 2) -> void:
+	for pass_i in passes:
+		var kill: Array[int] = []
+		for y in range(vol.size.y):
+			for z in range(vol.size.z):
+				for x in range(vol.size.x):
+					if vol.get_voxel(x, y, z) == 0:
+						continue
+					var n := 0
+					for o in [Vector3i(1, 0, 0), Vector3i(-1, 0, 0), Vector3i(0, 1, 0), Vector3i(0, -1, 0), Vector3i(0, 0, 1), Vector3i(0, 0, -1)]:
+						if vol.get_voxel(x + o.x, y + o.y, z + o.z) != 0:
+							n += 1
+					if n <= max_faces:
+						kill.append(vol.index_of(x, y, z))
+		for i in kill:
+			vol.data[i] = 0

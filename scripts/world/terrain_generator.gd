@@ -515,6 +515,7 @@ func _materials() -> void:
 	var lush := float(profile.g("climate.lush_above", 0.62))
 	var dry := float(profile.g("climate.dry_below", 0.3))
 	var rock_step := int(profile.g("cliff.rock_step", 3))
+	var patch := WorldRng.noise(seed, "grass_patch", 0.16, 2)        # taches d'herbe de 3-6 m : la pelouse n'est plus uniforme
 	var ids := {
 		"lush": pal.id("grass_lush"), "dry": pal.id("grass_dry"), "wild": pal.id("grass_wild"), "grass": pal.id("grass"),
 		"warm": pal.id("rock_warm"), "grey": pal.id("rock_grey"),
@@ -525,19 +526,19 @@ func _materials() -> void:
 			if field.top[i] == TerrainField.NO_GROUND:
 				continue
 			var p := field.center_m(cx, cz)
-			var m := moist.get_noise_2d(p.x, p.y) * 0.5 + 0.5
+			var m := moist.get_noise_2d(p.x, p.y) * 0.5 + 0.5 + patch.get_noise_2d(p.x, p.y) * 0.16
 			var slope := field.step_at(cx, cz)
 			var id: int = ids["grass"]
 			if slope >= rock_step or (rocky.get_noise_2d(p.x, p.y) > 0.62 and slope >= 1):
 				id = ids["warm"] if rocky.get_noise_2d(p.y, p.x) > 0.0 else ids["grey"]
 			elif field.edge_dist[i] < 0.5:
-				id = ids["dry"]
+				id = ids["wild"] if VoxelGrid.hash01(cx, cz, 5, seed) < 0.7 else ids["grass"]      # plus de liseré jaune au bord des falaises
 			elif m > lush:
 				id = ids["lush"]
 			elif m < dry:
 				id = ids["dry"]
 			else:
-				id = ids["wild"] if m < 0.5 else ids["grass"]
+				id = ids["wild"] if (m + (VoxelGrid.hash01(cx, cz, 6, seed) - 0.5) * 0.12) < 0.5 else ids["grass"]
 			field.material[i] = id
 			field.zone[i] = TerrainField.Zone.NATURAL
 

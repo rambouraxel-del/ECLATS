@@ -307,7 +307,7 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 				var idx := int(v * float(leaf_ids.size())) % leaf_ids.size()
 				if topness > radii.y * 0.3 and v > 0.45:
 					idx = 1 % leaf_ids.size()
-				if not fruit_ids.is_empty() and d > 0.8 and nz < 0.1:
+				if not fruit_ids.is_empty() and d > 0.9 and nz < 0.012:     # fruits rares : un cube de 20 cm est déjà gros
 					return fruit_ids[int(nz * 100.0) % fruit_ids.size()]
 				return leaf_ids[idx]
 			VoxelShapes.ellipsoid_pick(foliage, f_origin, F, c, radii, pick)
@@ -333,6 +333,8 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 						var cy0 := int(floor((top_y - f_origin.y) / F))
 						for k in len_c:
 							foliage.set_voxel(cx, cy0 - k, cz, leaf_ids[(cx + cz + k) % leaf_ids.size()])
+	if foliage != null:
+		VoxelShapes.despike(foliage, 1, 1)          # plus de cimes détachées : cellules de feuillage sans appui retirées
 	var stats := {"wood_cells": wood.count_solid(), "foliage_cells": foliage.count_solid() if foliage != null else 0, "floating_removed": removed_wood,
 		"blobs": blobs.size()}
 	return {"wood": wood, "wood_origin": lo, "foliage": foliage, "foliage_origin": f_origin, "stats": stats, "plan": pl}

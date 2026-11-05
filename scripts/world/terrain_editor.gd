@@ -6,7 +6,7 @@ extends RefCounted
 ## dans le cœur fixe : le terrassement ne peut jamais creuser plus que la couche superficielle.
 
 const V := VoxelGrid.VOXEL_SIZE
-const SKIRT_SLOPE := 2          # colonnes par cellule de dénivelé : pente 1:2 (≈ 27°)
+const SKIRT_SLOPE := 3          # colonnes par cellule de dénivelé : pente 1:3 (≈ 18°), raccord progressif aux plateformes
 const SKIRT_MAX_DELTA := 3      # au-delà, soutènement vertical plutôt que talus
 
 ## Évalue l'implantation d'une plateforme (rect en colonnes) : cibles, coûts, faisabilité.
@@ -91,7 +91,7 @@ static func stamp_pad(field: TerrainField, rect: Rect2i, target: int, zone: int,
 		for cx in range(rect.position.x, rect.end.x):
 			if field.has_ground(cx, cz):
 				band[field.idx(cx, cz)] = target
-	var sk := apply_skirt(field, band, 14)
+	var sk := apply_skirt(field, band, 22)
 	return {"changed": changed + sk["changed"], "retained": sk["retained"]}
 
 ## Raccorde le relief naturel à des colonnes aménagées (« band » : index de colonne → hauteur) :

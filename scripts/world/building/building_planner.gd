@@ -366,6 +366,17 @@ static func _try_window(p: BuildingPlan, rng: RandomNumberGenerator, r: Building
 			o.p = (p.annexes[0].x1 - 1 if r.annex else p.mx + p.W - BuildingPlan.WALL)
 			o.sign = 1
 			o.u = rng.randi_range(r.z0 + 3, r.z1 - w - 3)
+	# Fenêtres alignées par travée : u est calé sur une trame de 16 cellules propre à la façade, donc la même d'un étage
+	# à l'autre (colonnes de fenêtres superposées) et régulière d'une pièce à l'autre.
+	var lo_u := (r.x0 if o.axis == 2 else r.z0) + 3
+	var hi_u := (r.x1 if o.axis == 2 else r.z1) - w - 3
+	var base_u := (p.mx if o.axis == 2 else p.mz) + 6
+	var snapped_u := base_u + 16 * int(round(float(o.u - base_u) / 16.0))
+	if snapped_u < lo_u or snapped_u > hi_u:
+		snapped_u = base_u + 16 * int(floor(float(hi_u - base_u) / 16.0))
+		if snapped_u < lo_u:
+			snapped_u = o.u
+	o.u = snapped_u
 	if r.x1 - r.x0 < w + 6 and o.axis == 2:
 		return false
 	if r.z1 - r.z0 < w + 6 and o.axis == 0:

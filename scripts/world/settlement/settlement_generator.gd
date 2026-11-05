@@ -386,9 +386,11 @@ func _shrine() -> void:
 	# L'Ancre, son socle et les ruines : posés par le placement universel, dans la parcelle réservée.
 	_place_asset("teleport_anchor", center, 0, {"owner": owner, "free_tags": PackedInt32Array([PlacementSpec.TAG_PLOT]), "zones": [TerrainField.Zone.PLOT], "tags": [PlacementSpec.TAG_PLOT], "clearance": 0.0}, "shrine")
 	_place_asset("anchor_pedestal", center, 0, {"owner": owner, "zones": [TerrainField.Zone.PLOT], "tags": [PlacementSpec.TAG_PLOT], "clearance": 0.0, "y_extra": 0.0}, "shrine")
+	# fûts groupés en ARC côté opposé à l'accès (la route arrive côté place) : ensemble cohérent, entrée dégagée
+	var away := (center - (plaza["center"] as Vector2)).angle()
 	for k in 4:
-		var ang := float(k) * PI * 0.5 + 0.8
-		_place_asset_near("ruin_column", center + Vector2(cos(ang), sin(ang)) * 4.2, 1.2, {"owner": owner, "zones": [TerrainField.Zone.PLOT, TerrainField.Zone.NATURAL], "tags": [PlacementSpec.TAG_PLOT, PlacementSpec.TAG_FREE]}, "shrine")
+		var ang := away + (float(k) - 1.5) * 0.55
+		_place_asset_near("ruin_column", center + Vector2(cos(ang), sin(ang)) * 4.4, 1.2, {"owner": owner, "zones": [TerrainField.Zone.PLOT, TerrainField.Zone.NATURAL], "tags": [PlacementSpec.TAG_PLOT, PlacementSpec.TAG_FREE]}, "shrine")
 	_place_asset_near("brazier", center + Vector2(-2.4, 2.4), 1.0, {"owner": owner, "zones": [TerrainField.Zone.PLOT], "tags": [PlacementSpec.TAG_PLOT]}, "shrine")
 	_place_asset_near("brazier", center + Vector2(2.4, 2.4), 1.0, {"owner": owner, "zones": [TerrainField.Zone.PLOT], "tags": [PlacementSpec.TAG_PLOT]}, "shrine")
 

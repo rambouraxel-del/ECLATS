@@ -39,6 +39,7 @@ func _build(p_plan: BuildingPlan) -> BuildingModel:
 	_partitions()
 	_stairs()
 	_hearth()
+	_ceiling()
 	_gables_and_roofs()
 	_patches()
 	_carve_openings()
@@ -261,6 +262,24 @@ func _floors() -> void:
 			if r.floor == f:
 				fill(r.x0, fy - 1, r.z0, r.x1, fy - 1, r.z1, r.floor_material)
 		# les cloisons d'étage reposent sur le plancher : lignes de partition remplies après
+
+## Plafond de bois sous le comble : ferme le volume au-dessus des cloisons (maisons, échoppes, ateliers). Pour un étage
+## supérieur le plancher d'étage fait déjà office de plafond du niveau du dessous (trémie et dégagements conservés) ;
+## ici on ferme le dernier niveau. Solives apparentes tous les 1,2 m ; la cheminée et les cellules déjà pleines sont respectées.
+func _ceiling() -> void:
+	if not (plan.type in ["house_small", "house_large", "shop", "workshop", "community_hall"]):
+		return
+	var top := plan.floor_y(plan.floors - 1) + P.CLEAR
+	var x0 := plan.mx + P.WALL
+	var x1 := plan.mx + plan.W - P.WALL - 1
+	var z0 := plan.mz + P.WALL
+	var z1 := plan.mz + plan.D - P.WALL - 1
+	for z in range(z0, z1 + 1):
+		for x in range(x0, x1 + 1):
+			if vol.get_voxel(x, top - 1, z) == 0:
+				set_cell(x, top - 1, z, "floor_planks")
+			if vol.get_voxel(x, top - 2, z) == 0:
+				set_cell(x, top - 2, z, "wood_aged_dark" if (z - z0) % 12 < 2 else "wood_aged")
 
 func _partitions() -> void:
 	for w in plan.walls:
@@ -548,8 +567,8 @@ func _reclaimed() -> void:
 	# Tambour de colonne couché devant la porte (pierre claire sculptée, cristal éteint en son centre).
 	var ox := o.u + o.w + 4
 	var oz := o.p + o.thickness
-	fill(ox, P.GY, oz + 1, ox + 5, P.GY + 2, oz + 5, "stone_carved")
-	set_cell(ox + 2, P.GY + 3, oz + 3, "stone_carved")
+	# (le tambour couché, bloc clair très visible au seuil, est remplacé par quelques moellons sombres au pied du mur)
+	fill(ox, P.GY, oz + 1, ox + 3, P.GY + 1, oz + 2, "stone_rubble_dark")
 	# Bloc sculpté encastré dans le mur, à côté de la porte.
 	var u := o.u - 8
 	if u > plan.mx + 3:
@@ -557,7 +576,7 @@ func _reclaimed() -> void:
 		for du in 4:
 			for dy in 4:
 				for t in 2:
-					set_cell(u + du, y + dy, o.p + t, "stone_carved")
+					set_cell(u + du, y + dy, o.p + t, "stone_ashlar_dark")
 		set_cell(u + 1, y + 1, o.p + o.thickness - 1, "crystal_deep")
 
 # ------------------------------------------------------------------ colliders simplifiés
@@ -589,6 +608,10 @@ func _colliders() -> void:
 				_box(x0, fy - P.SLAB, hz0, hx0 - 1, fy - 1, z1)
 			if hx1 < x1:
 				_box(hx1 + 1, fy - P.SLAB, hz0, x1, fy - 1, z1)
+	# plafond du dernier niveau (voir _ceiling)
+	if plan.type in ["house_small", "house_large", "shop", "workshop", "community_hall"]:
+		var ctop := plan.floor_y(plan.floors - 1) + P.CLEAR
+		_box(plan.mx + P.WALL, ctop - 2, plan.mz + P.WALL, plan.mx + plan.W - P.WALL - 1, ctop - 1, plan.mz + plan.D - P.WALL - 1)
 	# murs, découpés autour des ouvertures
 	for w in plan.walls:
 		var y0 := plan.floor_y(w.floor)

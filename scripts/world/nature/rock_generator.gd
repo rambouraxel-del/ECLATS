@@ -20,7 +20,8 @@ const TONES := {
 static func families() -> PackedStringArray:
 	return PackedStringArray(["boulder", "outcrop", "formation", "ruin"])
 
-static func plan(family: String, seed: int) -> Dictionary:
+## `sub` force le type de vestige (ruin) : « column », « arch », « wall » ou « slab ».
+static func plan(family: String, seed: int, sub := "") -> Dictionary:
 	var rng := WorldRng.stream(seed, "rock:" + family)
 	var tone: String = ["warm", "grey", "warm", "grey", "dark"][rng.randi() % 5]
 	# identifiants de matières propres à ce rocher (copie locale : aucun conteneur partagé entre fils d'exécution)
@@ -31,12 +32,41 @@ static func plan(family: String, seed: int) -> Dictionary:
 	var p := {"family": family, "seed": seed, "tone": tone, "tone_ids": tone_ids, "embed": 0.3, "overhang_ok": false}
 	match family:
 		"boulder":
-			# quelques gros volumes lisibles (un sur trois), le reste de taille moyenne : plus de petits cailloux
+			# Silhouettes ASYMÉTRIQUES : masse à bosse décentrée, bloc couché, pointe inclinée (un gros volume sur trois)
 			var s := rng.randf_range(2.1, 3.0) if rng.randf() < 0.34 else rng.randf_range(1.3, 1.9)
-			p["radii"] = Vector3(s * rng.randf_range(0.8, 1.2), s * rng.randf_range(0.55, 0.9), s * rng.randf_range(0.8, 1.2))
-			p["size"] = Vector3(p["radii"].x * 2.1, p["radii"].y * 1.7, p["radii"].z * 2.1)
-			p["embed"] = p["radii"].y * 0.35
-			p["fissures"] = rng.randi_range(0, 2)
+			var variant: String = ["mass", "mass", "slab", "spike"][rng.randi() % 4]
+			var blobs: Array = []
+			match variant:
+				"mass":
+					var r := Vector3(s * rng.randf_range(0.9, 1.25), s * rng.randf_range(0.55, 0.8), s * rng.randf_range(0.8, 1.1))
+					blobs.append({"c": Vector3(0, r.y * 0.45, 0), "r": r, "tilt": Vector2(rng.randf_range(-0.12, 0.12), rng.randf_range(-0.12, 0.12))})
+					var a2 := rng.randf() * TAU
+					blobs.append({"c": Vector3(cos(a2) * r.x * 0.45, r.y * 0.85, sin(a2) * r.z * 0.45), "r": r * Vector3(0.55, 0.62, 0.55), "tilt": Vector2(0.15, -0.1)})   # bosse décentrée
+				"slab":
+					var r := Vector3(s * rng.randf_range(1.2, 1.5), s * rng.randf_range(0.32, 0.45), s * rng.randf_range(0.8, 1.05))
+					blobs.append({"c": Vector3(0, r.y * 0.9, 0), "r": r, "tilt": Vector2(rng.randf_range(-0.22, 0.22), rng.randf_range(-0.12, 0.12))})
+				"spike":
+					var r := Vector3(s * 0.5, s * rng.randf_range(1.05, 1.35), s * 0.45)
+					var lean := Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(0.25, 0.4)
+					blobs.append({"c": Vector3(0, r.y * 0.8, 0), "r": r, "tilt": lean})
+					blobs.append({"c": Vector3(-lean.x * 1.2, 0.25, -lean.y * 1.2) * s, "r": Vector3(s * 0.9, s * 0.35, s * 0.8), "tilt": Vector2.ZERO})   # pied
+			var ext := Vector3.ZERO
+			for bl in blobs:
+				var bc: Vector3 = bl["c"]
+				var br: Vector3 = bl["r"]
+				var tl: Vector2 = bl["tilt"]
+				ext.x = maxf(ext.x, absf(bc.x) + br.x * 1.25 + absf(tl.x) * br.y * 2.0)
+				ext.z = maxf(ext.z, absf(bc.z) + br.z * 1.25 + absf(tl.y) * br.y * 2.0)
+				ext.y = maxf(ext.y, bc.y + br.y * 1.1)
+			p["variant"] = variant
+			p["blobs"] = blobs
+			# face plane : un plan de coupe donne de grandes faces calmes (une seule par rocher, côté tiré au hasard)
+			var ca := rng.randf() * TAU
+			p["cut"] = {"n": Vector3(cos(ca), 0.25, sin(ca)).normalized(), "d": maxf(ext.x, ext.z) * rng.randf_range(0.62, 0.8)}
+			p["radii"] = Vector3(ext.x / 1.25, ext.y / 1.1, ext.z / 1.25)
+			p["size"] = Vector3(ext.x * 2.0, ext.y * 1.05, ext.z * 2.0)
+			p["embed"] = minf(ext.y * 0.3, 0.7)
+			p["fissures"] = rng.randi_range(1, 3)
 		"outcrop":
 			var w := rng.randf_range(2.4, 4.6)
 			p["layers"] = rng.randi_range(3, 6)
@@ -55,7 +85,7 @@ static func plan(family: String, seed: int) -> Dictionary:
 			p["embed"] = 0.4
 			p["crystal"] = rng.randf() < 0.4
 		"ruin":
-			p["sub"] = ["column", "wall", "arch", "slab"][rng.randi() % 4]
+			p["sub"] = sub if sub != "" else ["column", "wall", "arch", "slab"][rng.randi() % 4]
 			match p["sub"]:
 				"column": p["size"] = Vector3(2.4, 2.6, 2.4)
 				"wall": p["size"] = Vector3(rng.randf_range(2.4, 3.8), rng.randf_range(1.3, 2.3), 0.9)
@@ -142,6 +172,10 @@ static func shrink(pl: Dictionary, k: float) -> void:
 			pl["radii"] = (pl["radii"] as Vector3) * k
 			pl["size"] = (pl["size"] as Vector3) * k
 			pl["embed"] = float(pl["embed"]) * k
+			for bl in (pl["blobs"] as Array):
+				bl["c"] = (bl["c"] as Vector3) * k
+				bl["r"] = (bl["r"] as Vector3) * k
+			(pl["cut"] as Dictionary)["d"] = float((pl["cut"] as Dictionary)["d"]) * k
 		"outcrop":
 			pl["w"] = float(pl["w"]) * k
 			pl["d"] = float(pl["d"]) * k
@@ -191,16 +225,39 @@ static func _plug(vol: VoxelVolume, lo: Vector3, pl: Dictionary, ground: Diction
 static func _boulder(vol: VoxelVolume, lo: Vector3, pl: Dictionary, pal: VoxelPalette, nz: FastNoiseLite, tone_ids: Array, band_h: float, warp: float) -> void:
 	var radii: Vector3 = pl["radii"]
 	var seed: int = pl["seed"]
-	var c := Vector3(0, radii.y * 0.45, 0)
-	var pick := func(x: int, y: int, z: int, d: float) -> int:
-		var yy: float = lo.y + float(y) * C
-		var wob := nz.get_noise_3d(float(x) * 0.4, float(y) * 0.4, float(z) * 0.4) * 0.2      # bosses douces, peu de pointes
-		# flancs moins verticaux : la base s'évase (le rayon effectif grandit sous le centre du volume)
-		var dd := d * lerpf(1.0, 0.8, clampf((c.y - yy) / maxf(radii.y, 0.1), 0.0, 1.0))
-		if dd + wob > 1.0:
-			return 0
-		return _mat_for_height(tone_ids, yy, seed, band_h, warp)
-	VoxelShapes.ellipsoid_pick(vol, lo, C, c, radii, pick)
+	var cut: Dictionary = pl["cut"]
+	var cn: Vector3 = cut["n"]
+	var cd: float = cut["d"]
+	for bl in (pl["blobs"] as Array):
+		var bc: Vector3 = bl["c"]
+		var br: Vector3 = bl["r"]
+		var tl: Vector2 = bl["tilt"]
+		var reach := maxf(br.x, br.z) * 1.4 + (absf(tl.x) + absf(tl.y)) * br.y * 2.0
+		var x0 := maxi(int(floor((bc.x - reach - lo.x) / C)), 0)
+		var x1 := mini(int(ceil((bc.x + reach - lo.x) / C)), vol.size.x - 1)
+		var z0 := maxi(int(floor((bc.z - reach - lo.z) / C)), 0)
+		var z1 := mini(int(ceil((bc.z + reach - lo.z) / C)), vol.size.z - 1)
+		var y0 := 0
+		var y1 := mini(int(ceil((bc.y + br.y * 1.3 - lo.y) / C)), vol.size.y - 1)
+		for y in range(y0, y1 + 1):
+			var py := lo.y + (float(y) + 0.5) * C
+			var dy := py - bc.y
+			var flare := lerpf(1.0, 0.8, clampf(-dy / maxf(br.y, 0.1), 0.0, 1.0))   # base évasée : flancs moins verticaux
+			var mat := _mat_for_height(tone_ids, py, seed, band_h, warp)
+			for z in range(z0, z1 + 1):
+				var pz := lo.z + (float(z) + 0.5) * C
+				for x in range(x0, x1 + 1):
+					var px := lo.x + (float(x) + 0.5) * C
+					# cisaillement : l'axe du volume penche avec la hauteur (pointes inclinées, blocs couchés)
+					var lx := px - bc.x - tl.x * dy
+					var lz := pz - bc.z - tl.y * dy
+					var d := sqrt((lx / br.x) * (lx / br.x) + (dy / br.y) * (dy / br.y) + (lz / br.z) * (lz / br.z)) * flare
+					var wob := nz.get_noise_3d(float(x) * 0.3, float(y) * 0.3, float(z) * 0.3) * 0.12          # peu de relief : faces calmes
+					if d + wob > 1.0:
+						continue
+					if cn.x * px + cn.y * (py - bc.y) + cn.z * pz > cd and py > 0.15:
+						continue                                         # plan de coupe : grande face plane
+					vol.set_voxel(x, y, z, mat)
 	# fissures : plans minces qui entaillent le volume sur une partie de sa profondeur
 	var rng := WorldRng.stream(seed, "fissure")
 	for f in int(pl["fissures"]):
@@ -227,9 +284,9 @@ static func _outcrop(vol: VoxelVolume, lo: Vector3, pl: Dictionary, pal: VoxelPa
 	var oz := 0.0
 	for j in layers:
 		var t := float(j) / float(maxi(layers - 1, 1))
-		var shrink := lerpf(1.0, 0.35, pow(t, 0.8)) * rng.randf_range(0.9, 1.05)
-		ox += rng.randf_range(-0.25, 0.25)
-		oz += rng.randf_range(-0.18, 0.18)
+		var shrink := lerpf(1.0, 0.45, pow(t, 0.8)) * rng.randf_range(0.72, 1.1)          # gradins irréguliers
+		ox += rng.randf_range(-0.3, 0.55) * w * 0.25                                    # dérive latérale : silhouette asymétrique
+		oz += rng.randf_range(-0.25, 0.3) * d * 0.25
 		var c := Vector3(ox, float(j) * lh + lh * 0.45 - 0.2, oz)
 		var radii := Vector3(w * 0.5 * shrink, lh * 0.62, d * 0.5 * shrink)
 		var mat: int = tone_ids[(j * 5 + 3 * int(pl["seed"]) % 7) % tone_ids.size()]

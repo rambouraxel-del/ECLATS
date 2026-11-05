@@ -105,7 +105,7 @@ func _tree_spec(pl: Dictionary) -> PlacementSpec:
 	s.embed_max_m = 0.4
 	s.clearance_m = 0.7            # marge simple autour des façades, chemins, marches et mobilier
 	s.cliff_margin_m = 0.7
-	s.soft_overlap_max = 0.5
+	s.soft_overlap_max = 0.2          # couronnes qui ne s'imbriquent presque pas
 	s.allowed_zones = PackedInt32Array([TerrainField.Zone.NATURAL])
 	s.forbidden_materials = PackedStringArray(["rock_warm", "rock_grey", "cobble", "cobble_dark", "path_dirt", "stone"])
 	s.snap_m = 0.2
@@ -185,19 +185,39 @@ func _rocks() -> void:
 	var shrine: Dictionary = w.settlement.shrine if w.settlement != null else {}
 	var placed := 0
 	var guard := 0
+	# Ruines : les GRANDS vestiges (fûts, arche) forment un ensemble cohérent en arc autour du sanctuaire, côté opposé à
+	# la route d'accès ; partout ailleurs ils sont BAS (dalles, pans de mur) et ne se posent ni près d'une façade ni d'un chemin.
+	var arc_a0 := rng.randf() * TAU
+	var grand := 0
 	while placed < total and guard < total * 5:
 		guard += 1
 		var fam: String = fams[rng.randi() % fams.size()]
 		var seed := WorldRng.sub_seed(w.seed, "rock:%d" % guard)
-		var pl := RockGenerator.plan(fam, seed)
 		var center := Vector2.ZERO
 		var radius := 3.0
-		if fam == "outcrop":
+		var pl: Dictionary
+		if fam == "ruin" and not shrine.is_empty() and grand < 3:
+			var sub: String = ["column", "arch", "column"][grand]
+			pl = RockGenerator.plan(fam, seed, sub)
+			center = (shrine["center"] as Vector2) + Vector2.from_angle(arc_a0 + float(grand) * 0.62) * rng.randf_range(6.2, 7.6)
+			radius = 1.6
+			grand += 1
+		elif fam == "ruin":
+			pl = RockGenerator.plan(fam, seed, "slab" if rng.randf() < 0.55 else "wall")
+			if not shrine.is_empty() and rng.randf() < 0.7:
+				center = (shrine["center"] as Vector2) + Vector2.from_angle(arc_a0 + rng.randf_range(-1.2, 1.9)) * rng.randf_range(4.5, 9.0)
+			else:
+				center = _free_natural_point(1.0, [], 0.0)
+				if center.x == INF:
+					continue
+		else:
+			pl = RockGenerator.plan(fam, seed)
+		if fam == "ruin":
+			pass
+		elif fam == "outcrop":
 			center = _rim_point(2.0)
 			if center.x == INF:
 				continue
-		elif fam == "ruin" and not shrine.is_empty() and rng.randf() < 0.6:
-			center = (shrine["center"] as Vector2) + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(6.0, 10.0)
 		else:
 			center = _free_natural_point(1.0, [], 0.0)
 			if center.x == INF:
@@ -206,6 +226,8 @@ func _rocks() -> void:
 		if _near_passage(center, 2.5):
 			RockGenerator.shrink(pl, 0.6)
 		var spec := _rock_spec(pl)
+		if fam == "ruin":
+			spec.clearance_m = 1.3          # façades et chemins dégagés autour des vestiges
 		var res := placement.find_and_place(spec, center, radius, rng, {"samples": 30, "skip_access": true})
 		if not res.ok:
 			continue

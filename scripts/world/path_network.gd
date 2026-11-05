@@ -264,4 +264,4 @@ func _carve(cells: Array, h: PackedInt32Array, width_m: float, material_key: Str
 		placement.access_mask[j] = 1
 		road_cells[j] = hh
 		band[j] = hh
-	TerrainEditor.apply_skirt(field, band, 8)
+	TerrainEditor.apply_skirt(field, band, 12)
