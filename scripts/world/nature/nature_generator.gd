@@ -187,7 +187,7 @@ func _rocks() -> void:
 	var guard := 0
 	# Ruines : les GRANDS vestiges (fûts, arche) forment un ensemble cohérent en arc autour du sanctuaire, côté opposé à
 	# la route d'accès ; partout ailleurs ils sont BAS (dalles, pans de mur) et ne se posent ni près d'une façade ni d'un chemin.
-	var arc_a0 := rng.randf() * TAU
+	var arc_a0 := float(shrine["away"]) - 0.62 if shrine.has("away") else rng.randf() * TAU
 	var grand := 0
 	while placed < total and guard < total * 5:
 		guard += 1
@@ -196,12 +196,13 @@ func _rocks() -> void:
 		var center := Vector2.ZERO
 		var radius := 3.0
 		var pl: Dictionary
+		var is_grand := false
 		if fam == "ruin" and not shrine.is_empty() and grand < 3:
 			var sub: String = ["column", "arch", "column"][grand]
 			pl = RockGenerator.plan(fam, seed, sub)
-			center = (shrine["center"] as Vector2) + Vector2.from_angle(arc_a0 + float(grand) * 0.62) * rng.randf_range(6.2, 7.6)
+			center = (shrine["center"] as Vector2) + Vector2.from_angle(arc_a0 + float(grand) * 0.62 + rng.randf_range(-0.1, 0.1)) * rng.randf_range(6.2, 7.6)
 			radius = 1.6
-			grand += 1
+			is_grand = true
 		elif fam == "ruin":
 			pl = RockGenerator.plan(fam, seed, "slab" if rng.randf() < 0.55 else "wall")
 			if not shrine.is_empty() and rng.randf() < 0.7:
@@ -231,6 +232,8 @@ func _rocks() -> void:
 		var res := placement.find_and_place(spec, center, radius, rng, {"samples": 30, "skip_access": true})
 		if not res.ok:
 			continue
+		if is_grand:
+			grand += 1          # seuls les grands vestiges réellement posés comptent dans l'ensemble
 		var ground := TreeGenerator.ground_grid(field, res.pos, 3.4)
 		w.rocks.append({"kind": "rock", "family": fam, "seed": seed, "plan": pl, "res": res, "ground": ground, "pos": res.pos,
 			"xform": Transform3D(res.basis(), res.pos), "item": res.item_index})
@@ -288,6 +291,12 @@ func _plants() -> void:
 	var lists := {}
 	for kind in PLANTS:
 		lists[kind] = {}
+	for kind in ["tuft_short", "tuft_tall", "tuft_dense"]:
+		lists[kind] = {}
+	# densité de l'herbe : grandes zones rases ↔ zones fournies, indépendantes des amas de fleurs
+	var grass_noise := FastNoiseLite.new()
+	grass_noise.seed = WorldRng.sub_seed(w.seed, "grass_density")
+	grass_noise.frequency = 0.07
 	var grass_ids := {}
 	for k in ["grass", "grass_lush", "grass_dry", "grass_trim", "grass_wild", "grass_trampled"]:
 		grass_ids[pal.id(k)] = true
@@ -305,8 +314,13 @@ func _plants() -> void:
 		var weight: float = PLANTS[kind][biome]
 		if rng.randf() > weight:
 			continue
+		var dens := 0.0
+		if kind == "tuft":
+			dens = grass_noise.get_noise_2d(c.x, c.y)          # −1 rase … +1 fournie
+			if dens < -0.45 and rng.randf() < 0.7:
+				continue                                     # clairière rase : peu ou pas de touffes
 		var rho := rng.randf_range(0.7, 1.9) * (1.3 if kind == "tuft" else 1.0)
-		var count := int(rng.randf_range(10.0, 34.0) * (rho / 1.2) * (1.5 if kind == "tuft" else 1.0))
+		var count := int(rng.randf_range(10.0, 34.0) * (rho / 1.2) * (1.5 if kind == "tuft" else 1.0) * (clampf(1.0 + dens * 0.9, 0.3, 1.9) if kind == "tuft" else 1.0))
 		for k in count:
 			var off := Vector2.from_angle(rng.randf() * TAU) * rho * sqrt(rng.randf()) * (0.4 + 0.6 * rng.randf())
 			var p := c + off
@@ -322,15 +336,26 @@ func _plants() -> void:
 			if used.has(cell_key):
 				continue
 			used[cell_key] = true
+			var vkind := kind
+			if kind == "tuft":
+				# hauteur et fourniture des touffes elles-mêmes : zones rases (touffes courtes), moyennes, groupes hauts et fournis
+				var dd := dens + rng.randf_range(-0.25, 0.25)
+				var roll := rng.randf()
+				if dd < -0.2:
+					vkind = "tuft_short" if roll < 0.75 else "tuft"
+				elif dd > 0.25:
+					vkind = "tuft_dense" if roll < 0.4 else ("tuft_tall" if roll < 0.75 else "tuft")
+				else:
+					vkind = "tuft_short" if roll < 0.3 else ("tuft_tall" if roll < 0.45 else "tuft")
 			var y := float(field.top[i] + 1) * V
 			var rot := Basis(Vector3.UP, float(rng.randi() % 4) * PI * 0.5)
 			var half := Vector3(0.1, 0.0, 0.1)
 			var cp := field.center_m(col.x, col.y)
 			var base := Vector3(cp.x - 0.1, y, cp.y - 0.1)
 			var key := Vector2i(floori(cp.x / 10.0), floori(cp.y / 10.0))
-			if not lists[kind].has(key):
-				lists[kind][key] = []
-			lists[kind][key].append(Transform3D(rot, base + half - rot * half))
+			if not lists[vkind].has(key):
+				lists[vkind][key] = []
+			lists[vkind][key].append(Transform3D(rot, base + half - rot * half))
 	for kind in lists:
 		for key in lists[kind]:
 			w.plants.append({"kind": kind, "cell": key, "xforms": lists[kind][key]})

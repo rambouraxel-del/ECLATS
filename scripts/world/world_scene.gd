@@ -125,7 +125,7 @@ func _view(n: int) -> Array:
 				return [tp + Vector3(7, 3, 7.5), tp + Vector3(0, 2.2, 0)]
 		8:
 			if not world.rocks.is_empty():
-				var rp: Vector3 = world.rocks[0]["pos"]
+				var rp: Vector3 = _showcase_rock()
 				return [rp + Vector3(6, 2.4, 6.5), rp + Vector3(0, 1.3, 0)]
 		9: return [Vector3(pc.x + 90, 40, pc.y + 150), Vector3(pc.x, 0, pc.y)]
 		0: return [Vector3(pc.x - 40, 12, pc.y - 40), Vector3(pc.x, 2, pc.y)]
@@ -149,7 +149,7 @@ func _view_natural(n: int) -> Array:
 				return [tp + Vector3(10, 5.5, 11), tp + Vector3(0, 1.8, 0)]
 		8:
 			if not world.rocks.is_empty():
-				var rp: Vector3 = world.rocks[0]["pos"]
+				var rp: Vector3 = _showcase_rock()
 				return [rp + Vector3(7, 4.0, 7.5), rp + Vector3(0, 1.0, 0)]
 		9: return [Vector3(90, 40, 150), Vector3(0, 0, 0)]
 		0: return [Vector3(-40, 12, -40), Vector3(0, 2, 0)]
@@ -176,10 +176,93 @@ func _clear_of_foliage(from: Vector3, to: Vector3) -> Vector3:
 		p += away * 1.5 + Vector3(0, 1.0, 0)
 	return p
 
+## Rocher mis en avant par la vue 8 : le plus massif parmi ceux qu'aucune couronne d'arbre ne recouvre (à 2 m près).
+func _showcase_rock() -> Vector3:
+	var best := 0
+	var best_score := -1.0e9
+	for i in world.rocks.size():
+		var r: Dictionary = world.rocks[i]
+		var sz: Vector3 = r["plan"]["size"]
+		var rp: Vector3 = r["pos"]
+		var score := sz.x * sz.y * sz.z
+		if _in_crown(rp + Vector3(0, sz.y * 0.5, 0), 2.0):
+			score -= 1000.0
+		if score > best_score:
+			best_score = score
+			best = i
+	return world.rocks[best]["pos"]
+
+func _in_crown(p: Vector3, margin: float) -> bool:
+	for t in world.trees:
+		var cr: AABB = t["plan"]["crown"]
+		if cr.size.x <= 0.0:
+			continue
+		var tp: Vector3 = t["pos"]
+		if AABB(tp + cr.position, cr.size).grow(margin).has_point(p):
+			return true
+	return false
+
+func _segment_hits_crown(a: Vector3, b: Vector3) -> bool:
+	for t in world.trees:
+		var cr: AABB = t["plan"]["crown"]
+		if cr.size.x <= 0.0:
+			continue
+		var tp: Vector3 = t["pos"]
+		if AABB(tp + cr.position, cr.size).grow(-0.4).intersects_segment(a, b) != null:
+			return true
+		var tr: float = float(t["plan"].get("trunk_r", 0.3)) + 0.4          # le tronc masque aussi le sujet
+		if AABB(tp + Vector3(-tr, 0.0, -tr), Vector3(tr * 2.0, cr.position.y + cr.size.y * 0.5, tr * 2.0)).intersects_segment(a, b) != null:
+			return true
+	return false
+
+## Emprises (bâtiments, rochers) à ne pas traverser avec la caméra : boîtes alignées sur les axes.
+func _solid_boxes() -> Array[AABB]:
+	var boxes: Array[AABB] = []
+	for group in [world.buildings, world.rocks]:
+		for b in group:
+			var res: PlacementResult = b["res"]
+			var h := res.spec.half_extents(res.yaw)
+			boxes.append(AABB(res.pos - Vector3(h.x, 0.0, h.y), Vector3(h.x * 2.0, maxf(res.spec.size.y, 1.0), h.y * 2.0)))
+	return boxes
+
+## Caméra dégagée : ni dans une couronne, ni derrière une couronne, ni sous le sol. Si le point de départ est masqué,
+## on tourne autour du sujet (pas de 30°, trois distances) et on garde le premier cadrage libre.
+func _clear_view(from: Vector3, to: Vector3) -> Vector3:
+	var off := from - to
+	var solids := _solid_boxes()
+	for ring: float in [1.0, 1.3, 0.8]:
+		for k in 12:
+			var ang: float = deg_to_rad(float((k + 1) / 2) * 30.0 * (1.0 if k % 2 == 1 else -1.0)) if k > 0 else 0.0
+			var o: Vector3 = Vector3(off.x, 0.0, off.z).rotated(Vector3.UP, ang) * ring + Vector3(0, off.y, 0)
+			var p: Vector3 = to + o
+			var g := world.field.ground_at_m(p.x, p.z)
+			if not is_nan(g):
+				p.y = maxf(p.y, g + 1.6)
+			if _in_crown(p, 0.4) or _segment_hits_crown(p, to):
+				continue
+			var blocked := false
+			for pr in world.props:           # auvents, étals, mobilier : la caméra ne se pose pas dessus (hors voisinage du sujet)
+				var po: Vector3 = (pr["xform"] as Transform3D).origin
+				if Vector2(po.x - to.x, po.z - to.z).length() > 6.0 and Vector2(po.x - p.x, po.z - p.z).length() < 1.8 and p.y < po.y + 3.2:
+					blocked = true
+					break
+			if blocked:
+				continue
+			for bx in solids:
+				if bx.grow(0.5).has_point(to):
+					continue            # le sujet lui-même
+				if bx.grow(1.6).has_point(p) or bx.grow(-0.2).intersects_segment(p, to) != null:
+					blocked = true
+					break
+			if blocked:
+				continue
+			return p
+	return _clear_of_foliage(from, to)
+
 func _go_view(n: int) -> void:
 	var v := _view(n) if (world != null and not world.settlement.plaza.is_empty()) else (_view_natural(n) if world != null else [])
 	if cam and not v.is_empty():
-		cam.look_from(_clear_of_foliage(v[0], v[1]) if world != null else v[0], v[1])
+		cam.look_from((_clear_view(v[0], v[1]) if (n == 4 or n == 8) else _clear_of_foliage(v[0], v[1])) if world != null else v[0], v[1])
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey

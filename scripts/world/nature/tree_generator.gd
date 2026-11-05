@@ -276,6 +276,8 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 	# --- feuillage (20 cm) ---
 	var foliage: VoxelVolume = null
 	var f_origin := Vector3.ZERO
+	var fruit_ids: Array[int] = []
+	var fruit_sites: Array = []
 	var leaf_ids: Array[int] = []
 	for k in (def["leaf"] as Array):
 		leaf_ids.append(pal.id(k))
@@ -291,7 +293,6 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 		f_origin = (clo / F).floor() * F
 		var fsize := Vector3i(ceili((chi.x - f_origin.x) / F), ceili((chi.y - f_origin.y) / F), ceili((chi.z - f_origin.z) / F)) + Vector3i(2, 2, 2)
 		foliage = VoxelVolume.new(fsize)
-		var fruit_ids: Array[int] = []
 		if def.get("fruits", false):
 			fruit_ids = [pal.id("apple"), pal.id("blossom")]
 		for bi in blobs.size():
@@ -307,8 +308,8 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 				var idx := int(v * float(leaf_ids.size())) % leaf_ids.size()
 				if topness > radii.y * 0.3 and v > 0.45:
 					idx = 1 % leaf_ids.size()
-				if not fruit_ids.is_empty() and d > 0.9 and nz < 0.012:     # fruits rares : un cube de 20 cm est déjà gros
-					return fruit_ids[int(nz * 100.0) % fruit_ids.size()]
+				if not fruit_ids.is_empty() and d > 0.9 and nz < 0.012:     # fruits rares, posés ensuite en cubes de 10 cm
+					fruit_sites.append([x, y, z, int(nz * 100.0) % fruit_ids.size(), c])
 				return leaf_ids[idx]
 			VoxelShapes.ellipsoid_pick(foliage, f_origin, F, c, radii, pick)
 		if not strands.is_empty():
@@ -333,11 +334,65 @@ static func rasterize(pl: Dictionary, ground: Dictionary) -> Dictionary:
 						var cy0 := int(floor((top_y - f_origin.y) / F))
 						for k in len_c:
 							foliage.set_voxel(cx, cy0 - k, cz, leaf_ids[(cx + cz + k) % leaf_ids.size()])
+	var fruits: VoxelVolume = null
 	if foliage != null:
 		VoxelShapes.despike(foliage, 1, 1)          # plus de cimes détachées : cellules de feuillage sans appui retirées
+		# Les amas de feuillage réellement déconnectés de l'arbre (plusieurs cellules comprises) sont retirés : seule la
+		# composante reliée au bois (cellule de feuillage voisine d'un voxel de bois) ou, à défaut, la plus grosse reste.
+		_drop_detached_foliage(foliage, f_origin, wood, lo)
+		# Fruits et fleurs d'arbre : cubes de 10 cm (au lieu de 20 cm) sur la face extérieure de la cellule de feuillage.
+		if not fruit_sites.is_empty():
+			fruits = VoxelVolume.new(foliage.size * 2)
+			for fs in fruit_sites:
+				if foliage.get_voxel(fs[0], fs[1], fs[2]) == 0:
+					continue
+				var cc: Vector3 = fs[4]
+				var mid := f_origin + (Vector3(fs[0], fs[1], fs[2]) + Vector3(0.5, 0.5, 0.5)) * F
+				var dir := mid - cc
+				fruits.set_voxel(fs[0] * 2 + (1 if dir.x > 0.0 else 0), fs[1] * 2 + (1 if dir.y > 0.0 else 0), fs[2] * 2 + (1 if dir.z > 0.0 else 0), fruit_ids[fs[3]])
 	var stats := {"wood_cells": wood.count_solid(), "foliage_cells": foliage.count_solid() if foliage != null else 0, "floating_removed": removed_wood,
 		"blobs": blobs.size()}
-	return {"wood": wood, "wood_origin": lo, "foliage": foliage, "foliage_origin": f_origin, "stats": stats, "plan": pl}
+	return {"wood": wood, "wood_origin": lo, "foliage": foliage, "foliage_origin": f_origin, "fruits": fruits, "stats": stats, "plan": pl}
+
+## Retire du feuillage toute composante connexe (26 voisins) qui ne touche pas le bois et n'est pas la plus grosse.
+## Cellules de feuillage en grille F, bois en grille C : une cellule de feuillage touche le bois si un voxel de bois
+## est à moins d'une cellule de feuillage (marge de 20 cm) dans son volume élargi.
+static func _drop_detached_foliage(foliage: VoxelVolume, f_origin: Vector3, wood: VoxelVolume, w_origin: Vector3) -> void:
+	var comps := VoxelShapes.components(foliage)
+	if comps.size() <= 1:
+		return
+	var sx := foliage.size.x
+	var sz := foliage.size.z
+	var best := 0
+	var attached: Array[bool] = []
+	for k in comps.size():
+		if comps[k].size() > comps[best].size():
+			best = k
+		var touches := false
+		for i in comps[k]:
+			var x: int = i % sx
+			var z: int = (i / sx) % sz
+			var y: int = i / (sx * sz)
+			var m := f_origin + (Vector3(x, y, z) + Vector3(0.5, 0.5, 0.5)) * F
+			var wc := Vector3i(floori((m.x - w_origin.x) / C), floori((m.y - w_origin.y) / C), floori((m.z - w_origin.z) / C))
+			for dz in range(-2, 3):
+				for dy in range(-2, 3):
+					for dx in range(-2, 3):
+						if wood.get_voxel(wc.x + dx, wc.y + dy, wc.z + dz) != 0:
+							touches = true
+							break
+					if touches:
+						break
+				if touches:
+					break
+			if touches:
+				break
+		attached.append(touches)
+	for k in comps.size():
+		if attached[k] or k == best:
+			continue
+		for i in comps[k]:
+			foliage.data[i] = 0
 
 ## Contrôle de conception (utilisé par le validateur) : rien ne flotte, chaque amas touche du bois,
 ## le pied plonge dans le sol. Renvoie une liste de défauts.

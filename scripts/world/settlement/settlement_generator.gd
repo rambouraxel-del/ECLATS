@@ -68,6 +68,7 @@ func generate() -> void:
 	_plaza_props()
 	_market_props()
 	field.remove_small_blocks(6, occ.tag)
+	field.fill_hollows(48, 3, occ.tag)
 	_soften_edges()        # blocs isolés laissés par les terrassements
 
 # ------------------------------------------------------------------ place
@@ -381,22 +382,30 @@ func _shrine() -> void:
 	TerrainEditor.stamp_pad(field, rect, ev["target"], TerrainField.Zone.PLOT, pal.id("cobble_dark"), true)
 	occ.reserve(rect, PlacementSpec.TAG_PLOT, owner)
 	shrine = {"center": center, "rect": rect, "level": ev["target"], "owner": owner, "col": col}
-	if _connect_pad(rect, "path_dirt").is_empty():
+	# montée principale : même niveau que la plateforme dès la première cellule, marches régulières, 1,6 m de large
+	var route := _connect_pad(rect, "path_dirt", int(ev["target"]), 1.6, true)
+	if route.is_empty():
 		fail("sanctuaire", "route impossible")
+	else:
+		var rc: Array = route["cells"]
+		var q := field.center_m((rc[mini(8, rc.size() - 1)] as Vector2i).x, (rc[mini(8, rc.size() - 1)] as Vector2i).y)
+		shrine["access"] = q
 	# L'Ancre, son socle et les ruines : posés par le placement universel, dans la parcelle réservée.
 	_place_asset("teleport_anchor", center, 0, {"owner": owner, "free_tags": PackedInt32Array([PlacementSpec.TAG_PLOT]), "zones": [TerrainField.Zone.PLOT], "tags": [PlacementSpec.TAG_PLOT], "clearance": 0.0}, "shrine")
 	_place_asset("anchor_pedestal", center, 0, {"owner": owner, "zones": [TerrainField.Zone.PLOT], "tags": [PlacementSpec.TAG_PLOT], "clearance": 0.0, "y_extra": 0.0}, "shrine")
 	# fûts groupés en ARC côté opposé à l'accès (la route arrive côté place) : ensemble cohérent, entrée dégagée
-	var away := (center - (plaza["center"] as Vector2)).angle()
+	var arrival: Vector2 = shrine.get("access", plaza["center"])
+	var away := (center - arrival).angle()
+	shrine["away"] = away
 	for k in 4:
 		var ang := away + (float(k) - 1.5) * 0.55
-		_place_asset_near("ruin_column", center + Vector2(cos(ang), sin(ang)) * 4.4, 1.2, {"owner": owner, "zones": [TerrainField.Zone.PLOT, TerrainField.Zone.NATURAL], "tags": [PlacementSpec.TAG_PLOT, PlacementSpec.TAG_FREE]}, "shrine")
+		_place_asset_near("ruin_column", center + Vector2(cos(ang), sin(ang)) * 3.6, 0.8, {"owner": owner, "zones": [TerrainField.Zone.PLOT, TerrainField.Zone.NATURAL], "tags": [PlacementSpec.TAG_PLOT, PlacementSpec.TAG_FREE]}, "shrine")
 	_place_asset_near("brazier", center + Vector2(-2.4, 2.4), 1.0, {"owner": owner, "zones": [TerrainField.Zone.PLOT], "tags": [PlacementSpec.TAG_PLOT]}, "shrine")
 	_place_asset_near("brazier", center + Vector2(2.4, 2.4), 1.0, {"owner": owner, "zones": [TerrainField.Zone.PLOT], "tags": [PlacementSpec.TAG_PLOT]}, "shrine")
 
 ## Relie une plateforme réservée (sanctuaire, port) à la place : la route part de la première colonne
 ## libre au bord de la plateforme, du côté de la place.
-func _connect_pad(rect: Rect2i, material: String) -> Dictionary:
+func _connect_pad(rect: Rect2i, material: String, fixed_a := -1, width := 1.2, regular := false) -> Dictionary:
 	var pc: Vector2i = plaza["col"]
 	var center := rect.get_center()
 	var best := Vector2i(-1, -1)
@@ -413,7 +422,7 @@ func _connect_pad(rect: Rect2i, material: String) -> Dictionary:
 				best = Vector2i(cx, cz)
 	if best.x < 0:
 		return {}
-	return paths.connect_points(best, _nearest_plaza_col(best), 1.2, material)
+	return paths.connect_points(best, _nearest_plaza_col(best), width, material, fixed_a, -1, regular)
 
 func _nearest_plaza_col(c: Vector2i) -> Vector2i:
 	var pc: Vector2i = plaza["col"]

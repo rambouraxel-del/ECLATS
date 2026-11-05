@@ -51,13 +51,32 @@ static func build_plant(kind: String) -> VoxelVolume:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(kind)
 	match kind:
-		"tuft":
-			# Touffe d'herbe : brins fins de hauteurs variées qui s'écartent du centre.
-			b = VoxelModelBuilder.new(Vector3i(10, 16, 10))
-			for i in 6:
-				var a := TAU * i / 6.0 + rng.randf_range(-0.3, 0.3)
-				var h := rng.randf_range(6.0, 14.5)
-				var lean := rng.randf_range(1.0, 3.5)
+		"tuft", "tuft_short", "tuft_tall", "tuft_dense":
+			# Touffe d'herbe : brins fins de hauteurs variées qui s'écartent du centre. Variantes : rase, haute, fournie.
+			var blades := 6
+			var h_lo := 6.0
+			var h_hi := 14.5
+			var lean_hi := 3.5
+			match kind:
+				"tuft_short":
+					blades = 4
+					h_lo = 2.5
+					h_hi = 6.5
+				"tuft_tall":
+					blades = 6
+					h_lo = 11.0
+					h_hi = 20.5
+					lean_hi = 3.0
+				"tuft_dense":
+					blades = 11
+					h_lo = 5.0
+					h_hi = 15.0
+					lean_hi = 4.2
+			b = VoxelModelBuilder.new(Vector3i(10, 22, 10))
+			for i in blades:
+				var a := TAU * i / float(blades) + rng.randf_range(-0.3, 0.3)
+				var h := rng.randf_range(h_lo, h_hi)
+				var lean := rng.randf_range(1.0, lean_hi)
 				var key := "leaf_light" if i % 3 == 0 else ("ivy" if i % 3 == 1 else "leaves")
 				b.line(Vector3(5 + cos(a), 0.5, 5 + sin(a)), Vector3(5 + cos(a) * lean, h, 5 + sin(a) * lean), 1, key)
 		"flower_yellow", "flower_violet", "flower_white":

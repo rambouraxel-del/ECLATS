@@ -74,16 +74,19 @@ static func _window_dress(b: BuildingBuilder, o: P.Opening, rng: RandomNumberGen
 	var y_m := float(plan.floor_y(o.floor) + o.sill) * C
 	var roll := rng.randf()
 	var half_w := o.w / 2
-	if roll < 0.25:
-		# volets fermés : un battant plein devant l'ouverture, légèrement en saillie
+	var leaf_w := maxi(half_w, 2)
+	# volets ouverts : posés au-delà du cadre (linteau et appui débordent d'une cellule), jamais sur un poteau,
+	# une autre ouverture ou un angle ; sinon on retombe sur des volets fermés
+	var open_ok := _side_clear(b, o, o.u - 1 - leaf_w, o.u + o.w + leaf_w)
+	if roll < 0.25 or (roll < 0.7 and not open_ok):
+		# volets fermés : un battant plein exactement dans l'ouverture (ni plus haut que le linteau, ni plus large que le cadre)
 		var kit := _shutter_kit(o.w, o.h, (plan.seed + o.u) % 3, rng, true)
 		_place_on_wall(b, o, kit, float(o.u) * C, y_m, true)
 		return
 	if roll < 0.7:
-		# volets ouverts, plaqués contre le mur de chaque côté
 		for side in [-1, 1]:
-			var kit := _shutter_kit(maxi(half_w, 2), o.h, (plan.seed + o.u + side) % 3, rng, false)
-			var u0 := float(o.u - maxi(half_w, 2)) * C - 0.02 if side < 0 else float(o.u + o.w) * C + 0.02
+			var kit := _shutter_kit(leaf_w, o.h, (plan.seed + o.u + side) % 3, rng, false)
+			var u0 := float(o.u - 1 - leaf_w) * C - 0.02 if side < 0 else float(o.u + o.w + 1) * C + 0.02
 			_place_on_wall(b, o, kit, u0, y_m, true)
 	else:
 		# claustra : lattis de bois dans l'ouverture (barres de 2 cm tous les 6 cm)
@@ -101,19 +104,33 @@ static func _window_dress(b: BuildingBuilder, o: P.Opening, rng: RandomNumberGen
 
 static func _shutter_kit(w_cells: int, h_cells: int, seed: int, rng: RandomNumberGenerator, closed: bool) -> AssetKit:
 	var L := w_cells * 5
-	var H := h_cells * 5 + 4
+	var H := h_cells * 5            # même hauteur que l'ouverture : rien ne mord sur le linteau ni l'appui
 	var k := AssetKit.new(Vector3i(L, H, 3), seed)
 	k.planks(0, 0, 0, L - 1, H - 1, 1, 1, 0, 4, ["wood_aged", "wood_pale_old", "wood_aged_dark"], true)
-	# traverses et contre-fiche
+	# deux traverses (rangs 2-3 et H-4..H-3) ; la contre-fiche ne va que de l'une à l'autre, le jour en losange ne la croise jamais
 	k.box(0, 2, 2, L - 1, 3, 2, "wood_aged_dark")
 	k.box(0, H - 4, 2, L - 1, H - 3, 2, "wood_aged_dark")
-	k.line(Vector3(1, 3, 2.5), Vector3(L - 2, H - 4, 2.5), 1, "wood_aged_dark")
-	if rng.randf() < 0.6:
-		# jour en losange découpé (2 pixels) : motif de volet
+	if rng.randf() < 0.6 and L >= 8:
 		var cx := L / 2
 		var cy := H / 2
 		k.box(cx, cy - 1, 0, cx, cy + 2, 1, "")
+	else:
+		k.line(Vector3(1, 4, 2.5), Vector3(L - 2, H - 5, 2.5), 1, "wood_aged_dark")
 	return k
+
+## L'intervalle [ua, ub] (cellules le long du mur de l'ouverture) est-il libre : dans la paroi, hors poteaux d'angle et hors autres ouvertures ?
+static func _side_clear(b: BuildingBuilder, o: P.Opening, ua: int, ub: int) -> bool:
+	var inside := false
+	for w in b.plan.walls:
+		if w.exterior and w.floor == o.floor and w.axis == o.axis and w.p == o.p and o.u >= w.u0 and o.u + o.w - 1 <= w.u1:
+			inside = ua >= w.u0 + 3 and ub <= w.u1 - 3
+			break
+	if not inside:
+		return false
+	for o2 in b.plan.openings:
+		if o2 != o and o2.floor == o.floor and o2.axis == o.axis and o2.p == o.p and o2.u <= ub + 1 and o2.u + o2.w - 1 >= ua - 1:
+			return false
+	return true
 
 static func _claustra_kit(w_cells: int, h_cells: int, seed: int) -> AssetKit:
 	var L := w_cells * 5

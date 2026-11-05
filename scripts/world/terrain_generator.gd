@@ -404,6 +404,7 @@ func _cleanup() -> void:
 			break
 	report["cleaned_columns"] = changed_total
 	report["small_blocks_removed"] = field.remove_small_blocks(6)
+	report["hollows_filled"] = field.fill_hollows()
 
 # ------------------------------------------------------------------ 3. espaces habitables
 

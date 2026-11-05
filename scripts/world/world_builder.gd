@@ -85,6 +85,8 @@ static func _run_job(job: Dictionary) -> void:
 			var parts: Array = [{"name": "wood", "volume": m["wood"], "origin": m["wood_origin"], "grid": TreeGenerator.C, "material": "props"}]
 			if m["foliage"] != null:
 				parts.append({"name": "leaves", "volume": m["foliage"], "origin": m["foliage_origin"], "grid": TreeGenerator.F, "material": "props"})
+			if m.get("fruits") != null:
+				parts.append({"name": "fruits", "volume": m["fruits"], "origin": m["foliage_origin"], "grid": TreeGenerator.C, "material": "props"})
 			it["parts"] = parts
 			it["arrays"] = VoxelObjectView.make_arrays(parts)
 		"rock":

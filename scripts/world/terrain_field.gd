@@ -212,3 +212,58 @@ func remove_small_blocks(max_size: int, reserved := PackedByteArray()) -> int:
 			if set_top(i % n, i / n, best):
 				changed += 1
 	return changed
+
+## Comble les petites cuvettes isolées des pelouses : plateau de colonnes NATURELLES de même hauteur (`max_size` colonnes au plus)
+## dont tout le pourtour est plus haut. Il monte jusqu'au point de débordement (le plus bas voisin), de 2 cellules au plus ;
+## plusieurs passes comblent une cuvette étagée. Les ravines (qui ont une sortie plus basse), les falaises (contact avec le vide),
+## les marches, chemins, parcelles et emprises réservées ne sont jamais touchés. Renvoie le nombre de colonnes modifiées.
+func fill_hollows(max_size := 48, passes := 3, reserved := PackedByteArray()) -> int:
+	var changed := 0
+	for pass_i in passes:
+		var seen := PackedByteArray()
+		seen.resize(n * n)
+		var did := 0
+		for s0 in n * n:
+			if top[s0] == NO_GROUND or seen[s0] == 1 or zone[s0] != Zone.NATURAL:
+				continue
+			var h := top[s0]
+			var comp: Array[int] = [s0]
+			seen[s0] = 1
+			var k := 0
+			var ok := true
+			var rim := 1 << 20
+			while k < comp.size() and ok:
+				var i: int = comp[k]
+				k += 1
+				if not reserved.is_empty() and reserved[i] != 0:
+					ok = false
+					break
+				for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var x: int = i % n + o.x
+					var z: int = i / n + o.y
+					if x < 0 or z < 0 or x >= n or z >= n:
+						ok = false
+						break
+					var j := x + z * n
+					if top[j] == NO_GROUND or zone[j] != Zone.NATURAL or top[j] < h:
+						ok = false          # vide, zone aménagée ou sortie plus basse (ravine)
+						break
+					if top[j] == h:
+						if seen[j] == 0:
+							seen[j] = 1
+							comp.append(j)
+							if comp.size() > max_size:
+								ok = false
+								break
+					else:
+						rim = mini(rim, top[j])
+			if not ok or comp.size() > max_size or rim == 1 << 20:
+				continue
+			var target := mini(rim, h + 2)
+			for i in comp:
+				if set_top(i % n, i / n, target):
+					changed += 1
+					did += 1
+		if did == 0:
+			break
+	return changed

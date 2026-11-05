@@ -140,7 +140,7 @@ static func _heap_pop(heap: Array) -> Array:
 
 ## Relie deux colonnes ; width_m = largeur ; end_heights : hauteurs imposées aux extrémités
 ## (cellules) ou -1 pour suivre le relief. Renvoie la route ou {} si impossible.
-func connect_points(a: Vector2i, b: Vector2i, width_m: float, material_key: String, fixed_a := -1, fixed_b := -1) -> Dictionary:
+func connect_points(a: Vector2i, b: Vector2i, width_m: float, material_key: String, fixed_a := -1, fixed_b := -1, regular := false) -> Dictionary:
 	var cells := find_route(a, b)
 	if cells.size() < 2:
 		failures.append({"from": a, "to": b, "reason": "aucun_chemin"})
@@ -176,6 +176,19 @@ func connect_points(a: Vector2i, b: Vector2i, width_m: float, material_key: Stri
 			locked[i] = true
 	locked[0] = true
 	locked[k - 1] = true
+	# Montée « régulière » (sanctuaire) : entre deux points imposés, le profil est une rampe linéaire arrondie, donc
+	# des marches de même hauteur (20 cm) à intervalles égaux, continues d'un bout à l'autre ; impossible → profil lissé.
+	if regular:
+		var i0 := 0
+		while i0 < k - 1:
+			var j0 := i0 + 1
+			while j0 < k - 1 and not locked.has(j0):
+				j0 += 1
+			if j0 - i0 > 1 and absi(h[j0] - h[i0]) <= j0 - i0:
+				for m in range(i0 + 1, j0):
+					h[m] = h[i0] + int(round(float(h[j0] - h[i0]) * float(m - i0) / float(j0 - i0)))
+					locked[m] = true
+			i0 = j0
 	# Contraintes : |Δ| ≤ 1 entre cellules consécutives et ≤ 1 sur deux pas (pente 1:2).
 	for iteration in 40:
 		var changed := false

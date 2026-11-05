@@ -200,7 +200,7 @@ func _timber_frame() -> void:
 		# les poteaux évitent les ouvertures (fenêtres et portes restent dans leur travée)
 		var kept: Array[int] = []
 		for pu in posts:
-			if pu == w.u0 or pu == w.u1 - 1 or not _opening_in(w, pu - 1, pu + 2):
+			if pu == w.u0 or pu == w.u1 - 1 or not _opening_in(w, pu - 3, pu + 4):
 				kept.append(pu)
 		posts = kept
 		posts.sort()
@@ -225,7 +225,7 @@ func _timber_frame() -> void:
 						set_cell(x, ry, z, frame)
 		# croix de Saint-André irrégulières : pas toutes les travées
 		for i in range(posts.size() - 1):
-			if rng.randf() < 0.4 and posts[i + 1] - posts[i] >= 12 and not _opening_in(w, posts[i], posts[i + 1] + 1):
+			if rng.randf() < 0.4 and posts[i + 1] - posts[i] >= 12 and not _opening_in(w, posts[i] - 1, posts[i + 1] + 4):
 				var ua := posts[i] + 2
 				var ub := posts[i + 1] - 1
 				var flip := rng.randf() < 0.5
