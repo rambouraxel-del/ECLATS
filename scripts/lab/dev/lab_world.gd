@@ -443,6 +443,205 @@ func prepare_flatten(cells: Array, params: Dictionary) -> Dictionary:
 	op["ok"] = true
 	return op
 
+# ------------------------------------------------------------------ opération : habitation générée (Lot 9)
+
+## rect_m : emprise disponible (m). params : variante (auto|cabane|deux_pieces|en_L), seed, yaw (0-3), murs, toit.
+## Même raccord au terrain que l'éditeur de cartes (HousePad). Le terrain est restauré avant de rendre sauf keep_terrain.
+func prepare_dwelling(rect_m: Rect2, params: Dictionary, keep_terrain := false) -> Dictionary:
+	var op := {"kind": "dwelling", "ok": false, "reasons": [], "params": params.duplicate(), "version": version, "rect_m": rect_m}
+	var gopts := {}
+	for k in ["murs", "toit"]:
+		if params.has(k):
+			gopts[k] = params[k]
+	var gen := DwellingGenerator.generate(String(params.get("variante", "auto")), int(params.get("seed", 1)), rect_m.size, gopts)
+	op["gen"] = gen
+	if not bool(gen["ok"]):
+		op["reasons"] = gen["reasons"]
+		return op
+	var model: Construction = gen["model"]
+	op["model"] = model
+	var yaw := posmod(int(params.get("yaw", 0)), 4)
+	var pos := Vector2(snappedf(rect_m.get_center().x, 0.1), snappedf(rect_m.get_center().y, 0.1))
+	var snap := snapshot()
+	var ev := HousePad.evaluate(field, model, pos, yaw, {"occ": occ, "need_link": false}, true)
+	op["eval"] = ev
+	if not bool(ev["ok"]):
+		op["reasons"] = ev["reasons"]
+		restore(snap)
+		return op
+	op["ok"] = true
+	op["pos"] = ev["pos"]
+	op["yaw"] = yaw
+	op["rect"] = ev["rect"]
+	op["yard"] = ev["yard"]
+	op["ground_m"] = ev["ground_m"]
+	op["cut_cells"] = ev["cut"]
+	op["fill_cells"] = ev["fill"]
+	op["terrain_cells"] = (ev["changed"] as Array).size()
+	op["xform"] = HousePad.node_transform(model, ev["pos"], yaw, float(ev["ground_m"]))
+	op["door"] = ev.get("door", Vector2.ZERO)
+	op["changed_rect"] = diff_rect(snap, field.top.duplicate(), field.zone.duplicate(), field.material.duplicate())
+	if keep_terrain:
+		op["snap"] = snap
+		return op
+	restore(snap)
+	return op
+
+# ------------------------------------------------------------------ opération : composition « marché + végétation » sur une zone peinte (Lot 9)
+
+const COMPOSITION_PROPS := {"stall": "market_stall", "crate": "crate_stack", "barrel": "barrel_set"}
+const COMPOSITION_TREES := ["oak", "birch", "parasol", "pine"]
+
+func _prop_spec(id: String) -> PlacementSpec:
+	var s := PlacementSpec.from_asset_info(AssetLibrary.info(id), "prop")
+	s.snap_m = 0.2
+	s.clearance_m = 0.35
+	s.cliff_margin_m = 0.4
+	s.support_fraction = 0.8
+	s.gap_tolerance_m = 0.2
+	return s
+
+## cells : indices de colonnes peintes. params : seed, etals (0-5), vegetation (0-100 %).
+## Réutilise les objets existants : étal de marchand, tas de caisses, tonneaux (assets cuits) et arbres du générateur. Chaque objet
+## est posé par le système de placement (support, pente, collisions) et doit se trouver sur une colonne peinte. Le monde est
+## restauré avant de rendre, sauf keep_state.
+func prepare_composition(cells: Array, params: Dictionary, keep_state := false) -> Dictionary:
+	var op := {"kind": "composition", "ok": false, "reasons": [], "params": params.duplicate(), "version": version, "cells": cells, "items": []}
+	var land: Array[int] = []
+	var painted := {}
+	var sum := Vector2.ZERO
+	for i in cells:
+		var ii := int(i)
+		if field.top[ii] != TerrainField.NO_GROUND:
+			land.append(ii)
+			painted[ii] = true
+			sum += field.center_m(ii % field.n, ii / field.n)
+	var area := float(land.size()) * V * V
+	if area < 9.0:
+		op["reasons"] = ["Zone trop petite pour une composition : %.1f m² peints, au moins 9 m² sont nécessaires (peignez une zone plus grande avec le pinceau)." % area]
+		return op
+	var center := sum / float(land.size())
+	var radius := sqrt(area / PI)
+	var seed := int(params.get("seed", 1))
+	var n_stall := clampi(int(params.get("etals", 3)), 0, 5)
+	var veg := clampf(float(params.get("vegetation", 50)), 0.0, 100.0) / 100.0
+	var n_tree := clampi(roundi(veg * area / 9.0), 0, 12)
+	var rng := WorldRng.stream(world.seed, "composition:%d" % seed)
+	var snap := snapshot()
+	var items: Array = []
+	var fails := {}
+	var cell_pos := func(i: int) -> Vector2:
+		return field.center_m(i % field.n, i / field.n)
+	var on_paint := func(p: Vector2) -> bool:
+		var c := field.col_of_m(p.x, p.y)
+		return painted.has(field.idx(c.x, c.y))
+	var yaw_toward := func(from: Vector2, to: Vector2) -> int:
+		var d := to - from
+		var best := 0
+		var bd := -2.0
+		for y in 4:
+			var f := Vector2(sin(y * PI * 0.5), cos(y * PI * 0.5))
+			var dot := f.dot(d.normalized()) if d.length() > 0.01 else 0.0
+			if dot > bd:
+				bd = dot
+				best = y
+		return best
+	# --- étals : en couronne autour du centre, ouverts vers lui
+	var a0 := rng.randf() * TAU
+	for k in n_stall:
+		var placed := false
+		for attempt in 14:
+			var ang := a0 + float(k) * TAU / float(maxi(n_stall, 1)) + (rng.randf() - 0.5) * 0.5
+			var rr := radius * (0.38 + 0.12 * float(attempt % 4) * 0.5)
+			var p := center + Vector2(cos(ang), sin(ang)) * rr
+			if not on_paint.call(p):
+				continue
+			var yaw: int = yaw_toward.call(p, center)
+			var res := placement.evaluate(_prop_spec("market_stall"), p, yaw, {"skip_access": true})
+			if res.ok:
+				placement.commit(res, {})
+				items.append({"kind": "prop", "id": "market_stall", "res": res, "role": "étal"})
+				placed = true
+				break
+			else:
+				fails[String(res.reasons[0]) if not res.reasons.is_empty() else "?"] = int(fails.get(String(res.reasons[0]) if not res.reasons.is_empty() else "?", 0)) + 1
+		if not placed:
+			pass
+	# --- petits objets près des étals (une caisse ou des tonneaux par étal)
+	var stalls := items.duplicate()
+	for k in stalls.size():
+		var sp: Vector3 = (stalls[k]["res"] as PlacementResult).pos
+		for attempt in 8:
+			var ang2 := rng.randf() * TAU
+			var p2 := Vector2(sp.x, sp.z) + Vector2(cos(ang2), sin(ang2)) * (1.9 + 0.2 * float(attempt))
+			if not on_paint.call(p2):
+				continue
+			var pid: String = "crate_stack" if (k + seed) % 2 == 0 else "barrel_set"
+			var res2 := placement.evaluate(_prop_spec(pid), p2, int(rng.randi() % 4), {"skip_access": true})
+			if res2.ok:
+				placement.commit(res2, {})
+				items.append({"kind": "prop", "id": pid, "res": res2, "role": "caisses" if pid == "crate_stack" else "tonneaux"})
+				break
+	# --- végétation : arbres sur le pourtour de la zone
+	var tree_n := 0
+	for k in n_tree:
+		for attempt in 16:
+			var ang3 := rng.randf() * TAU
+			var p3 := center + Vector2(cos(ang3), sin(ang3)) * radius * rng.randf_range(0.62, 0.95)
+			if not on_paint.call(p3):
+				continue
+			var sp_name: String = COMPOSITION_TREES[rng.randi() % COMPOSITION_TREES.size()]
+			var top := prepare_tree(p3, sp_name, int(rng.randi() % 100000))
+			if bool(top["ok"]):
+				placement.commit(top["res"], {})
+				(top["item"] as Dictionary)["item"] = (top["res"] as PlacementResult).item_index
+				items.append({"kind": "tree", "op": top, "role": "arbre"})
+				tree_n += 1
+				break
+	op["items"] = items
+	var counts := {"étal": 0, "caisses": 0, "tonneaux": 0, "arbre": 0}
+	for it in items:
+		counts[String(it["role"])] += 1
+	op["counts"] = counts
+	op["center"] = center
+	op["area_m2"] = area
+	op["summary"] = "Marché + végétation : %d étal(s), %d caisses, %d tonneaux, %d arbre(s) sur %.0f m²" % [counts["étal"], counts["caisses"], counts["tonneaux"], counts["arbre"], area]
+	if items.is_empty():
+		var why := "aucun emplacement libre sur les colonnes peintes"
+		if not fails.is_empty():
+			why = String(fails.keys()[0])
+		op["reasons"] = ["Aucun objet n'a pu être posé dans cette zone (%s). Agrandissez la zone, choisissez un sol plus plat ou moins d'objets." % why]
+	else:
+		op["ok"] = true
+	if keep_state and op["ok"]:
+		op["snap"] = snap
+	else:
+		restore(snap)
+	return op
+
+## Nœud 3D d'un objet de composition (aperçu et application).
+func composition_node(it: Dictionary, apply_body: StaticBody3D = null) -> Node3D:
+	if String(it["kind"]) == "tree":
+		var top: Dictionary = it["op"]
+		var n: Node3D = (top["node_fn"] as Callable).call()
+		if apply_body != null:
+			AuthoredIslandView.add_tree(apply_body, top["item"])
+		return n
+	var id: String = it["id"]
+	var res: PlacementResult = it["res"]
+	var info := AssetLibrary.info(id)
+	var xf := res.asset_transform()
+	xf.origin.y -= float(info.get("ground_y", 0.0))
+	var node := AssetLibrary.instantiate(id)
+	AuthoredIslandView.strip_asset_collisions(node)
+	node.transform = xf
+	if apply_body != null:
+		for c in info.get("colliders", []):
+			var pos: Array = c["position"]
+			var size: Array = c["size"]
+			AuthoredIslandView._box(apply_body, AABB(Vector3(float(pos[0]), float(pos[1]), float(pos[2])), Vector3(float(size[0]), float(size[1]), float(size[2]))), xf)
+	return node
+
 # ------------------------------------------------------------------ application et annulation
 
 func apply(op: Dictionary) -> Dictionary:
@@ -506,6 +705,42 @@ func _apply(op: Dictionary) -> Dictionary:
 			entry["changed_rect"] = t["changed_rect"]
 			entry["record"] = rec
 			fresh = t
+		"dwelling":
+			var td := prepare_dwelling(fresh["rect_m"], fresh["params"], true)     # rejoue la transaction et GARDE le terrain
+			if not bool(td["ok"]):
+				restore(snap)
+				return {"ok": false, "reason": "; ".join(td["reasons"])}
+			var owner_d := occ.new_owner()
+			occ.reserve(td["yard"], PlacementSpec.TAG_ROAD, owner_d)
+			occ.reserve(td["rect"], PlacementSpec.TAG_PLOT, owner_d)
+			var dnode := ConstructionView.create(td["model"], {"collide": true})
+			dnode.transform = td["xform"]
+			dnode.name = "habitation_%d" % _counter
+			objects_root.add_child(dnode)
+			entry["nodes"] = [dnode]
+			entry["changed_rect"] = td["changed_rect"]
+			entry["record"] = {"model": td["model"], "pos": td["pos"], "yaw": td["yaw"], "ground_m": td["ground_m"]}
+			fresh = td
+		"composition":
+			var tc := prepare_composition(fresh["cells"], fresh["params"], true)
+			if not bool(tc["ok"]):
+				restore(snap)
+				return {"ok": false, "reason": "; ".join(tc["reasons"])}
+			var cbody := StaticBody3D.new()
+			cbody.name = "Collision_%d" % _counter
+			cbody.collision_layer = 1
+			cbody.collision_mask = 0
+			objects_root.add_child(cbody)
+			var cnodes: Array = [cbody]
+			for it in tc["items"]:
+				var cn := composition_node(it, cbody)
+				cn.name = "compo_%d_%d" % [_counter, cnodes.size()]
+				objects_root.add_child(cn)
+				cnodes.append(cn)
+			entry["nodes"] = cnodes
+			entry["changed_rect"] = Rect2i()
+			entry["record"] = {"items": (tc["items"] as Array).size()}
+			fresh = tc
 		"flatten":
 			var target: int = fresh["target"]
 			var cells_changed := 0
@@ -535,6 +770,8 @@ func _reprepare(op: Dictionary) -> Dictionary:
 		"rock": return prepare_rock(op["pos"], op["family"], int(op["seed"]), float(op.get("scale", 1.0)))
 		"house": return prepare_house(op["rect_m"], op["params"])
 		"flatten": return prepare_flatten(op["cells"], op["params"])
+		"dwelling": return prepare_dwelling(op["rect_m"], op["params"])
+		"composition": return prepare_composition(op["cells"], op["params"])
 	return op
 
 func can_undo() -> bool:
@@ -568,6 +805,13 @@ static func describe(op: Dictionary) -> String:
 			var fp: Vector2 = op.get("footprint_m", Vector2.ZERO)
 			return "Maison %s · emprise bâtie %.1f × %.1f m · niveau fini %.2f m · déblai %d / remblai %d cellules · %d colonnes de sol raccordées" % [
 				"(cabane)" if op.get("type", "") == "hut" else "simple", fp.x, fp.y, float(op.get("target_m", 0.0)), int(op.get("cut_cells", 0)), int(op.get("fill_cells", 0)), int(op.get("terrain_cells", 0))]
+		"dwelling":
+			if not op.has("gen") or not bool((op["gen"] as Dictionary)["ok"]):
+				return ""
+			var ev: Dictionary = op.get("eval", {})
+			return "%s\nTerrain : niveau fini %.2f m · déblai %d / remblai %d cellules · %d colonnes de sol raccordées" % [DwellingGenerator.describe(op["gen"]), float(op.get("ground_m", 0.0)), int(op.get("cut_cells", 0)), int(op.get("fill_cells", 0)), int(op.get("terrain_cells", 0))]
+		"composition":
+			return String(op.get("summary", ""))
 		"flatten":
 			return "Aplanir à %.2f m · %d colonnes · déblai max %.2f m · remblai max %.2f m" % [float(op.get("target_m", 0.0)), (op.get("land", []) as Array).size(), float(op.get("cut_max_m", 0.0)), float(op.get("fill_max_m", 0.0))]
 	return String(op.get("summary", ""))

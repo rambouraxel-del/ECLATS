@@ -40,7 +40,7 @@ des planches de concept (`docs/references/`).
 1. Télécharger **Godot 4.3 (ou plus récent, 4.x) — version standard**, pas « .NET » :
    <https://godotengine.org/download/windows/> puis dézipper (aucune installation).
 2. Récupérer le projet : bouton **Code → Download ZIP** sur GitHub (branche
-   `claude/nifty-pascal-km2czc` ; Lot 4 : `claude/lot4-generation-coherente` ; Lot 5 : `claude/lot5-ile-ouverture` ; Lot 6 : `claude/lot6-menu-laboratoire` ; **Lot 7 : branche `claude/lot7-carte-terrain-editeur`**),
+   `claude/nifty-pascal-km2czc` ; Lot 4 : `claude/lot4-generation-coherente` ; Lot 5 : `claude/lot5-ile-ouverture` ; Lot 6 : `claude/lot6-menu-laboratoire` ; Lot 7 : `claude/lot7-carte-terrain-editeur` ; **Lots 8 et 9 : branche `claude/lot8-9-construction-assemblage`**),
    ou `git clone` puis `git checkout claude/lot7-carte-terrain-editeur`.
 3. Lancer `Godot_v4.x-stable_win64.exe` → **Importer** → choisir le fichier `project.godot`
    du dossier → **Importer et éditer**. Le premier import prend quelques secondes.
@@ -64,6 +64,10 @@ G aperçu · Entrée confirmer · X annuler l'aperçu · Ctrl+Z annuler · C cop
 **Générer une île depuis un plan (menu, Lot 7)** : graine, largeur, longueur → *Aperçu du plan* (2D, légende) → *Construire et explorer l'île* ;
 dans l'île : repère à rejoindre, **F5** vue aérienne, **F6** retour à l'éditeur. **Éditeur de carte** (Outils développeur) : 1-8 outils (contour, zones, chemins, repères,
 relief, matériau, masque, régénérer) · Ctrl+Z annuler · Exporter / Ouvrir une carte. Détails : [docs/CARTE_PLAN.md](docs/CARTE_PLAN.md).
+
+**Construire (Lot 8, dans le laboratoire : touche B)** : 1-8 sol · fondations · mur · porte · fenêtre · pièce · toit · modifier ; clic, Entrée confirmer, Ctrl+Z, PgUp/PgDn étage ;
+stock de démonstration (1 unité / m²). **Atelier** : enregistrer / ouvrir une maison ; **éditeur de carte, outil 9** : placer une maison sur une parcelle en pente, ou *Placer automatiquement une habitation* (Lot 9) ;
+laboratoire : `/generer habitation --variante auto|cabane|deux_pieces|en_L`, `/generer composition` (marché + végétation sur la zone peinte). Détails : [docs/CONSTRUCTION.md](docs/CONSTRUCTION.md).
 
 Autres scènes (caméra libre) :
 
@@ -128,6 +132,8 @@ Diagnostic d'une génération (rapport lisible + JSON) :
 
 - [docs/CARTE_PLAN.md](docs/CARTE_PLAN.md) — **plan d'île, terrain issu du plan, éditeur de carte, format de fichier** (Lot 7).
 - [docs/BILAN_LOT7.md](docs/BILAN_LOT7.md) — bilan du Lot 7 (recette, captures, limites).
+- [docs/CONSTRUCTION.md](docs/CONSTRUCTION.md) — **construction joueur, format de maison, placement sur une carte, habitations générées, composition** (Lots 8 et 9).
+- [docs/BILAN_LOT8_9.md](docs/BILAN_LOT8_9.md) — bilan des Lots 8 et 9 (recette, captures, limites).
 - [docs/ILE_OUVERTURE.md](docs/ILE_OUVERTURE.md) — **île d'ouverture** : accès, commandes, parcours, modifier la carte (Lot 5).
 - [docs/BILAN_LOT5.md](docs/BILAN_LOT5.md) — bilan du Lot 5 (recette jouée, mesures, captures, limites).
 - [docs/GENERATION_MONDE.md](docs/GENERATION_MONDE.md) — **règles et architecture de la génération** (Lot 4).

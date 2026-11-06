@@ -36,6 +36,9 @@ var _house_info: Label
 var _house_pick: OptionButton
 var _house_files: Array[String] = []
 var _eval_t := 0
+var auto_variant := 0
+var auto_seed := 1
+var auto_fit := Vector2(8.0, 7.0)
 
 # état de manipulation
 var _dragging := false
@@ -407,6 +410,41 @@ func _build_house_options() -> void:
 	_house_pick = _option(names, maxi(_house_files.find(house_source), 0), func(i: int) -> void: _load_house(i))
 	_opt_btn("Tourner la maison (R)", _rotate_house)
 	_opt_btn("Actualiser la liste", func() -> void: _build_options())
+	_opts.add_child(HSeparator.new())
+	_opts.add_child(_label("Habitation générée : le jeu cherche une parcelle compatible (plateau, pelouse), choisit l'orientation d'après l'accès au chemin et pose.", 13))
+	_option(["Variante : auto (selon la graine)", "Cabane", "Maison à deux pièces", "Maison en L"], auto_variant, func(i: int) -> void: auto_variant = i)
+	var hb := HBoxContainer.new()
+	_opts.add_child(hb)
+	var sd := SpinBox.new()
+	sd.min_value = 0
+	sd.max_value = 99999
+	sd.value = auto_seed
+	sd.prefix = "Graine "
+	sd.custom_minimum_size = Vector2(120, 32)
+	sd.value_changed.connect(func(v: float) -> void: auto_seed = int(v))
+	hb.add_child(sd)
+	var fw := SpinBox.new()
+	fw.min_value = 4
+	fw.max_value = 14
+	fw.step = 0.5
+	fw.value = auto_fit.x
+	fw.prefix = "L "
+	fw.suffix = " m"
+	fw.custom_minimum_size = Vector2(80, 32)
+	fw.value_changed.connect(func(v: float) -> void: auto_fit.x = v)
+	hb.add_child(fw)
+	var fd := SpinBox.new()
+	fd.min_value = 4
+	fd.max_value = 14
+	fd.step = 0.5
+	fd.value = auto_fit.y
+	fd.prefix = "P "
+	fd.suffix = " m"
+	fd.custom_minimum_size = Vector2(80, 32)
+	fd.value_changed.connect(func(v: float) -> void: auto_fit.y = v)
+	hb.add_child(fd)
+	var ab := _opt_btn("Placer automatiquement une habitation", _auto_place)
+	ab.name = "BtnAuto"
 	_house_info = _label("", 13, Color(0.85, 0.95, 1.0))
 	_house_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_house_info.custom_minimum_size = Vector2(290, 150)
@@ -434,10 +472,7 @@ func _rotate_house() -> void:
 	_update_house_preview(house_pos, true)
 
 static func door_side_name(dir: Vector2i) -> String:
-	if dir == Vector2i(0, 1): return "sud"
-	if dir == Vector2i(0, -1): return "nord"
-	if dir == Vector2i(1, 0): return "est"
-	return "ouest"
+	return HousePad.side_name(dir)
 
 ## Aperçu d'implantation (limité à ~10 par seconde : chaque évaluation relit le relief autour de la parcelle).
 func _update_house_preview(p: Vector2, force := false) -> void:
@@ -465,6 +500,28 @@ func _update_house_preview(p: Vector2, force := false) -> void:
 		_house_info.text = t
 		_house_info.add_theme_color_override("font_color", Color(0.65, 1.0, 0.7) if ok else Color(1.0, 0.65, 0.6))
 	canvas.queue_redraw()
+
+## Habitation générée posée sur une parcelle compatible, orientation choisie d'après le chemin ; refus expliqué sans rien forcer.
+func _auto_place() -> Dictionary:
+	if doc.field == null:
+		say("Tracez d'abord un contour : il n'y a pas encore d'île.")
+		return {"ok": false}
+	canvas.house_ghost = {}
+	var r := doc.auto_place_dwelling(["auto", "cabane", "deux_pieces", "en_L"][auto_variant], auto_seed, auto_fit)
+	if bool(r["ok"]):
+		var gen: Dictionary = r["gen"]
+		say("%s — Ctrl+Z pour annuler." % doc.message)
+		_refresh(true)
+		if _house_info != null:
+			_house_info.text = "✔ %s\n%s\nRecette : %s" % [doc.message, String(gen["text"]), LabCommands.recipe_string(gen["recipe"])]
+			_house_info.add_theme_color_override("font_color", Color(0.65, 1.0, 0.7))
+	else:
+		var why := " ".join(PackedStringArray(r["reasons"]))
+		say("Impossible : %s" % why)
+		if _house_info != null:
+			_house_info.text = "✖ %s" % why
+			_house_info.add_theme_color_override("font_color", Color(1.0, 0.65, 0.6))
+	return r
 
 func place_house_here() -> Dictionary:
 	if house_model == null or house_pos.x > 1.0e8:

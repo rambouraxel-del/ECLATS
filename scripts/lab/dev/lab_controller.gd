@@ -133,6 +133,53 @@ func request(gen: String, o: Dictionary) -> Dictionary:
 			recipe["opts"]["emprise"] = r.size
 			op = lab.prepare_house(r, params)
 			op["summary"] = "Maison"
+		"habitation":
+			var rh := Rect2()
+			if o.has("emprise"):
+				var dims2: Vector2 = o["emprise"]
+				var c2 := sel.rect_m().get_center() if sel.has_rect() else sel.point_or_aim()
+				if c2.x > 1.0e8:
+					return _refuse("Aucune emprise : sélectionnez un rectangle ou visez le sol pour y poser l'emprise demandée.")
+				rh = Rect2(sel.snap(c2 - dims2 * 0.5), dims2)
+				if not sel.has_rect():
+					sel.set_tool(LabSelection.Tool.RECT)
+				sel.set_rect(rh.position, rh.position + dims2)
+			elif sel.has_rect():
+				rh = sel.rect_m()
+			else:
+				return _refuse("Aucun rectangle : choisissez l'outil Rectangle (2 clics), tapez /rect 8 6, ou ajoutez --emprise 8x6.")
+			var yaw_h := int(o["yaw"]) if o.has("yaw") else _auto_yaw(rh.get_center())
+			var hp := {"seed": int(o.get("seed", 1)), "yaw": yaw_h, "variante": String(o.get("variante", "auto"))}
+			for k3 in ["murs", "toit"]:
+				if o.has(k3):
+					hp[k3] = o[k3]
+			op = lab.prepare_dwelling(rh, hp)
+			var ropts := hp.duplicate()
+			ropts["emprise"] = rh.size
+			if op.has("gen") and bool((op["gen"] as Dictionary)["ok"]):
+				var gr: Dictionary = (op["gen"] as Dictionary)["recipe"]["opts"]
+				ropts["variante"] = gr["variante"]            # variante retenue (si « auto ») : la recette est reproductible telle quelle
+				ropts["murs"] = gr["murs"]
+				ropts["toit"] = gr["toit"]
+			recipe["opts"] = ropts
+			op["summary"] = "Habitation"
+		"composition":
+			if sel.brush_cells.is_empty() and o.has("trace"):
+				var origin2 := sel.snap(sel.aim_xz()) if sel.aim.x < 1.0e8 else Vector2.ZERO
+				if o.has("origin"):
+					origin2 = o["origin"]
+				sel.set_tool(LabSelection.Tool.BRUSH)
+				sel.paint_trace(origin2, o["trace"], float(o.get("rayon", sel.brush_radius)))
+			if o.has("rayon"):
+				sel.brush_radius = float(o["rayon"])
+			if sel.brush_cells.is_empty():
+				return _refuse("Aucune zone : peignez avec l'outil Pinceau (clic maintenu) ou donnez --trace.")
+			var cp := {"seed": int(o.get("seed", 1)), "etals": int(o.get("etals", 3)), "vegetation": int(o.get("vegetation", 50))}
+			var rc := cp.duplicate()
+			rc["rayon"] = sel.brush_radius
+			rc["trace"] = sel.stroke_relative()
+			recipe["opts"] = rc
+			op = lab.prepare_composition(sel.brush_cells.keys(), cp)
 		"aplanir":
 			if sel.brush_cells.is_empty() and o.has("trace"):
 				var origin := sel.snap(sel.aim_xz()) if sel.aim.x < 1.0e8 else Vector2.ZERO
@@ -167,7 +214,10 @@ func request(gen: String, o: Dictionary) -> Dictionary:
 	var what := LabWorld.describe(op)
 	if what == "":
 		what = String(op.get("summary", gen))
-	_say("Aperçu prêt · %s\nEntrée : confirmer · X : annuler l'aperçu" % what, "ok")
+	var extra := ""
+	if gen == "habitation":
+		extra = "\nRecette : %s" % LabCommands.recipe_string(recipe)
+	_say("Aperçu prêt · %s%s\nEntrée : confirmer · X : annuler l'aperçu" % [what, extra], "ok")
 	state_changed.emit()
 	return {"ok": true, "op": op}
 
@@ -217,7 +267,7 @@ func confirm() -> Dictionary:
 		_say("Refusé : %s" % r.get("reason", "?"), "erreur")
 		return r
 	cancel_preview(false)
-	if String(op["kind"]) == "flatten":
+	if String(op["kind"]) == "flatten" or String(op["kind"]) == "composition":
 		sel.clear_brush()
 	sel.refresh_visuals()
 	last_recipe = op["recipe"]
@@ -304,6 +354,33 @@ func _make_ghost(op: Dictionary) -> void:
 			pad.material_override = m
 			pad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			g.add_child(pad)
+		"dwelling":
+			var dn := ConstructionView.create(op["model"], {"ghost": Color(0.25, 0.95, 0.5, 0.38)})
+			dn.transform = op["xform"]
+			g.add_child(dn)
+			# la plateforme prévue est ombrée comme pour la maison simple
+			var yard2: Rect2i = op["yard"]
+			var f2 := lab.field
+			var d0 := f2.center_m(yard2.position.x, yard2.position.y)
+			var d1 := f2.center_m(yard2.end.x - 1, yard2.end.y - 1)
+			var pad2 := MeshInstance3D.new()
+			var bm2 := BoxMesh.new()
+			bm2.size = Vector3(d1.x - d0.x + LabWorld.V, 0.03, d1.y - d0.y + LabWorld.V)
+			pad2.mesh = bm2
+			pad2.position = Vector3((d0.x + d1.x) * 0.5, float(op["ground_m"]) + 0.02, (d0.y + d1.y) * 0.5)
+			var m2 := StandardMaterial3D.new()
+			m2.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			m2.albedo_color = Color(0.3, 0.95, 0.45, 0.28)
+			m2.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			pad2.material_override = m2
+			pad2.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			g.add_child(pad2)
+			lab.add_child(g)
+			ghost = g
+			return
+		"composition":
+			for it in op["items"]:
+				g.add_child(lab.composition_node(it))
 	_ghostify(g)
 	lab.add_child(g)
 	ghost = g

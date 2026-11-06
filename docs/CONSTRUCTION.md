@@ -67,3 +67,25 @@ Ce que fait la pose (`HousePad`, mêmes règles que l'atelier du Lot 6) :
 - **refus expliqués, rien ne change** : hors de l'île · trop près du bord · emprise occupée (autre maison, chemin, point de départ) · relief trop accidenté · **zone protégée** (le masque est respecté : si la plateforme ou le raccord toucheraient une colonne protégée, la pose est refusée) · aucun chemin à moins de 14 m · chemin derrière la maison (tourner la maison) · raccord trop raide · maison sans porte.
 
 Les retouches sont écrites dans les couches de relief de la carte (comme un pinceau), la maison est **embarquée dans le fichier de carte** (`eclats-carte` **v2**, champ `maisons` ; les cartes v1 se rouvrent sans changement). Dans l'île 3D (« Vérifier en 3D »), la maison est visitable : portes et fenêtres sont de vraies découpes, les arbres du décor ne poussent pas dedans.
+
+## Habitations générées (Lot 9)
+
+Dans le laboratoire : **Habitation (3 variantes)** dans le panneau, ou `/generer habitation --variante auto|cabane|deux_pieces|en_L --graine N [--emprise 8x7] [--yaw 0-3] [--murs bois|pierre|enduit] [--toit tuiles|chaume|ardoise|bardeaux]` (barre T). L'emprise est le rectangle sélectionné ; la maison générée tient dedans.
+
+| Variante | Agencement | Volume |
+|---|---|---|
+| **Cabane** | une pièce, porte au sud, une fenêtre | 3 à 5 m de large, murs de 2,0 ou 2,5 m, un toit |
+| **Maison à deux pièces** | cloison avec porte intérieure, porte d'entrée dans la plus grande pièce, 3 fenêtres | 5 à 8 m, un toit |
+| **Maison en L** | deux ailes reliées par une porte ; l'aile est plus profonde que large | corps bas (2,5 m) + aile haute (3,0 m), **deux toits aux faîtages croisés** |
+
+- **Déterminisme** : à graine, emprise et réglages identiques, la même maison (même signature). `auto` choisit la variante d'après la graine parmi celles qui tiennent. Imposer une matière (`--murs`, `--toit`) ne change pas la forme.
+- **Recette** affichée dans le panneau (« Recette : /generer habitation --variante en_L --graine 7 … », la variante retenue par `auto` y est écrite en clair) et **contraintes de pose** : emprise avec débord de toit, porte à orienter vers le chemin, dénivelé rattrapé (1,60 m), raccord ≤ 14 m et ≤ 30 %, jamais sur zone protégée.
+- Dans le labo, la pose réutilise le **même raccord de terrain** que l'éditeur de cartes (`HousePad`) ; Ctrl+Z restaure tout. Refus expliqués : emprise trop petite (taille minimale donnée), hors de l'île, relief trop accidenté, emplacement occupé.
+
+### Placement automatique sur un plan (éditeur de cartes, outil 9)
+« **Placer automatiquement une habitation** » (variante, graine, emprise disponible) :
+1. génère l'habitation ; 2. examine les emplacements des **parcelles** du plan (zones *plateau habitable* et *pelouse*, abords de 3 m compris) dans les quatre orientations, par un contrôle rapide (île, bord, occupation, masque, relief) ; 3. pour les 20 meilleurs candidats (porte proche d'un chemin, proche du centre de la parcelle), évalue l'implantation complète ; 4. retient celui dont **le raccord au chemin est le plus court et le plus doux** — l'orientation découle de l'accès — et le pose (une opération, Ctrl+Z).
+**Aucune pose forcée** : sans parcelle compatible, la phrase donne le nombre d'emplacements examinés et les causes (zone protégée, relief, occupation, bord, chemin trop loin) ; sans plateau ni pelouse, ou sans chemin, le refus le dit.
+
+### Composition « marché + végétation » (première démonstration)
+Dans le laboratoire, avec le **pinceau** (zone peinte) : `/generer composition --etals 0-5 --vegetation 0-100 --graine N` ou « Marché + végétation » dans le panneau. Objets existants : étal de marchand, tas de caisses, tonneaux (assets cuits), arbres du générateur. Les étals forment une couronne ouverte vers le centre, caisses ou tonneaux près des étals, arbres sur le pourtour ; chaque objet passe par le système de placement (support, pente, collisions) et reste **sur la zone peinte**. **Ajustable** : nombre d'étals, densité de végétation, graine, puis nouvel aperçu sur la même zone. **Une seule opération** à confirmer, **une seule** à annuler (Ctrl+Z retire tout). Hors périmètre : boutique, mairie, économie, faune, remodelage de l'île d'ouverture (en attente des retours d'Axel sur les variantes d'habitation).

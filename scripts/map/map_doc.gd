@@ -497,6 +497,132 @@ func place_house(model: Construction, pos: Vector2, yaw: int, hname := "", need_
 	res["id"] = h["id"]
 	return res
 
+const PARCEL_KINDS := ["plateau", "pelouse"]
+const PARCEL_REACH_M := 3.0
+const AUTO_FULL_EVALS := 20
+
+## Cherche une parcelle compatible du plan (zones « plateau » et « pelouse », abords compris) pour une habitation générée et la pose
+## (une opération annulable). L'orientation retenue est celle dont la porte se raccorde le mieux au chemin (raccord court et doux).
+## Refus : aucune pose forcée, les raisons sont comptées par catégorie. commit = false : cherche seulement.
+func auto_place_dwelling(variant: String, seed: int, fit: Vector2, opts := {}, commit := true) -> Dictionary:
+	var out := {"ok": false, "reasons": [], "examined": 0}
+	if field == null:
+		out["reasons"] = ["Aucune île : dessinez d'abord un contour."]
+		return out
+	var gen := DwellingGenerator.generate(variant, seed, fit, opts)
+	out["gen"] = gen
+	if not bool(gen["ok"]):
+		out["reasons"] = gen["reasons"]
+		return out
+	var model: Construction = gen["model"]
+	var zones: Array[Dictionary] = []
+	for z in plan.zones:
+		if PARCEL_KINDS.has(String(z["kind"])):
+			zones.append(z)
+	if zones.is_empty():
+		out["reasons"] = ["Le plan ne contient aucune parcelle (zone « plateau habitable » ou « pelouse ») : l'habitation n'a nulle part où se poser."]
+		return out
+	if plan.paths.is_empty():
+		out["reasons"] = ["Le plan n'a aucun chemin : l'orientation de la porte ne peut pas être choisie ni raccordée."]
+		return out
+	var ctx := house_ctx(true)
+	var occ := HousePad.build_occ(field, ctx)
+	ctx["occ"] = occ
+	var fp := HousePad.footprint(model)
+	var ent: Dictionary = fp["entrance"]
+	var counts := {"bord": 0, "occupe": 0, "protege": 0, "relief": 0, "chemin": 0}
+	var cands: Array[Dictionary] = []
+	var examined := 0
+	for z in zones:
+		var zc: Vector2 = z["c"]
+		var reach := float(z["r"]) + PARCEL_REACH_M
+		var steps := int(ceil(reach))
+		for dz in range(-steps, steps + 1):
+			for dx in range(-steps, steps + 1):
+				var p := Vector2(snappedf(zc.x + float(dx), 0.1), snappedf(zc.y + float(dz), 0.1))
+				if p.distance_to(zc) > reach or not IslandPlan.point_in_poly(p, plan.outline):
+					continue
+				for yaw in 4:
+					examined += 1
+					var key := HousePad.quick_check(field, model, p, yaw, ctx, occ)
+					if key != "":
+						counts[key] += 1
+						continue
+					var door := p + HousePad.rot((ent["pos"] as Vector2) - (fp["center"] as Vector2), yaw)
+					var np := HousePad.nearest_path(plan.paths, door)
+					if np.is_empty() or float(np["d"]) > HousePad.LINK_MAX_M:
+						counts["chemin"] += 1
+						continue
+					cands.append({"pos": p, "yaw": yaw, "zone": String(z["id"]), "dd": float(np["d"]), "dc": p.distance_to(zc)})
+	out["examined"] = examined
+	out["counts"] = counts
+	if cands.is_empty():
+		out["reasons"] = [_auto_refusal(model, examined, counts)]
+		return out
+	cands.sort_custom(func(a, b) -> bool:
+		var sa := float(a["dd"]) + 0.4 * float(a["dc"])
+		var sb := float(b["dd"]) + 0.4 * float(b["dc"])
+		if absf(sa - sb) > 1.0e-6:
+			return sa < sb
+		var pa: Vector2 = a["pos"]
+		var pb: Vector2 = b["pos"]
+		if pa.x != pb.x:
+			return pa.x < pb.x
+		if pa.y != pb.y:
+			return pa.y < pb.y
+		return int(a["yaw"]) < int(b["yaw"]))
+	var best := {}
+	var best_score := 1.0e9
+	var refused: Array[String] = []
+	var tried := 0
+	for cd in cands:
+		if tried >= AUTO_FULL_EVALS:
+			break
+		tried += 1
+		var ev := HousePad.evaluate(field, model, cd["pos"], int(cd["yaw"]), ctx, false)
+		if not bool(ev["ok"]):
+			refused.append(String(ev["reasons"][0]))
+			continue
+		var lk: Dictionary = ev["link"]
+		var score := float(lk.get("length", 0.0)) + 8.0 * float(lk.get("grade", 0.0)) + 0.4 * float(cd["dc"]) + 0.01 * float(int(ev["cut"]) + int(ev["fill"]))
+		if score < best_score - 1.0e-9:
+			best_score = score
+			best = cd.duplicate()
+			best["eval"] = ev
+	if best.is_empty():
+		var why := refused[0] if not refused.is_empty() else "aucune implantation complète n'a pu être calculée"
+		out["reasons"] = ["Aucune parcelle ne convient pour %s : %d emplacements examinés, %d pré-sélectionnés, mais tous refusés à l'évaluation du terrain (par exemple : %s)" % [model.name, examined, cands.size(), why]]
+		return out
+	out["pos"] = best["pos"]
+	out["yaw"] = best["yaw"]
+	out["parcel"] = best["zone"]
+	out["eval"] = best["eval"]
+	out["door_side"] = HousePad.side_name(HousePad.rot_i(ent["dir"], int(best["yaw"])))
+	out["ok"] = true
+	if commit:
+		var pr := place_house(model, best["pos"], int(best["yaw"]), model.name)
+		if not bool(pr["ok"]):
+			out["ok"] = false
+			out["reasons"] = pr["reasons"]
+			return out
+		out["placed"] = pr
+		var lk2: Dictionary = pr["link"]
+		message = "Habitation posée : %s, parcelle « %s », porte côté %s, raccord au chemin %s m (%d %%) — %d emplacements examinés." % [
+			model.name, out["parcel"], out["door_side"], Construction.fm(float(lk2.get("length", 0.0)), 1), roundi(float(lk2.get("grade", 0.0)) * 100.0), examined]
+	return out
+
+func _auto_refusal(model: Construction, examined: int, counts: Dictionary) -> String:
+	var parts: Array[String] = []
+	var labels := {"bord": "hors de l'île ou trop près du bord", "occupe": "emplacement occupé (chemin, autre maison, départ)", "protege": "zone protégée par le masque",
+		"relief": "relief trop accidenté", "chemin": "porte à plus de %d m d'un chemin" % int(HousePad.LINK_MAX_M)}
+	for k in ["protege", "relief", "occupe", "bord", "chemin"]:
+		if int(counts[k]) > 0:
+			parts.append("%d × %s" % [int(counts[k]), labels[k]])
+	var fp := HousePad.footprint(model)
+	var sz: Vector2 = fp["size"]
+	return "Aucune parcelle compatible pour %s (emprise %s × %s m) : %d positions et orientations examinées sur le plateau et la pelouse, toutes refusées — %s. Rien n'est posé." % [
+		model.name, Construction.fm(sz.x), Construction.fm(sz.y), examined, ", ".join(PackedStringArray(parts))]
+
 func remove_house(id: String) -> bool:
 	for i in plan.houses.size():
 		if String(plan.houses[i]["id"]) == id:

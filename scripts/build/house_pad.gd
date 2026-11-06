@@ -26,6 +26,12 @@ static func rot(v: Vector2, yaw: int) -> Vector2:
 		3: return Vector2(-v.y, v.x)
 	return v
 
+static func side_name(dir: Vector2i) -> String:
+	if dir == Vector2i(0, 1): return "sud"
+	if dir == Vector2i(0, -1): return "nord"
+	if dir == Vector2i(1, 0): return "est"
+	return "ouest"
+
 static func rot_i(v: Vector2i, yaw: int) -> Vector2i:
 	var r := rot(Vector2(v), yaw)
 	return Vector2i(roundi(r.x), roundi(r.y))
@@ -87,6 +93,53 @@ static func _restore(f: TerrainField, s: Dictionary) -> void:
 	f.zone = s["zone"]
 	f.material = s["mat"]
 
+## Occupation du terrain : bandes des chemins, emprises déjà prises, points à dégager. Réutilisable pour plusieurs évaluations (ctx.occ).
+static func build_occ(field: TerrainField, ctx: Dictionary) -> OccupancyMap:
+	var occ := OccupancyMap.new(field)
+	for pa in ctx.get("paths", []):
+		var pts: Array = pa["pts"]
+		var hw := float(pa["width"]) * 0.5 + 0.4
+		for k in range(pts.size() - 1):
+			var a: Vector2 = pts[k]
+			var b: Vector2 = pts[k + 1]
+			var lo := field.col_of_m(minf(a.x, b.x) - hw, minf(a.y, b.y) - hw)
+			var hi := field.col_of_m(maxf(a.x, b.x) + hw, maxf(a.y, b.y) + hw)
+			for cz in range(lo.y, hi.y + 1):
+				for cx in range(lo.x, hi.x + 1):
+					if field.has_ground(cx, cz) and field.center_m(cx, cz).distance_to(_seg_closest(field.center_m(cx, cz), a, b)) <= hw:
+						occ.tag[field.idx(cx, cz)] = PlacementSpec.TAG_ROAD
+	for r2: Rect2 in ctx.get("avoid", []):
+		occ.reserve(_cols(field, r2.grow(0.8)), PlacementSpec.TAG_PLOT, occ.new_owner())
+	for kp: Vector2 in ctx.get("keep_clear", []):
+		occ.reserve_disc(kp, 1.6, PlacementSpec.TAG_ITEM, occ.new_owner())
+	return occ
+
+## Contrôle RAPIDE (sans toucher au terrain) : "" si l'emplacement peut convenir, sinon la catégorie du refus :
+## "bord" (hors de l'île / trop près du vide) · "occupe" · "protege" · "relief".
+static func quick_check(field: TerrainField, model: Construction, pos: Vector2, yaw: int, ctx: Dictionary, occ: OccupancyMap) -> String:
+	var rect_m := Rect2(pos - size_for(model, yaw) * 0.5, size_for(model, yaw))
+	var rect := _cols(field, rect_m)
+	var near := Rect2i(rect.position - Vector2i.ONE, rect.size + Vector2i(2, 2))
+	for cz in range(near.position.y, near.end.y, 3):
+		for cx in range(near.position.x, near.end.x, 3):
+			if not field.has_ground(cx, cz) or field.edge_dist[field.idx(cx, cz)] < EDGE_MIN_M:
+				return "bord"
+	var grown := Rect2i(rect.position - Vector2i(YARD, YARD), rect.size + Vector2i(YARD, YARD) * 2)
+	for cz in range(grown.position.y, grown.end.y, 2):
+		for cx in range(grown.position.x, grown.end.x, 2):
+			if field.has_ground(cx, cz) and occ.tag[field.idx(cx, cz)] != PlacementSpec.TAG_FREE:
+				return "occupe"
+	var mask: PackedByteArray = ctx.get("mask", PackedByteArray())
+	if mask.size() == field.n * field.n:
+		for cz in range(grown.position.y - 3, grown.end.y + 3, 2):
+			for cx in range(grown.position.x - 3, grown.end.x + 3, 2):
+				if field.in_bounds(cx, cz) and mask[field.idx(cx, cz)] != 0:
+					return "protege"
+	var hr := field.height_range(rect)
+	if hr.x == TerrainField.NO_GROUND or hr.y - hr.x > CUT + FILL:
+		return "relief"
+	return ""
+
 static func evaluate(field: TerrainField, model: Construction, pos: Vector2, yaw: int, ctx := {}, commit := false) -> Dictionary:
 	pos = Vector2(snappedf(pos.x, 0.1), snappedf(pos.y, 0.1))       # positions à 10 cm : le fichier de carte les garde à l'identique
 	var fp := footprint(model)
@@ -112,25 +165,10 @@ static func evaluate(field: TerrainField, model: Construction, pos: Vector2, yaw
 	var rect := _cols(field, rect_m)
 	res["rect"] = rect
 	var mask: PackedByteArray = ctx.get("mask", PackedByteArray())
-	var occ := OccupancyMap.new(field)
 	var paths: Array = ctx.get("paths", [])
-	for pa in paths:
-		var pts: Array = pa["pts"]
-		var hw := float(pa["width"]) * 0.5 + 0.4
-		for k in range(pts.size() - 1):
-			var a: Vector2 = pts[k]
-			var b: Vector2 = pts[k + 1]
-			var lo := field.col_of_m(minf(a.x, b.x) - hw, minf(a.y, b.y) - hw)
-			var hi := field.col_of_m(maxf(a.x, b.x) + hw, maxf(a.y, b.y) + hw)
-			# le raccord doit pouvoir arriver au chemin : on ne réserve que sa bande, pas ses abords proches de la porte
-			for cz in range(lo.y, hi.y + 1):
-				for cx in range(lo.x, hi.x + 1):
-					if field.has_ground(cx, cz) and field.center_m(cx, cz).distance_to(_seg_closest(field.center_m(cx, cz), a, b)) <= hw:
-						occ.tag[field.idx(cx, cz)] = PlacementSpec.TAG_ROAD
-	for r2: Rect2 in ctx.get("avoid", []):
-		occ.reserve(_cols(field, r2.grow(0.8)), PlacementSpec.TAG_PLOT, occ.new_owner())
-	for kp: Vector2 in ctx.get("keep_clear", []):
-		occ.reserve_disc(kp, 1.6, PlacementSpec.TAG_ITEM, occ.new_owner())
+	var occ: OccupancyMap = ctx.get("occ", null)
+	if occ == null:
+		occ = build_occ(field, ctx)
 	var snap := _snapshot(field)
 	var ev := TerrainEditor.evaluate_pad(field, occ, rect, YARD, CUT, FILL, 2, PackedInt32Array(), EDGE_MIN_M)
 	if not bool(ev["ok"]):
@@ -166,11 +204,18 @@ static func evaluate(field: TerrainField, model: Construction, pos: Vector2, yaw
 	# ---- colonnes modifiées, respect du masque
 	var changed: Array[int] = []
 	var protected := 0
-	for i in field.n * field.n:
-		if field.top[i] != snap["top"][i] or field.material[i] != snap["mat"][i]:
-			changed.append(i)
-			if mask.size() == field.n * field.n and mask[i] != 0:
-				protected += 1
+	var box := yard.grow(26)
+	if link.has("rect"):
+		box = box.merge((link["rect"] as Rect2i).grow(8))
+	var stop: PackedInt32Array = snap["top"]
+	var smat: PackedByteArray = snap["mat"]
+	for cz in range(maxi(box.position.y, 0), mini(box.end.y, field.n)):
+		for cx in range(maxi(box.position.x, 0), mini(box.end.x, field.n)):
+			var i := cx + cz * field.n
+			if field.top[i] != stop[i] or field.material[i] != smat[i]:
+				changed.append(i)
+				if mask.size() == field.n * field.n and mask[i] != 0:
+					protected += 1
 	if protected > 0:
 		_restore(field, snap)
 		res["reasons"] = ["Zone protégée : la plateforme de la maison et son raccord de terrain toucheraient %d colonnes protégées par le masque. Déplacez la maison ou retirez la protection." % protected]
@@ -243,4 +288,5 @@ static func _carve_link(field: TerrainField, res: Dictionary, door: Vector2, np:
 	if not band.is_empty():
 		TerrainEditor.apply_skirt(field, band, 6)
 	out["columns"] = band.size()
+	out["rect"] = Rect2i(lo, hi - lo + Vector2i.ONE)
 	return out

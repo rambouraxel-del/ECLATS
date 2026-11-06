@@ -27,10 +27,17 @@ var _lock: CheckButton
 var _variant_label: Label
 var _roof_label: Label
 var _yaw_label: Label
+var _etals: SpinBox
+var _veg: SpinBox
+var _etals_label: Label
+var _veg_label: Label
+var constraints_label: Label
 var _msg_t := 0.0
 var _reticle: Control
 
-const GENS := [["arbre", "Arbre"], ["rocher", "Rocher"], ["maison", "Maison"], ["aplanir", "Aplanir (zone peinte)"]]
+const GENS := [["arbre", "Arbre"], ["rocher", "Rocher"], ["maison", "Maison"], ["aplanir", "Aplanir (zone peinte)"], ["habitation", "Habitation (3 variantes)"], ["composition", "Marché + végétation (zone peinte)"]]
+const VARIANT_LABELS := ["auto (selon la graine)", "cabane", "deux pièces", "maison en L"]
+const VARIANT_KEYS := ["auto", "cabane", "deux_pieces", "en_L"]
 
 func setup(c: LabController, s: LabSelection) -> void:
 	ctl = c
@@ -134,6 +141,23 @@ func _build() -> void:
 	for y in ["vers le joueur", "sud (0)", "est (1)", "nord (2)", "ouest (3)"]:
 		_yaw.add_item(y)
 	g1.add_child(_yaw)
+	_etals_label = _lbl("Étals", 14)
+	g1.add_child(_etals_label)
+	_etals = SpinBox.new()
+	_etals.min_value = 0
+	_etals.max_value = 5
+	_etals.value = 3
+	_etals.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	g1.add_child(_etals)
+	_veg_label = _lbl("Végétation %", 14)
+	g1.add_child(_veg_label)
+	_veg = SpinBox.new()
+	_veg.min_value = 0
+	_veg.max_value = 100
+	_veg.step = 10
+	_veg.value = 50
+	_veg.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	g1.add_child(_veg)
 	var b1 := _btn("Aperçu (G)", _on_preview)
 	b1.name = "BtnApercu"
 	v.add_child(b1)
@@ -153,6 +177,11 @@ func _build() -> void:
 	recipe_label = _lbl("", 12, MenuStyle.MUTED)
 	recipe_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 	v.add_child(recipe_label)
+	constraints_label = _lbl("", 12, Color(0.75, 0.9, 1.0))
+	constraints_label.name = "Contraintes"
+	constraints_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	constraints_label.custom_minimum_size = Vector2(280, 0)
+	v.add_child(constraints_label)
 	var hint := _lbl("T : commandes · Tab : souris libre\nÉchap : pause · F3 : infos", 12, MenuStyle.MUTED)
 	v.add_child(hint)
 	# message principal (bas de l'écran)
@@ -216,6 +245,15 @@ func current_opts() -> Dictionary:
 				o["toit"] = LabCommands.ROOFS[LabCommands.ROOF_NAMES.values()[_roof.selected - 1]]
 			if _yaw.selected > 0:
 				o["yaw"] = _yaw.selected - 1
+		"habitation":
+			o["variante"] = VARIANT_KEYS[maxi(_variant.selected, 0)]
+			if _roof.selected > 0:
+				o["toit"] = _roof.get_item_text(_roof.selected)
+			if _yaw.selected > 0:
+				o["yaw"] = _yaw.selected - 1
+		"composition":
+			o["etals"] = int(_etals.value)
+			o["vegetation"] = int(_veg.value)
 		"aplanir":
 			pass
 	return o
@@ -253,9 +291,14 @@ func _refresh() -> void:
 	for i in _tool_btns.size():
 		_tool_btns[i].set_pressed_no_signal(i == sel.tool)
 	# la sélection courante oriente la génération proposée
-	var want := {LabSelection.Tool.POINT: [0, 1], LabSelection.Tool.RECT: [2], LabSelection.Tool.BRUSH: [3]}
+	var want := {LabSelection.Tool.POINT: [0, 1], LabSelection.Tool.RECT: [2, 4], LabSelection.Tool.BRUSH: [3, 5]}
 	if not (want[sel.tool] as Array).has(_gen.selected):
 		_gen.select(want[sel.tool][0])
+	# un aperçu en attente (panneau ou barre de commandes) aligne le panneau sur ce qui a été demandé
+	var kinds := {"tree": 0, "rock": 1, "house": 2, "flatten": 3, "dwelling": 4, "composition": 5}
+	var pk := String(ctl.pending.get("kind", ""))
+	if kinds.has(pk) and _gen.selected != int(kinds[pk]):
+		_gen.select(int(kinds[pk]))
 	_variant.clear()
 	match current_gen():
 		"arbre":
@@ -274,17 +317,37 @@ func _refresh() -> void:
 		"aplanir":
 			_variant_label.text = "Niveau"
 			_variant.add_item("médian de la zone")
-	var house := current_gen() == "maison"
+		"habitation":
+			_variant_label.text = "Variante"
+			for lbl in VARIANT_LABELS:
+				_variant.add_item(String(lbl))
+			if String(ctl.pending.get("kind", "")) == "dwelling":
+				_variant.select(maxi(VARIANT_KEYS.find(String((ctl.pending["params"] as Dictionary).get("variante", "auto"))), 0))
+		"composition":
+			_variant_label.text = "Objets"
+			_variant.add_item("étals, caisses, tonneaux, arbres")
+	var house := current_gen() == "maison" or current_gen() == "habitation"
 	_roof_label.visible = house
 	_roof.visible = house
 	_yaw_label.visible = house
 	_yaw.visible = house
+	var compo := current_gen() == "composition"
+	_etals_label.visible = compo
+	_etals.visible = compo
+	_veg_label.visible = compo
+	_veg.visible = compo
+	if current_gen() == "habitation":
+		_variant.visible = true
 	_lock.visible = sel.tool == LabSelection.Tool.RECT
 	_lock.set_pressed_no_signal(sel.lock_size)
 	_seed.editable = current_gen() != "aplanir"
 	info.text = sel.info_text()
 	var rt := ctl.recipe_text()
 	recipe_label.text = ("Recette : " + rt) if rt != "" else ""
+	constraints_label.text = ""
+	var pd: Dictionary = ctl.pending
+	if not pd.is_empty() and String(pd.get("kind", "")) == "dwelling" and pd.has("gen") and bool((pd["gen"] as Dictionary)["ok"]):
+		constraints_label.text = DwellingGenerator.constraints_text(pd["gen"])
 
 func _on_message(text: String, level: String) -> void:
 	msg.text = text

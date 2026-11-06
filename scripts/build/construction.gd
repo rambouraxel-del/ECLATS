@@ -356,7 +356,14 @@ func height_m() -> float:
 				top = maxf(top, lv + float(s["y"]) + ROOF_T + float(s["rise"]))
 	return top
 
-## Porte d'entrée : la première porte du rez-de-chaussée. {pos (m, au seuil, à l'extérieur), dir (Vector2i, vers l'extérieur), wall_id, door (centre m)} ou {}.
+func _inside_slab(lv: int, p: Vector2) -> bool:
+	for f in slabs(lv):
+		if p.x > float(f["x0"]) * U + 0.01 and p.x < float(f["x1"]) * U - 0.01 and p.y > float(f["z0"]) * U + 0.01 and p.y < float(f["z1"]) * U - 0.01:
+			return true
+	return false
+
+## Porte d'entrée : la première porte EXTÉRIEURE du rez-de-chaussée (un côté au moins n'est sur aucun sol : une porte entre deux pièces
+## n'en est pas une). {pos (m, au seuil, à l'extérieur), dir (Vector2i, vers l'extérieur), wall_id, door (centre m)} ou {}.
 func entrance() -> Dictionary:
 	var bb := bbox_m()
 	if bb.size == Vector2.ZERO:
@@ -369,12 +376,23 @@ func entrance() -> Dictionary:
 			var mid := (float(o["at"]) + float(o["w"]) * 0.5) * U
 			var line := float(wall_line(w)) * U
 			var p := Vector2(mid, line) if wall_axis(w) == 0 else Vector2(line, mid)
-			var d := p - c
-			var dir := Vector2i.ZERO
+			var normals: Array[Vector2i] = []
 			if wall_axis(w) == 0:
-				dir = Vector2i(0, 1) if d.y >= 0.0 else Vector2i(0, -1)
+				normals.append(Vector2i(0, 1))
+				normals.append(Vector2i(0, -1))
 			else:
-				dir = Vector2i(1, 0) if d.x >= 0.0 else Vector2i(-1, 0)
+				normals.append(Vector2i(1, 0))
+				normals.append(Vector2i(-1, 0))
+			var outs: Array[Vector2i] = []
+			for nv in normals:
+				if not _inside_slab(0, p + Vector2(nv) * 0.5):
+					outs.append(nv)
+			if outs.is_empty():
+				continue                                  # porte intérieure
+			var dir := outs[0]
+			if outs.size() == 2:                          # mur isolé : côté opposé au centre de la construction
+				var d := p - c
+				dir = normals[0] if (d.y >= 0.0 if wall_axis(w) == 0 else d.x >= 0.0) else normals[1]
 			return {"door": p, "dir": dir, "pos": p + Vector2(dir) * (WALL_T * 0.5 + 0.5), "wall_id": int(w["id"])}
 	return {}
 
