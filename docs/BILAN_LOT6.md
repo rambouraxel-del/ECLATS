@@ -1,6 +1,6 @@
 # Bilan du Lot 6 — Menu principal, première personne, laboratoire développeur
 
-Branche : `claude/lot6-menu-laboratoire` (partie de `claude/lot5-ile-ouverture`), **deux commits**, un par étape.
+Branche : `claude/lot6-menu-laboratoire` (partie de `claude/lot5-ile-ouverture`) : un commit par étape (`d089215` étape 1, `ae9d886` étape 2) et un commit intermédiaire `3d0d80a` (correctif de confort de l'étape 1 trouvé pendant la recette, poussé après coup).
 Accès : le projet démarre sur le **menu principal**. Détails : [LABORATOIRE.md](LABORATOIRE.md) · [ILE_OUVERTURE.md](ILE_OUVERTURE.md).
 
 ## Étape 1 — Menu principal et première personne
