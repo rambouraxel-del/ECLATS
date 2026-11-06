@@ -21,6 +21,7 @@ var message := ""
 var rebuilds := 0
 var _snap: Dictionary = {}
 var _hf := PackedFloat32Array()      # hauteurs flottantes (cellules) pendant un trait de relief
+var _hf_ready := PackedByteArray()   # 1 = colonne déjà initialisée dans _hf (initialisation paresseuse)
 var _target := 0.0
 var _stroke_dirty := Rect2i()
 var _stroke_has := false
@@ -194,7 +195,7 @@ func house_conflicts() -> Array[String]:
 	if field == null:
 		return out
 	for h in plan.houses:
-		var nm := String(h["name"])
+		var nm := String(h["name"]) if String(h["name"]) != "" else "la maison"
 		var rect_m: Rect2 = h["rect"]
 		var c0 := field.col_of_m(rect_m.position.x, rect_m.position.y)
 		var c1 := field.col_of_m(rect_m.end.x - 0.001, rect_m.end.y - 0.001)
@@ -258,7 +259,12 @@ func undo() -> String:
 	var e: Dictionary = undo_stack.pop_back()
 	var structure_changed := (e["plan"] as IslandPlan).signature() != plan.signature()
 	plan = e["plan"]
-	rebuild(structure_changed or build == null)
+	var r_undo: Rect2i = e.get("rect", Rect2i())
+	if not structure_changed and build != null and field != null and r_undo.size != Vector2i.ZERO:
+		PlanTerrain.apply_layers_rect(build, plan, r_undo.grow(1))
+		path_reports = PlanTerrain.path_reports(plan, field)
+	else:
+		rebuild(structure_changed or build == null)
 	serial += 1
 	message = "Annulé : %s" % e["label"]
 	return String(e["label"])
@@ -408,10 +414,11 @@ func stroke_begin(label: String, tool: String, at: Vector2) -> void:
 	limit_hit = false
 	_stroke_dirty = Rect2i()
 	if tool in ["monter", "creuser", "aplanir", "adoucir"]:
+		# Lot 11 : hauteurs flottantes initialisées PAR COLONNE au premier passage du pinceau (plus de boucle sur toute la carte)
 		var n := field.n
 		_hf.resize(n * n)
-		for i in n * n:
-			_hf[i] = float(field.top[i])
+		_hf_ready.resize(n * n)
+		_hf_ready.fill(0)
 		var c := col_of(at)
 		_target = float(field.top_at(c.x, c.y)) if field.has_ground(c.x, c.y) else 0.0
 
@@ -427,9 +434,25 @@ func stroke_dab(tool: String, center: Vector2, radius: float, strength := 0.5, m
 	var L := plan.layers
 	var tlo := Vector2i(1 << 30, 1 << 30)
 	var thi := Vector2i(-1, -1)
+	var relief_tool := tool in ["monter", "creuser", "aplanir", "adoucir"]
+	var margin := 2 if tool == "adoucir" else 0
+	var wlo := Vector2i(maxi(lo.x - margin, 0), maxi(lo.y - margin, 0))
+	var whi := Vector2i(mini(hi.x + margin, n - 1), mini(hi.y + margin, n - 1))
+	if relief_tool:
+		for wz in range(wlo.y, whi.y + 1):
+			for wx in range(wlo.x, whi.x + 1):
+				var wi := wx + wz * n
+				if _hf_ready[wi] == 0:
+					_hf_ready[wi] = 1
+					_hf[wi] = float(field.top[wi])
+	# fenêtre de lissage : copie des seules hauteurs voisines (valeurs d'AVANT ce coup), au lieu de toute la carte
 	var win := PackedFloat32Array()
+	var ww := whi.x - wlo.x + 1
 	if tool == "adoucir":
-		win = _hf.duplicate()
+		win.resize(ww * (whi.y - wlo.y + 1))
+		for wz in range(wlo.y, whi.y + 1):
+			for wx in range(wlo.x, whi.x + 1):
+				win[(wx - wlo.x) + (wz - wlo.y) * ww] = _hf[wx + wz * n]
 	for cz in range(lo.y, hi.y + 1):
 		for cx in range(lo.x, hi.x + 1):
 			var i := cx + cz * n
@@ -481,7 +504,7 @@ func stroke_dab(tool: String, center: Vector2, radius: float, strength := 0.5, m
 									var j := x + z * n
 									if field.top[j] == TerrainField.NO_GROUND:
 										continue
-									s += win[j]
+									s += win[(x - wlo.x) + (z - wlo.y) * ww]
 									c += 1
 							if c > 0:
 								_hf[i] = lerpf(_hf[i], s / float(c), clampf(strength * w * 1.2, 0.0, 1.0))
@@ -508,6 +531,7 @@ func stroke_dab(tool: String, center: Vector2, radius: float, strength := 0.5, m
 func stroke_end() -> Rect2i:
 	var r := _stroke_dirty
 	if _stroke_has:
+		_snap["rect"] = r            # l'annulation de ce trait ne recalcule que ce rectangle
 		finish_op(false)
 		path_reports = PlanTerrain.path_reports(plan, field)
 	else:

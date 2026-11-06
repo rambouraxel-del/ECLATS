@@ -195,18 +195,27 @@ func rebuild_rect(cols: Rect2i) -> void:
 		mi.mesh = mesh
 		mi.position = tl["origin"]
 		terrain_root.add_child(mi)
-	update_ground()
+	update_ground(grown)
 	last_rebuild_ms = Time.get_ticks_msec() - t0
 
 ## Carte de hauteurs de collision (une valeur par colonne) : relue après chaque modification du relief.
-func update_ground() -> void:
+## Lot 11 : `rect` limite la mise à jour aux colonnes modifiées (la carte de hauteurs est conservée entre deux retouches).
+func update_ground(rect := Rect2i()) -> void:
 	var n := field.n
-	var data := PackedFloat32Array()
-	data.resize(n * n)
-	for i in n * n:
-		var t := field.top[i]
-		data[i] = (-400.0 if t == TerrainField.NO_GROUND else float(t + 1) * V) / V
-	ground_shape.map_data = data
+	if _ground_data.size() != n * n or rect.size == Vector2i.ZERO:
+		_ground_data.resize(n * n)
+		for i in n * n:
+			var t := field.top[i]
+			_ground_data[i] = (-400.0 if t == TerrainField.NO_GROUND else float(t + 1) * V) / V
+	else:
+		for cz in range(maxi(rect.position.y, 0), mini(rect.end.y, n)):
+			for cx in range(maxi(rect.position.x, 0), mini(rect.end.x, n)):
+				var i := cx + cz * n
+				var t := field.top[i]
+				_ground_data[i] = (-400.0 if t == TerrainField.NO_GROUND else float(t + 1) * V) / V
+	ground_shape.map_data = _ground_data
+
+var _ground_data := PackedFloat32Array()
 
 # ------------------------------------------------------------------ services
 

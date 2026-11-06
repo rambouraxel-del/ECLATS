@@ -1,0 +1,61 @@
+{
+	"machine": {
+		"coeurs": 4,
+		"cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+		"moteur": "4.3-stable (official)",
+		"os": "Linux",
+		"rendu": " / forward_plus"
+	},
+	"tailles": [
+		{
+			"adoucir_debut_ms": 0.192,
+			"adoucir_fin_ms": 0.683,
+			"adoucir_par_coup_ms": 4.668,
+			"annuler_ms": 3.078,
+			"collisions_update_ground_local_ms": 0.445,
+			"collisions_update_ground_ms": 16.073,
+			"colonnes_par_cote": 312,
+			"monter_debut_ms": 0.205,
+			"monter_fin_ms": 0.952,
+			"monter_par_coup_ms": 1.513,
+			"pile_annulation": 3,
+			"plan_m": [
+				56,
+				48
+			],
+			"relief_du_plan_ms": 793.76,
+			"retouche_locale_3d_ms": 430.571,
+			"tuile_empreinte": 79506187,
+			"tuile_maillage_ms": 133.887,
+			"tuile_voxelisation_ms": 58.431,
+			"vue3d_relief_ms": 788.923,
+			"vue3d_relief_reutilise_ms": 0.015,
+			"vue3d_terrain_ms": 1239.663
+		},
+		{
+			"adoucir_debut_ms": 0.427,
+			"adoucir_fin_ms": 1.148,
+			"adoucir_par_coup_ms": 4.248,
+			"annuler_ms": 2.53,
+			"collisions_update_ground_local_ms": 1.386,
+			"collisions_update_ground_ms": 49.801,
+			"colonnes_par_cote": 664,
+			"monter_debut_ms": 0.41,
+			"monter_fin_ms": 1.103,
+			"monter_par_coup_ms": 0.994,
+			"pile_annulation": 3,
+			"plan_m": [
+				120,
+				120
+			],
+			"relief_du_plan_ms": 4033.087,
+			"retouche_locale_3d_ms": 219.385,
+			"tuile_empreinte": 3453987341,
+			"tuile_maillage_ms": 122.799,
+			"tuile_voxelisation_ms": 57.059,
+			"vue3d_relief_ms": 4183.293,
+			"vue3d_relief_reutilise_ms": 0.02,
+			"vue3d_terrain_ms": 5172.886
+		}
+	]
+}

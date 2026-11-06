@@ -476,6 +476,27 @@ static func apply_layers(b: Build, plan: IslandPlan) -> void:
 		if L.mat[i] != 0:
 			f.material[i] = L.mat[i]
 
+## Comme apply_layers, mais seulement sur un rectangle de colonnes (annulation d'un trait de pinceau : Lot 11). Le reste du terrain est
+## déjà à jour ; les couches doivent avoir la grille du terrain.
+static func apply_layers_rect(b: Build, plan: IslandPlan, rect: Rect2i) -> void:
+	var f := b.field
+	var L := plan.layers
+	if L == null or L.n != f.n:
+		apply_layers(b, plan)
+		return
+	var x0 := maxi(rect.position.x, 0)
+	var z0 := maxi(rect.position.y, 0)
+	var x1 := mini(rect.end.x, f.n)
+	var z1 := mini(rect.end.y, f.n)
+	for cz in range(z0, z1):
+		for cx in range(x0, x1):
+			var i := cx + cz * f.n
+			if b.base_top[i] == TerrainField.NO_GROUND:
+				continue
+			var d := L.delta[i]
+			f.top[i] = maxi(b.base_top[i] + d, f.core_top[i] + TerrainField.MIN_SURFACE) if d != 0 else b.base_top[i]
+			f.material[i] = L.mat[i] if L.mat[i] != 0 else b.base_mat[i]
+
 ## Empreinte du relief (comparaison de deux générations).
 static func fingerprint(f: TerrainField) -> int:
 	return hash(f.top) ^ (hash(f.material) << 1)
