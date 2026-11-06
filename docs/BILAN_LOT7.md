@@ -1,7 +1,7 @@
 # Bilan du Lot 7 — Du plan 2D à l'île 3D, puis édition du terrain
 
 Branche : `claude/lot7-carte-terrain-editeur` (partie de `claude/lot6-menu-laboratoire`). Un commit par étape :
-**étape 1** `e32b958` (plan → terrain → île 3D), **étape 2** `ETAPE2` (éditeur de carte, masque, régénération, export / ouverture).
+**étape 1** `e32b958` (plan → terrain → île 3D), **étape 2** `0e98620` (éditeur de carte, masque, régénération, export / ouverture).
 Mode d'emploi, format de fichier et limites : [CARTE_PLAN.md](CARTE_PLAN.md).
 
 ## Ce qui est livré
