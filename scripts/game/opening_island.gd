@@ -7,8 +7,10 @@ extends Node3D
 ## user://cache/ (clé = carte + palette + version du constructeur) ; les ouvertures suivantes la rechargent en
 ## quelques secondes. Modifier la carte JSON invalide le cache automatiquement.
 ##
-## Touches : ZQSD/WASD (selon le clavier) ou flèches · souris : caméra (clic pour capturer, Échap pour libérer)
-##           Maj courir · Espace sauter · E activer · F5/F6/F7 ambiance · Ctrl+Suppr : oublier la sauvegarde de l'île
+## Lot 6 : PREMIÈRE PERSONNE par défaut (V : vue à la troisième personne), réticule, pause sur Échap (menu de pause).
+##
+## Touches : ZQSD/WASD (selon le clavier) ou flèches · souris : regarder (clic pour recapturer) · Échap : pause
+##           Maj courir · Espace sauter · E activer · V changer de vue · F3 infos techniques · F5/F6/F7 ambiance · Ctrl+Suppr : oublier la sauvegarde
 
 const MAP_PATH := "res://config/islands/ile_ouverture.json"
 const CACHE_DIR := "user://cache"
@@ -46,6 +48,8 @@ var _banner_t := -1.0
 var _toast: Label
 var _toast_t := -1.0
 var _in_range := false
+var _reticle: Control
+var _hint: Label
 
 func _ready() -> void:
 	GameInput.ensure()
@@ -55,10 +59,12 @@ func _ready() -> void:
 	island_id = String(map.get("id", "ile"))
 	if Engine.is_editor_hint():
 		return
-	App.set_scene_help("Île d'ouverture · F5 jour · F6 coucher · F7 nuit · Ctrl+Suppr oublier la sauvegarde de l'île")
+	App.set_tech_default(false)            # infos techniques à la demande (F3)
+	App.capture_on_resume = true
+	App.set_scene_help("Île d'ouverture · V vue 1re/3e personne · F5 jour · F6 coucher · F7 nuit · Ctrl+Suppr oublier la sauvegarde de l'île")
 	App.set_controls_help(PackedStringArray([
-		"%s bouger (ou flèches) · souris caméra · Maj courir · Espace sauter · %s activer" % [GameInput.move_keys_label(), GameInput.key_label("interact")],
-		"Clic : capturer la souris · Échap : la libérer · molette : distance de la caméra",
+		"%s bouger (ou flèches) · souris regarder · Maj courir · Espace sauter · %s activer" % [GameInput.move_keys_label(), GameInput.key_label("interact")],
+		"Clic : recapturer la souris · Échap : pause · V : changer de vue · molette : distance (3e personne)",
 	]))
 	if OS.get_cmdline_user_args().has("--sans-cache"):
 		use_cache = false
@@ -74,6 +80,11 @@ func _ready() -> void:
 		return
 	_start_build()
 
+func _exit_tree() -> void:
+	# retour au menu pendant la construction : le fil est joint plus tard (App), sans bloquer le retour
+	if _thread != null and _thread.is_started():
+		App.adopt_thread(_thread)
+
 func _start_build() -> void:
 	_loading.text = "Construction de l'île d'ouverture (première ouverture : une à deux minutes)…"
 	_loading.visible = true
@@ -84,6 +95,8 @@ func _start_build() -> void:
 		call_deferred("_on_built"))
 
 func _on_built() -> void:
+	if not is_inside_tree():
+		return
 	_thread.wait_to_finish()
 	world = _result
 	nodes = Node3D.new()
@@ -208,7 +221,11 @@ func _start_game() -> void:
 	add_child(camrig)
 	camrig.yaw = spawn_yaw
 	camrig.arm.add_excluded_object(explorer.get_rid())
+	camrig.first_person = not OS.get_cmdline_user_args().has("--3e-personne")
+	if camrig.first_person:
+		camrig.pitch = 0.0
 	camrig.snap()
+	_reticle.visible = camrig.first_person
 	var a: Dictionary = info["anchor"]
 	anchor_fx = AnchorFx.new()
 	anchor_fx.name = "AnchorFx"
@@ -272,6 +289,22 @@ func _make_hud() -> void:
 	_toast.offset_top = 90
 	_toast.visible = false
 	_hud_layer.add_child(_toast)
+	_reticle = Control.new()
+	_reticle.set_anchors_preset(Control.PRESET_CENTER)
+	_reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_reticle.visible = false
+	_reticle.draw.connect(func() -> void:
+		_reticle.draw_circle(Vector2.ZERO, 3.6, Color(0, 0, 0, 0.45))
+		_reticle.draw_circle(Vector2.ZERO, 2.2, Color(1, 1, 1, 0.9)))
+	_hud_layer.add_child(_reticle)
+	_hint = _label(14, HORIZONTAL_ALIGNMENT_RIGHT)
+	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	_hint.offset_left = -420
+	_hint.offset_right = -18
+	_hint.offset_top = -34
+	_hint.modulate.a = 0.7
+	_hint.text = "Échap · pause    F3 · infos techniques"
+	_hud_layer.add_child(_hint)
 	_loading = _label(26, HORIZONTAL_ALIGNMENT_CENTER)
 	_loading.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	_loading.offset_left = -500
@@ -347,6 +380,7 @@ func _process(delta: float) -> void:
 	if not ready_to_play:
 		return
 	camrig.interior = _is_interior(explorer.global_position)
+	_reticle.visible = camrig.first_person
 	explorer.cam_yaw = camrig.yaw
 	_objective.text = objective_text()
 	_in_range = anchor_in_range()

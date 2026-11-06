@@ -1,7 +1,10 @@
 class_name ThirdPersonCamera
 extends Node3D
-## Caméra à la troisième personne : orbite à la souris autour de l'explorateur, bras à ressort qui évite les murs,
-## rapprochement automatique en intérieur. Clic : capturer la souris · Échap : la libérer · molette : distance.
+## Caméra de l'explorateur : PREMIÈRE PERSONNE par défaut (Lot 6, à hauteur des yeux, suit le lissage des marches) ou
+## troisième personne (touche V) : orbite à la souris, bras à ressort qui évite les murs, rapprochement en intérieur.
+## Le clic recapture la souris ; la pause (Échap) est gérée par App.
+
+const EYE_HEIGHT := 1.6
 
 var target: Node3D
 var yaw := 0.0
@@ -12,6 +15,7 @@ var dist_out := 4.6
 var dist_in := 1.8
 var arm: SpringArm3D
 var cam: Camera3D
+var first_person := false : set = set_first_person
 var _h := 1.55
 
 func _ready() -> void:
@@ -31,35 +35,79 @@ func _ready() -> void:
 	cam.far = 2500.0
 	arm.add_child(cam)
 	cam.current = true
+	_apply_mode()
+
+func set_first_person(v: bool) -> void:
+	first_person = v
+	if arm != null:
+		_apply_mode()
+
+func _apply_mode() -> void:
+	cam.fov = 76.0 if first_person else 64.0
+	arm.shape = null if first_person else _sphere()
+	if first_person:
+		arm.spring_length = 0.0
+		pitch = clampf(pitch, -1.4, 1.4)
+	else:
+		pitch = clampf(pitch, -1.25, 0.55)
+		arm.spring_length = dist_in if interior else dist_out
+	var ex := target as Explorer
+	if ex and ex.model:
+		ex.model.visible = not first_person
+
+func _sphere() -> SphereShape3D:
+	var s := SphereShape3D.new()
+	s.radius = 0.2
+	return s
+
+func toggle_view() -> void:
+	set_first_person(not first_person)
+	snap()
 
 func snap() -> void:
 	if target:
-		global_position = target.global_position + Vector3(0, _h, 0)
+		global_position = _goal()
 		rotation = Vector3(pitch, yaw, 0)
-		arm.spring_length = dist_in if interior else dist_out
+		arm.spring_length = 0.0 if first_person else (dist_in if interior else dist_out)
+
+## Point visé par la caméra : yeux (1re personne, avec le lissage des marches du modèle) ou épaule (3e personne).
+func _goal() -> Vector3:
+	var base := target.global_position
+	if first_person:
+		var ex := target as Explorer
+		var off := Vector3.ZERO
+		if ex and ex.model:
+			off = Vector3(0.0, ex.model.position.y, 0.0)        # le corps a « sauté » une marche : l'œil rattrape en douceur
+		return base + Vector3(0, EYE_HEIGHT, 0) + off
+	return base + Vector3(0, _h, 0)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		var mm := event as InputEventMouseMotion
 		yaw -= mm.relative.x * sensitivity
-		pitch = clampf(pitch - mm.relative.y * sensitivity, -1.25, 0.55)
+		var lim := 1.45 if first_person else 1.25
+		pitch = clampf(pitch - mm.relative.y * sensitivity, -lim, 1.45 if first_person else 0.55)
 	elif event is InputEventMouseButton and event.pressed:
 		var mb := event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_LEFT and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		elif mb.button_index == MOUSE_BUTTON_WHEEL_UP:
+		elif not first_person and mb.button_index == MOUSE_BUTTON_WHEEL_UP:
 			dist_out = clampf(dist_out - 0.4, 2.2, 9.0)
-		elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		elif not first_person and mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			dist_out = clampf(dist_out + 0.4, 2.2, 9.0)
-	elif event is InputEventKey and event.pressed and (event as InputEventKey).keycode == KEY_ESCAPE:
-		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	elif event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_V:
+		toggle_view()
 
 func _process(delta: float) -> void:
 	if target == null:
 		return
+	if first_person:
+		global_position = _goal()           # sans retard : la vue suit exactement le corps
+		rotation = Vector3(pitch, yaw, 0)
+		return
 	var h := 1.45 if interior else 1.55
 	_h = lerpf(_h, h, clampf(delta * 4.0, 0.0, 1.0))
-	var goal := target.global_position + Vector3(0, _h, 0)
+	var goal := _goal()
 	global_position = global_position.lerp(goal, clampf(1.0 - exp(-14.0 * delta), 0.0, 1.0))
 	var want_pitch := pitch
 	if interior:

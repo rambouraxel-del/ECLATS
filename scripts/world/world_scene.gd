@@ -16,6 +16,7 @@ var env: EnvironmentManager
 var cam: FreeCamera
 var nodes: Node3D
 var _label: Label
+var _loading: Label
 var _thread: Thread
 var _building := false
 var _tex_on := true
@@ -36,15 +37,36 @@ func _ready() -> void:
 	_label.add_theme_constant_override("shadow_offset_x", 1)
 	_label.add_theme_constant_override("shadow_offset_y", 1)
 	layer.add_child(_label)
+	_loading = Label.new()
+	_loading.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_loading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_loading.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_loading.add_theme_font_size_override("font_size", 28)
+	_loading.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
+	_loading.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	_loading.add_theme_constant_override("shadow_offset_x", 2)
+	_loading.add_theme_constant_override("shadow_offset_y", 2)
+	layer.add_child(_loading)
 	if not Engine.is_editor_hint():
+		if App.launch.has("profile"):
+			profile = String(App.launch["profile"])
+			world_seed = int(App.launch.get("seed", world_seed))
+		App.set_tech_default(true)
 		App.set_scene_help("Île générée · vues 1-9,0 · F5 jour · F6 coucher · F7 nuit · Y cycle · N/B île · G profil · R régénérer · V validation")
 		_generate()
+
+func _exit_tree() -> void:
+	# retour au menu pendant la génération : le fil est joint plus tard, sans bloquer
+	if _thread != null and _thread.is_started():
+		App.adopt_thread(_thread)
 
 func _generate() -> void:
 	if _building:
 		return
 	_building = true
 	_label.text = "Génération de l'île « %s » (graine %d)…" % [profile, world_seed]
+	_loading.text = "Génération de l'île « %s » (graine %d)…" % [profile, world_seed]
+	_loading.visible = true
 	var p := profile
 	var s := world_seed
 	_thread = Thread.new()
@@ -53,6 +75,8 @@ func _generate() -> void:
 		call_deferred("_on_built"))
 
 func _on_built() -> void:
+	if not is_inside_tree():
+		return
 	_thread.wait_to_finish()
 	world = _result
 	_validation = WorldValidator.validate(world, {"buildings": false})
@@ -61,6 +85,7 @@ func _on_built() -> void:
 	nodes = Node3D.new()
 	nodes.name = "Generated"
 	add_child(nodes)
+	_loading.visible = false
 	var t0 := Time.get_ticks_msec()
 	WorldView.create(world, nodes)
 	env.setup(world.seed)
