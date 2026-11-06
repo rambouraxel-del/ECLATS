@@ -114,6 +114,10 @@
 		{"key": "iron_rust", "name": "Fer rouillé", "color": "#6d4c3b", "variation": 0.04, "roughness": 0.7, "emission": 0, "style": "metal", "metallic": 0.35, "wear": 1.0},
 		{"key": "soot", "name": "Suie", "color": "#2d2825", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "default", "metallic": 0, "wear": 0.5},
 		{"key": "ember_glow", "name": "Braise vive", "color": "#e0672a", "variation": 0.04, "roughness": 0.6, "emission": 2.2, "style": "crystal", "metallic": 0, "wear": 0.2},
-		{"key": "sack_cloth", "name": "Toile de sac", "color": "#b8a27a", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.5}
+		{"key": "sack_cloth", "name": "Toile de sac", "color": "#b8a27a", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.5},
+		{"key": "cloth_slate", "name": "Cape bleu ardoise", "color": "#5b6b7c", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.35},
+		{"key": "cloth_slate_dark", "name": "Doublure ardoise", "color": "#3f4a57", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.35},
+		{"key": "skin", "name": "Peau", "color": "#c99a7c", "variation": 0.02, "roughness": 0.8, "emission": 0, "style": "default", "metallic": 0, "wear": 0.0},
+		{"key": "cloth_linen", "name": "Lin écru", "color": "#cbbf9f", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.3}
 	]
 }

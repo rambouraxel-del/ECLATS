@@ -1,7 +1,7 @@
 extends Node
 ## Autoload « App » : raccourcis globaux et petit panneau d'aide.
 ##   F1 : laboratoire graphique   F2 : première île   F4 : île habitée (Lot 3)   F8 : galerie de matériaux
-##   F9 : île générée (Lot 4, génération structurelle)
+##   F9 : île générée (Lot 4, génération structurelle)   F10 : île d'ouverture (Lot 5, jouable)
 ##   L : éclairage suivant
 ##   F3 : afficher / masquer l'aide   F11 : plein écran
 
@@ -11,11 +11,13 @@ const SCENES := {
 	KEY_F4: "res://scenes/island/colony_island.tscn",
 	KEY_F8: "res://scenes/lab/material_gallery.tscn",
 	KEY_F9: "res://scenes/world/settled_island.tscn",
+	KEY_F10: "res://scenes/game/opening_island.tscn",
 }
 
 var _hud: Label
 var _layer: CanvasLayer
 var _extra_help := ""
+var _controls_help := PackedStringArray()
 
 func _ready() -> void:
 	if DisplayServer.get_name() == "headless":
@@ -36,12 +38,18 @@ func _ready() -> void:
 func set_scene_help(text: String) -> void:
 	_extra_help = text
 
+## Lignes de commandes propres à la scène (remplacent celles de la caméra libre), ex. l'explorateur du Lot 5.
+func set_controls_help(lines: PackedStringArray) -> void:
+	_controls_help = lines
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if key == null or not key.pressed or key.echo:
 		return
 	if SCENES.has(key.keycode):
 		_extra_help = ""
+		_controls_help = PackedStringArray()
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		get_tree().change_scene_to_file(SCENES[key.keycode])
 	elif key.keycode == KEY_L:
 		var rig := get_tree().get_first_node_in_group("lighting_rig") as LightingRig
@@ -73,9 +81,12 @@ func _process(_delta: float) -> void:
 	elif rig:
 		lines.append("Éclairage : %s" % rig.current_name())
 	lines.append("")
-	lines.append("ZQSD/WASD bouger · souris regarder · Espace/Ctrl monter/descendre · Shift accélérer")
-	lines.append("Molette vitesse/zoom · Tab vol/orbite · Échap libérer la souris (clic pour reprendre)")
-	lines.append("F1 laboratoire · F2 île · F4 colonie · F9 île générée · F8 matériaux · L éclairage · F3 aide · F11 plein écran")
+	if _controls_help.is_empty():
+		lines.append("ZQSD/WASD bouger · souris regarder · Espace/Ctrl monter/descendre · Shift accélérer")
+		lines.append("Molette vitesse/zoom · Tab vol/orbite · Échap libérer la souris (clic pour reprendre)")
+	else:
+		lines.append_array(_controls_help)
+	lines.append("F1 laboratoire · F2 île · F4 colonie · F9 île générée · F10 île d'ouverture · F8 matériaux · L éclairage · F3 aide · F11 plein écran")
 	if _extra_help != "":
 		lines.append(_extra_help)
 	_hud.text = "\n".join(lines)

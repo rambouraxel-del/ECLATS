@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/opening_island.gd" id="1_open"]
+[ext_resource type="Script" path="res://scripts/rendering/environment_manager.gd" id="2_env"]
+
+[node name="OpeningIsland" type="Node3D"]
+script = ExtResource("1_open")
+
+[node name="Environment" type="Node3D" parent="."]
+script = ExtResource("2_env")
+start_preset = "village_day"

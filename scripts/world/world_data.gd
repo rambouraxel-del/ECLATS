@@ -24,6 +24,7 @@ var timings := {}                       # ms par phase
 var stats := {}
 var failures: Array[Dictionary] = []
 var events: Array[String] = []          # journal : corrections et rejets (jamais silencieux)
+var authored := {}                      # île dessinée (Lot 5) : carte, tuiles de terrain, sous-face, ancre, départ…
 
 func log_event(msg: String) -> void:
 	events.append(msg)

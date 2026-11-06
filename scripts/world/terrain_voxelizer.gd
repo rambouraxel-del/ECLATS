@@ -12,7 +12,8 @@ extends RefCounted
 
 const V := VoxelGrid.VOXEL_SIZE
 
-static func build(field: TerrainField) -> IslandData:
+## `rect` (colonnes) : ne voxélise qu'une partie de l'île (tuiles des grandes îles du Lot 5) ; vide = toute l'île.
+static func build(field: TerrainField, rect := Rect2i()) -> IslandData:
 	var pal := VoxelPalette.get_default()
 	var m := {
 		"dirt": pal.id("dirt"), "dirt_dry": pal.id("dirt_dry"), "dirt_fertile": pal.id("dirt_fertile"),
@@ -22,39 +23,49 @@ static func build(field: TerrainField) -> IslandData:
 		"root": pal.id("root"), "moss": pal.id("moss"),
 	}
 	var n := field.n
+	var r := Rect2i(0, 0, n, n) if rect.size == Vector2i.ZERO else rect
+	var rx := r.position.x
+	var rz := r.position.y
+	var sx := r.size.x
+	var sz := r.size.y
 	var min_y := 1 << 20
 	var max_y := -(1 << 20)
 	var roots: Array = field.landmarks.get("roots", [])
-	for i in n * n:
-		if field.top[i] == TerrainField.NO_GROUND:
-			continue
-		min_y = mini(min_y, field.bottom[i])
-		max_y = maxi(max_y, field.top[i])
-	var root_max := 14
+	for cz in range(rz, r.end.y):
+		for cx in range(rx, r.end.x):
+			var i := cx + cz * n
+			if field.top[i] == TerrainField.NO_GROUND:
+				continue
+			min_y = mini(min_y, field.bottom[i])
+			max_y = maxi(max_y, field.top[i])
+	if min_y > max_y:
+		return null
+	var root_max := 14 if not roots.is_empty() else 0
 	var y_off := -(min_y - 1 - root_max)
-	var size := Vector3i(n, max_y - min_y + 3 + root_max, n)
+	var size := Vector3i(sx, max_y - min_y + 3 + root_max, sz)
 	var data := IslandData.new()
 	data.seed = field.seed
 	data.core = VoxelVolume.new(size)
 	data.surface = VoxelVolume.new(size)
 	data.solid = PackedByteArray()
 	data.solid.resize(data.core.data.size())
-	data.origin_cell = Vector3i(field.origin.x, -y_off, field.origin.y)
+	data.origin_cell = Vector3i(field.origin.x + rx, -y_off, field.origin.y + rz)
 	data.top = PackedInt32Array()
-	data.top.resize(n * n)
+	data.top.resize(sx * sz)
 	data.top.fill(-1)
 	data.top_material = PackedByteArray()
-	data.top_material.resize(n * n)
+	data.top_material.resize(sx * sz)
 	var core_data := data.core.data
 	var surf_data := data.surface.data
 	var solid := data.solid
-	var stride_z := n
-	var stride_y := n * n
+	var stride_z := sx
+	var stride_y := sx * sz
 	var warp := WorldRng.noise(field.seed, "strata", 0.035, 2)
 	var band_cache := {}
-	for cz in n:
-		for cx in n:
+	for cz in range(rz, r.end.y):
+		for cx in range(rx, r.end.x):
 			var ci := cx + cz * n
+			var li := (cx - rx) + (cz - rz) * sx
 			var top := field.top[ci]
 			if top == TerrainField.NO_GROUND:
 				continue
@@ -98,19 +109,19 @@ static func build(field: TerrainField) -> IslandData:
 				else:
 					mat = _strata(field.seed, y, wv, top - bot, m, band_cache, top)
 				var vy := y + y_off
-				var idx := cx + cz * stride_z + vy * stride_y
+				var idx := li + vy * stride_y
 				solid[idx] = 1
 				if y <= core_top:
 					core_data[idx] = mat
 				else:
 					surf_data[idx] = mat
-			data.top[ci] = top + y_off
-			data.top_material[ci] = top_mat
+			data.top[li] = top + y_off
+			data.top_material[li] = top_mat
 	# Cristaux à la pointe des cônes de la sous-face (position structurée, pas de semis).
 	for s in field.landmarks.get("spikes", []):
 		var col := field.col_of_m(s.c.x, s.c.y)
 		var ci := col.x + col.y * n
-		if not field.has_ground(col.x, col.y):
+		if not field.has_ground(col.x, col.y) or not r.has_point(col):
 			continue
 		var tip := field.bottom[ci]
 		if int(s.len) >= 4.0 and WorldRng.sub_seed(field.seed, "crystal_%d_%d" % [col.x, col.y]) % 3 != 0:
@@ -119,10 +130,10 @@ static func build(field: TerrainField) -> IslandData:
 					if absi(dx) + absi(dz) > 1:
 						continue
 					for dy in range(-2, 1):
-						var x := col.x + dx
-						var z := col.y + dz
+						var x := col.x + dx - rx
+						var z := col.y + dz - rz
 						var vy := tip + dy + y_off
-						if x < 0 or z < 0 or x >= n or z >= n or vy < 0:
+						if x < 0 or z < 0 or x >= sx or z >= sz or vy < 0 or vy >= size.y:
 							continue
 						var idx := x + z * stride_z + vy * stride_y
 						if solid[idx] != 0 and dy >= -1:
@@ -130,18 +141,18 @@ static func build(field: TerrainField) -> IslandData:
 	# Racines pendantes sous le bord (cœur : non destructibles).
 	for rt in roots:
 		var col := field.col_of_m(rt.c.x, rt.c.y)
-		if not field.has_ground(col.x, col.y):
+		if not field.has_ground(col.x, col.y) or not r.has_point(col):
 			continue
 		var ci := col.x + col.y * n
-		var x := col.x
+		var x := col.x - rx
 		for k in int(rt.len):
 			var y := field.bottom[ci] - 1 - k
 			var vy := y + y_off
 			if vy < 0:
 				break
 			if k > 1 and (k * 7 + col.x) % 5 == 0:
-				x = clampi(x + (1 if (k + col.y) % 2 == 0 else -1), 0, n - 1)
-			var idx := x + col.y * stride_z + vy * stride_y
+				x = clampi(x + (1 if (k + col.y) % 2 == 0 else -1), 0, sx - 1)
+			var idx := x + (col.y - rz) * stride_z + vy * stride_y
 			if solid[idx] == 0:
 				core_data[idx] = m["root"]
 				solid[idx] = 1

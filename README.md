@@ -1,9 +1,17 @@
-# ÉCLATS — fondations graphiques 3D (Lots 1 à 4)
+# ÉCLATS — fondations graphiques 3D (Lots 1 à 5)
 
 RPG d'exploration et de construction sur des îles flottantes. Ce dépôt contient le
 **premier prototype visuel** (Godot 4, GDScript, rendu Forward+) : un laboratoire
 graphique, une première île voxel générée par seed, et une bibliothèque de 10 objets.
 Pas de personnage, de quêtes, d'inventaire ni de combat dans ce lot.
+
+**Lot 5** : **île d'ouverture jouable** (scène de démarrage, touche **F10**) : une île **fixe** dessinée à la main
+(≈ 30 000 m², carte JSON éditable), un explorateur à cape bleu ardoise à la troisième personne (ZQSD / WASD, collisions,
+maison visitable avec étage), du quai au sanctuaire en ≈ 4 min 30 de marche, objectif « Rejoindre le sanctuaire »,
+activation de l'Ancre (« E · Activer l'Ancre », pulsation cyan, « Île découverte ») et sauvegarde.
+Voir [docs/ILE_OUVERTURE.md](docs/ILE_OUVERTURE.md) et [docs/BILAN_LOT5.md](docs/BILAN_LOT5.md).
+
+![Plan de l'île d'ouverture](docs/captures/lot5/00_plan.png)
 
 **Lot 4** : **refonte structurelle de la génération** (touche **F9**) : terrain hiérarchique par profils, système de
 placement universel (réservations, exceptions déclarées, refus explicites), colonie qui s'adapte au relief, bâtiments
@@ -31,16 +39,24 @@ des planches de concept (`docs/references/`).
 1. Télécharger **Godot 4.3 (ou plus récent, 4.x) — version standard**, pas « .NET » :
    <https://godotengine.org/download/windows/> puis dézipper (aucune installation).
 2. Récupérer le projet : bouton **Code → Download ZIP** sur GitHub (branche
-   `claude/nifty-pascal-km2czc` ; **Lot 4 : branche `claude/lot4-generation-coherente`**), ou `git clone` puis `git checkout claude/lot4-generation-coherente`.
+   `claude/nifty-pascal-km2czc` ; Lot 4 : `claude/lot4-generation-coherente` ; **Lot 5 : branche `claude/lot5-ile-ouverture`**),
+   ou `git clone` puis `git checkout claude/lot5-ile-ouverture`.
 3. Lancer `Godot_v4.x-stable_win64.exe` → **Importer** → choisir le fichier `project.godot`
    du dossier → **Importer et éditer**. Le premier import prend quelques secondes.
-4. Appuyer sur **F5** (ou le bouton ▶ en haut à droite) : le laboratoire s'ouvre.
-   **F2** passe à l'île, **F1** revient au laboratoire.
+4. Appuyer sur **F5** (ou le bouton ▶ en haut à droite) : l'**île d'ouverture** s'ouvre (première ouverture :
+   construction de l'île, une à deux minutes, puis quelques secondes les fois suivantes grâce au cache).
+   **F9** ouvre l'île générée du Lot 4, **F1** le laboratoire, **F2** la première île.
 
 Pour ouvrir une scène précise dans l'éditeur : `scenes/lab/graphics_lab.tscn` ou
 `scenes/island/first_island.tscn`, puis **F6** (lancer la scène courante).
 
 ## Commandes
+
+**Île d'ouverture (F10, Lot 5)** : Z Q S D / W A S D (ou flèches) se déplacer · souris caméra (clic : capturer,
+Échap : libérer) · molette distance · Maj courir · Espace sauter · **E activer l'Ancre** · F5 / F6 / F7 ambiance ·
+Ctrl + Suppr oublier la sauvegarde de l'île. Détails : [docs/ILE_OUVERTURE.md](docs/ILE_OUVERTURE.md).
+
+Autres scènes (caméra libre) :
 
 | Touche | Action |
 |---|---|
@@ -51,7 +67,7 @@ Pour ouvrir une scène précise dans l'éditeur : `scenes/lab/graphics_lab.tscn`
 | Molette | Vitesse (vol) ou distance (orbite) |
 | Tab | Basculer vol libre / orbite autour de l'île |
 | Échap | Libérer la souris (clic gauche pour la reprendre) |
-| F1 / F2 / F4 / F8 / **F9** | Laboratoire / Première île (Lot 2) / Île habitée (Lot 3) / Galerie de matériaux / **Île générée (Lot 4)** |
+| F1 / F2 / F4 / F8 / **F9** / **F10** | Laboratoire / Première île (Lot 2) / Île habitée (Lot 3) / Galerie de matériaux / **Île générée (Lot 4)** / **Île d'ouverture (Lot 5)** |
 | L | Éclairage suivant (plein jour, heure dorée, neutre, crépuscule) |
 | F3 | Masquer / afficher l'aide |
 | F11 | Plein écran |
@@ -81,8 +97,9 @@ Sous Windows (PowerShell, depuis le dossier du projet) :
 
 Sous Linux / CI : `GODOT=/chemin/godot tools/check.sh`. La même vérification tourne
 automatiquement sur GitHub à chaque push (`.github/workflows/godot-check.yml`).
-Elle importe le projet en mode headless puis lance `tests/run_checks.gd` (180 contrôles, Lots 1 à 3) et
-`tests/run_checks_lot4.gd` (121 contrôles rapides du Lot 4). `ECLATS_MONDE=1 tools/check.sh` (ou `check.ps1 -Monde`)
+Elle importe le projet en mode headless puis lance `tests/run_checks.gd` (180 contrôles, Lots 1 à 3),
+`tests/run_checks_lot4.gd` (121 contrôles rapides du Lot 4) et `tests/run_checks_lot5.gd` (île d'ouverture).
+Partie jouée automatique du Lot 5 : `godot --headless --fixed-fps 60 -s tools/opening_recette.gd -- rapport.json`. `ECLATS_MONDE=1 tools/check.sh` (ou `check.ps1 -Monde`)
 ajoute la validation d'îles complètes sur plusieurs graines et profils (+ 15 contrôles, ≈ 10 min sans GPU).
 
 Diagnostic d'une génération (rapport lisible + JSON) :
@@ -94,11 +111,14 @@ Diagnostic d'une génération (rapport lisible + JSON) :
 - `config/lighting.json` : les préréglages d'éclairage (soleil, ciel, brouillard, lueur).
 - `config/environment.json` : plafonds d'exposition, brume, nuages, îles lointaines, cycle jour/nuit (Lot 4).
 - `config/profiles/*.json` : profils d'île (relief, falaises, climat, programme de colonie, végétation, rochers).
+- `config/islands/ile_ouverture.json` : **carte fixe de l'île d'ouverture** (relief, chemins, bâtiments, arbres, rochers, objets, Ancre, départ).
 - `materials/voxel.gdshader` : rendu commun des voxels (liseré des arêtes, émission).
 - Île : sélectionner le nœud `Island` dans `first_island.tscn` → seed, rayon, profondeur, collines.
 
 ## Documentation
 
+- [docs/ILE_OUVERTURE.md](docs/ILE_OUVERTURE.md) — **île d'ouverture** : accès, commandes, parcours, modifier la carte (Lot 5).
+- [docs/BILAN_LOT5.md](docs/BILAN_LOT5.md) — bilan du Lot 5 (recette jouée, mesures, captures, limites).
 - [docs/GENERATION_MONDE.md](docs/GENERATION_MONDE.md) — **règles et architecture de la génération** (Lot 4).
 - [docs/BILAN_LOT4.md](docs/BILAN_LOT4.md) — bilan du Lot 4 (audit, refonte, mesures, contrôles auto vs validations GPU).
 - [docs/DIRECTION_ARTISTIQUE.md](docs/DIRECTION_ARTISTIQUE.md) — **référence artistique** (planches dans `docs/references/`).
