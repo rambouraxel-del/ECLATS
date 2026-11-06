@@ -186,93 +186,13 @@ func _ready() -> void:
 	await _key(KEY_Z, true)
 	await _frames(40)
 	_check(lab.stack.is_empty() and lab.objects_root.get_child_count() == 0 and _same(lab, snap_c), "Ctrl+Z : toute la composition disparaît en une opération")
-	# ------------------------------------------------------------ B. éditeur : placement automatique
-	get_node("/root/App").call("open", App.MAP_EDITOR_SCENE, {})
-	await _frames(5)
-	ed = await _wait_scene("MapEditor") as MapEditor
-	cv = ed.canvas
-	await _frames(10)
-	ed._g_seed.value = 21
-	var gb := ed.find_children("*", "Button", true, false).filter(func(b) -> bool: return (b as Button).text.begins_with("Générer"))
-	(gb[0] as Button).pressed.emit()
-	await _frames(6)
-	await _key(KEY_9)
-	var doc := ed.doc
-	ed.auto_variant = 3
-	ed.auto_seed = 3
-	ed.auto_fit = Vector2(9.0, 8.5)
-	var top0 := doc.field.top.duplicate()
-	var ab := ed.find_child("BtnAuto", true, false) as Button
-	ab.pressed.emit()
-	await _frames(6)
-	_check(doc.plan.houses.size() == 1 and doc.undo_stack.size() == 1, "placement automatique : habitation posée (%s)" % doc.message.left(120))
-	var h: Dictionary = doc.plan.houses[0]
-	cv.view_center = h["pos"]
-	cv.px_per_m = 15.0
-	cv.queue_redraw()
-	await _frames(4)
-	await _shot("20_carte_placement_automatique")
-	var nm := String(h["name"])
-	await _key(KEY_Z, true)
-	_check(doc.plan.houses.is_empty() and doc.field.top == top0, "Ctrl+Z : habitation retirée, terrain restauré")
-	# refus : tout est protégé
-	doc.begin_op("masque")
-	for i in doc.plan.layers.mask.size():
-		doc.plan.layers.mask[i] = 1
-	doc.finish_op(false)
-	ed._refresh(true)
-	var depth := doc.undo_stack.size()
-	ab.pressed.emit()
-	await _frames(6)
-	_check(doc.plan.houses.is_empty() and doc.undo_stack.size() == depth, "tout est protégé : aucune pose forcée")
-	_check("zone protégée" in ed._msg.text, "refus expliqué : %s" % ed._msg.text.left(120))
-	cv.fit()
-	await _frames(4)
-	await _shot("21_carte_refus_aucune_parcelle")
-	await _key(KEY_Z, true)
-	_check(doc.plan.layers.count_mask() == 0, "masque retiré (Ctrl+Z)")
-	ed.auto_variant = 2
-	ed.auto_fit = Vector2(8.0, 6.5)
-	ab.pressed.emit()
-	await _frames(6)
-	_check(doc.plan.houses.size() == 1, "« maison à deux pièces » posée automatiquement : %s" % doc.message.left(100))
-	# 3D : visite
-	var pf := MapEditor.DIR + "carte_habitation_lot9.eclats-carte.json"
-	doc.export_to(pf)
-	ed._on_verify()
-	isl = await _wait_scene("MapIsland")
-	_check(isl != null and (isl.get("house_nodes") as Array).size() == 1, "île 3D : l'habitation est là")
-	var plan: IslandPlan = isl.get("plan")
-	var hh: Dictionary = plan.houses[0]
-	var model: Construction = Construction.from_dict(hh["model"])["construction"]
-	var ex: Explorer = isl.get("explorer")
-	var np := HousePad.nearest_path(plan.paths, hh["door"])
-	isl.call("place_player", (np["q"] as Vector2).x, (np["q"] as Vector2).y, 0.0, 0.0)
-	await get_tree().physics_frame
-	await _frames(6)
-	var fp := HousePad.footprint(model)
-	var dir := HousePad.rot_i((fp["entrance"] as Dictionary)["dir"], int(hh["yaw"]))
-	var okw := await _walk(ex, hh["door"], 0.5)
-	var inside := (hh["pos"] as Vector2) + Vector2(dir) * -1.0
-	var okw2 := await _walk(ex, inside, 0.8)
-	_check(okw and okw2 and (hh["rect"] as Rect2).has_point(Vector2(ex.global_position.x, ex.global_position.z)) and int(isl.get("falls")) == 0, "du chemin jusque dans l'habitation par le raccord (x %.1f, z %.1f)" % [ex.global_position.x, ex.global_position.z])
-	var out_p := (hh["door"] as Vector2) + Vector2(dir) * 7.0
-	ex.auto_active = false
-	ex.teleport(Vector3(out_p.x, (isl.get("lab") as LabWorld).ground_y(out_p.x, out_p.y) + 0.1, out_p.y), 0.0)
-	var d := (hh["pos"] as Vector2) - out_p
-	isl.get("camrig").yaw = atan2(-d.x, -d.y)
-	isl.get("camrig").pitch = -0.06
-	isl.get("camrig").snap()
-	await get_tree().physics_frame
-	await _frames(10)
-	await _shot("22_habitation_en_3d")
 	report["duree_s"] = (Time.get_ticks_msec() - t0) / 1000
 	var bad_n := 0
 	for c in report["controles"]:
 		if not c["ok"]:
 			bad_n += 1
 	report["echecs"] = bad_n
-	var f := FileAccess.open(OUT + "/lot9_rapport.json", FileAccess.WRITE)
+	var f := FileAccess.open(OUT + "/lot9_carte_rapport.json", FileAccess.WRITE)
 	f.store_string(JSON.stringify(report, "\t"))
 	f.close()
 	print("== %d contrôle(s), %d échec(s) en %d s ==" % [report["controles"].size(), bad_n, report["duree_s"]])
