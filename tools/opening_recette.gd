@@ -153,9 +153,9 @@ func _play() -> void:
 	var pc := Vector2(float(plaza["center"][0]), float(plaza["center"][1]))
 	var pr := float(plaza["radius"])
 	# --- 1. quai → col → hameau
-	_capture("01_quai_depart", _path_pts("sentier_des_falaises")[2])
-	var legs := [["sentier_des_falaises", "Sentier des falaises"], ["descente_du_col", "Descente du col"]]
-	var caps := {"sentier_des_falaises": {7: "02_sentier_des_falaises", 17: "03_col_pierre_levee"}, "descente_du_col": {3: "03b_vue_sur_le_hameau"}}
+	_capture("01_quai_depart", _path_pts("quai_dallage")[2])
+	var legs := [["quai_dallage", "Chaussée du quai"], ["sentier_des_falaises", "Sentier des falaises"], ["descente_du_col", "Descente du col"]]
+	var caps := {"sentier_des_falaises": {5: "02_sentier_des_falaises", 15: "03_col_pierre_levee"}, "descente_du_col": {4: "03b_vue_sur_le_hameau"}}
 	for lg in legs:
 		var pts := _path_pts(lg[0])
 		var t := await _walk_path(pts, lg[1], caps.get(lg[0], {}))
@@ -211,7 +211,7 @@ func _play() -> void:
 	_capture("07_detour_du_verger", d1[3], -0.15)
 	# --- 6. chute dans le vide : du sentier des falaises vers l'ouest
 	var p1 := _path_pts("sentier_des_falaises")
-	var edge_start: Vector2 = p1[11]
+	var edge_start: Vector2 = p1[p1.size() - 7]      # (-126,25 ; 15) : corniche au bord du vide ouest
 	_teleport(edge_start)
 	var falls0: int = scene.get("falls")
 	ex.auto_active = true

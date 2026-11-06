@@ -1,5 +1,5 @@
 {
- "_doc": "Île d'ouverture du Lot 5 : carte FIXE et ÉDITABLE (mètres ; x vers l'est, z vers le sud, y vers le haut). Le relief se compose dans l'ordre des formes de terrain.shapes (poly/disc/line/bump ; op set = remplace avec fondu 'blend', rough = irrégularité des bords). Chemins = polylignes taillées dans le relief ; bâtiments, arbres, rochers et objets sont posés aux coordonnées données (y calculé). Modifier ce fichier puis relancer : l'île est reconstruite (cache invalidé).",
+ "_doc": "Île d'ouverture du Lot 5 : carte FIXE et ÉDITABLE (mètres ; x vers l'est, z vers le sud, y vers le haut). Le relief se compose dans l'ordre des formes de terrain.shapes (poly/disc/line/bump ; op set = remplace avec fondu 'blend', rough = irrégularité des bords). Chemins = polylignes taillées dans le relief ; bâtiments, arbres, rochers et objets sont posés aux coordonnées données (y calculé). Modifier ce fichier puis relancer : l'île est reconstruite (cache invalidé). Lot 10 : retouchée à la main par tools/lot10_remodelage.py (voir docs/REMODELAGE_LOT10.md).",
  "id": "ile-ouverture-01",
  "name": "Île d'ouverture",
  "version": 1,
@@ -1314,6 +1314,16 @@
     ],
     "r": 15.0,
     "h": 4.0
+   },
+   {
+    "id": "butte_de_revelation",
+    "type": "bump",
+    "c": [
+     -60.0,
+     -25.5
+    ],
+    "r": 11.0,
+    "h": 4.0
    }
   ],
   "core_depth_cells": 20
@@ -1327,20 +1337,41 @@
  },
  "paths": [
   {
+   "id": "quai_dallage",
+   "name": "Dallage du quai",
+   "kind": "main",
+   "width": 2.4,
+   "material": "cobble",
+   "pts": [
+    [
+     -67.5,
+     112.0
+    ],
+    [
+     -67.5,
+     103.5
+    ],
+    [
+     -70.5,
+     99.0
+    ],
+    [
+     -75.0,
+     95.0
+    ],
+    [
+     -82.5,
+     90.0
+    ]
+   ]
+  },
+  {
    "id": "sentier_des_falaises",
    "name": "Sentier des falaises",
    "kind": "main",
    "width": 2.0,
    "material": "path_dirt",
    "pts": [
-    [
-     -67.5,
-     102.5
-    ],
-    [
-     -75.0,
-     96.25
-    ],
     [
      -82.5,
      90.0
@@ -1419,38 +1450,39 @@
      -37.5
     ],
     [
-     -82.5,
-     -32.5
+     -84.0,
+     -34.5
     ],
     [
-     -75.0,
-     -37.5
+     -76.0,
+     -31.5
     ],
     [
-     -65.0,
-     -33.75
+     -68.0,
+     -28.5
     ],
     [
-     -57.5,
-     -23.75
+     -60.0,
+     -25.5
     ],
     [
-     -50.0,
-     -17.5
+     -48.0,
+     -19.4
     ],
     [
-     -37.5,
-     -10.0
+     -37.0,
+     -13.8
     ],
     [
-     -27.5,
-     -5.0
+     -26.0,
+     -8.2
     ],
     [
-     -18.75,
-     -1.25
+     -17.2,
+     -3.7
     ]
-   ]
+   ],
+   "skirt": 24
   },
   {
    "id": "rue_du_hameau",
@@ -1471,7 +1503,8 @@
      25.0,
      5.0
     ]
-   ]
+   ],
+   "skirt": 20
   },
   {
    "id": "lacets_des_hauteurs",
@@ -1578,7 +1611,8 @@
      67.5,
      5.0
     ]
-   ]
+   ],
+   "skirt": 20
   },
   {
    "id": "chemin_de_crete",
@@ -1760,54 +1794,6 @@
   }
  ],
  "props": [
-  {
-   "id": "mooring_post",
-   "pos": [
-    -63.75,
-    107.5
-   ],
-   "yaw": 0
-  },
-  {
-   "id": "crate_stack",
-   "pos": [
-    -76.25,
-    100.0
-   ],
-   "yaw": 1
-  },
-  {
-   "id": "barrel_set",
-   "pos": [
-    -60.0,
-    100.0
-   ],
-   "yaw": 0
-  },
-  {
-   "id": "crystal_lamp",
-   "pos": [
-    -72.5,
-    103.75
-   ],
-   "yaw": 0
-  },
-  {
-   "id": "banner_stand",
-   "pos": [
-    -62.5,
-    98.75
-   ],
-   "yaw": 0
-  },
-  {
-   "id": "signpost",
-   "pos": [
-    -80.0,
-    92.5
-   ],
-   "yaw": 1
-  },
   {
    "id": "watch_tower",
    "pos": [
@@ -2109,6 +2095,206 @@
    "pos": [
     37.5,
     -68.75
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -71.2,
+    112.2
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -63.8,
+    112.2
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "mooring_post",
+   "pos": [
+    -64.0,
+    109.6
+   ],
+   "yaw": 1
+  },
+  {
+   "id": "crate_stack",
+   "pos": [
+    -61.6,
+    110.4
+   ],
+   "yaw": 1
+  },
+  {
+   "id": "barrel_set",
+   "pos": [
+    -60.2,
+    108.8
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crate_stack",
+   "pos": [
+    -61.9,
+    107.9
+   ],
+   "yaw": 2
+  },
+  {
+   "id": "notice_board",
+   "pos": [
+    -71.6,
+    106.4
+   ],
+   "yaw": 3
+  },
+  {
+   "id": "banner_stand",
+   "pos": [
+    -65.2,
+    103.0
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "signpost",
+   "pos": [
+    -72.0,
+    100.4
+   ],
+   "yaw": 1
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -70.0,
+    104.6
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -74.0,
+    93.6
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -83.8,
+    91.8
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "signpost",
+   "pos": [
+    -84.2,
+    92.8
+   ],
+   "yaw": 1
+  },
+  {
+   "id": "banner_stand",
+   "pos": [
+    -16.5,
+    -6.0
+   ],
+   "yaw": 3
+  },
+  {
+   "id": "banner_stand",
+   "pos": [
+    -18.7,
+    -1.8
+   ],
+   "yaw": 3
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -21.6,
+    -8.1
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -23.4,
+    -4.7
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -32.3,
+    -13.5
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -34.1,
+    -10.1
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "market_stall",
+   "pos": [
+    9.5,
+    5.4
+   ],
+   "yaw": 2
+  },
+  {
+   "id": "market_stall",
+   "pos": [
+    14.2,
+    5.6
+   ],
+   "yaw": 2
+  },
+  {
+   "id": "crate_stack",
+   "pos": [
+    11.9,
+    7.6
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "barrel_set",
+   "pos": [
+    16.4,
+    7.3
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -9.7,
+    -9.5
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    -5.3,
+    -9.5
    ],
    "yaw": 0
   }
@@ -2487,6 +2673,82 @@
    "seed": 13204,
    "scale": 1.0,
    "sub": "wall"
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    -60.5,
+    91.0
+   ],
+   "seed": 31001,
+   "scale": 1.0
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    -54.0,
+    93.0
+   ],
+   "seed": 31002,
+   "scale": 1.2
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    -120.19,
+    11.66
+   ],
+   "seed": 31003,
+   "scale": 1.3,
+   "variant": "mass"
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    -128.57,
+    6.38
+   ],
+   "seed": 31004,
+   "scale": 1.0
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    -117.91,
+    -8.46
+   ],
+   "seed": 31005,
+   "scale": 1.5,
+   "variant": "slab"
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    -97.5,
+    -30.0
+   ],
+   "seed": 31006,
+   "scale": 1.0,
+   "variant": "spike"
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    -75.5,
+    -26.0
+   ],
+   "seed": 31007,
+   "scale": 1.2,
+   "variant": "mass"
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    -73.5,
+    -37.5
+   ],
+   "seed": 31008,
+   "scale": 1.0
   }
  ],
  "trees": [
@@ -3187,14 +3449,6 @@
    "seed": 2506
   },
   {
-   "species": "fruit",
-   "pos": [
-    -23.96,
-    2.13
-   ],
-   "seed": 2507
-  },
-  {
    "species": "parasol",
    "pos": [
     -15.16,
@@ -3587,14 +3841,6 @@
    "seed": 2907
   },
   {
-   "species": "parasol",
-   "pos": [
-    -21.25,
-    -11.25
-   ],
-   "seed": 900001
-  },
-  {
    "species": "pine",
    "pos": [
     110.0,
@@ -3609,6 +3855,158 @@
     -85.0
    ],
    "seed": 900003
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -58.0,
+    94.5
+   ],
+   "seed": 30001
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -51.0,
+    97.5
+   ],
+   "seed": 30002
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -119.53,
+    20.54
+   ],
+   "seed": 30003
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -118.65,
+    17.3
+   ],
+   "seed": 30004
+  },
+  {
+   "species": "birch",
+   "pos": [
+    -120.19,
+    15.93
+   ],
+   "seed": 30005
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -116.82,
+    0.93
+   ],
+   "seed": 30006
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -119.0,
+    -1.62
+   ],
+   "seed": 30007
+  },
+  {
+   "species": "birch",
+   "pos": [
+    -117.55,
+    -6.11
+   ],
+   "seed": 30008
+  },
+  {
+   "species": "birch",
+   "pos": [
+    -129.35,
+    -9.71
+   ],
+   "seed": 30009
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -115.04,
+    -11.5
+   ],
+   "seed": 30010
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -125.51,
+    -19.03
+   ],
+   "seed": 30011
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -113.17,
+    -18.08
+   ],
+   "seed": 30012
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -72.0,
+    -24.0
+   ],
+   "seed": 30013
+  },
+  {
+   "species": "pine",
+   "pos": [
+    -67.5,
+    -21.0
+   ],
+   "seed": 30014
+  },
+  {
+   "species": "birch",
+   "pos": [
+    -70.5,
+    -37.0
+   ],
+   "seed": 30015
+  },
+  {
+   "species": "parasol",
+   "pos": [
+    -26.5,
+    4.5
+   ],
+   "seed": 30016
+  },
+  {
+   "species": "parasol",
+   "pos": [
+    3.2,
+    6.8
+   ],
+   "seed": 30017
+  },
+  {
+   "species": "fruit",
+   "pos": [
+    29.4,
+    6.8
+   ],
+   "seed": 30018
+  },
+  {
+   "species": "fruit",
+   "pos": [
+    36.4,
+    8.4
+   ],
+   "seed": 30019
   }
  ],
  "anchor": {
@@ -3622,9 +4020,10 @@
  "spawn": {
   "pos": [
    -67.5,
-   100.0
+   112.5
   ],
-  "yaw_deg": 40
+  "pier_m": 7.0,
+  "yaw_deg": 0.0
  },
  "zones": [
   {

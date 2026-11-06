@@ -246,7 +246,7 @@ func _cells_of(points: PackedVector2Array) -> Array:
 ## Taille un chemin le long d'une polyligne : profil lissé qui suit le relief (pente ≤ 1:2, marches de 20 cm au
 ## plus), raccords imposés sur les tracés existants, la place, les cours et le quai. `regular` : rampe linéaire
 ## entre deux points fixes (marches de même hauteur à intervalles égaux).
-func carve_polyline(points: PackedVector2Array, width: float, material: String, regular := false, name := "") -> bool:
+func carve_polyline(points: PackedVector2Array, width: float, material: String, regular := false, name := "", skirt := 12) -> bool:
 	var cells := _cells_of(points)
 	var keep: Array = []
 	for c: Vector2i in cells:
@@ -332,14 +332,14 @@ func carve_polyline(points: PackedVector2Array, width: float, material: String, 
 		worst = maxi(worst, absi(h[i] - h[i - 1]))
 	if worst > 1:
 		log_event("chemin %s : marche de %d cellules à un raccord" % [name, worst])
-	w.paths._carve(cells, h, width, material)
+	w.paths._carve(cells, h, width, material, skirt)
 	w.paths.routes.append({"from": cells[0], "to": cells[k - 1], "cells": cells, "heights": h, "width": width, "material": material, "name": name})
 	return true
 
 func _paths() -> void:
 	for p: Dictionary in map.get("paths", []):
 		var pts := IslandMap.pts(p["pts"])
-		carve_polyline(pts, float(p.get("width", 1.8)), String(p.get("material", "path_dirt")), bool(p.get("regular", false)), String(p.get("id", "")))
+		carve_polyline(pts, float(p.get("width", 1.8)), String(p.get("material", "path_dirt")), bool(p.get("regular", false)), String(p.get("id", "")), int(p.get("skirt", 12)))
 		if String(p.get("kind", "main")) == "main":
 			for q in pts:
 				if route_points.is_empty() or (route_points.back() as Vector2).distance_to(q) > 0.5:
@@ -484,6 +484,13 @@ func _spawn() -> Dictionary:
 	var s: Dictionary = map.get("spawn", {})
 	var p := IslandMap.v2(s.get("pos", [0, 0]))
 	var g := field.ground_at_m(p.x, p.y)
+	# Lot 10 : `pier_m` pose le départ SUR le ponton, à cette distance (m) du bord de l'île, au milieu du tablier
+	# (le joueur descend du navire : bateau à côté de lui, grève et sentier devant). `pos` reste un point de terre ferme voisin.
+	if s.has("pier_m") and not st.port.is_empty():
+		var rim: Vector2 = st.port["rim"]
+		var axis: Vector2 = st.port["axis"]
+		var q := rim + axis * float(s["pier_m"])
+		return {"pos": Vector3(q.x, float(st.port["deck_top"]) + 0.1, q.y), "yaw_deg": float(s.get("yaw_deg", 0.0))}
 	return {"pos": Vector3(p.x, (0.0 if is_nan(g) else g) + 0.1, p.y), "yaw_deg": float(s.get("yaw_deg", 0.0))}
 
 ## Volumes intérieurs des bâtiments (monde) : la caméra se rapproche quand le joueur y entre.

@@ -232,7 +232,8 @@ func connect_points(a: Vector2i, b: Vector2i, width_m: float, material_key: Stri
 	routes.append(route)
 	return route
 
-func _carve(cells: Array, h: PackedInt32Array, width_m: float, material_key: String) -> void:
+## `skirt` : portée (colonnes de 20 cm) de l'épaule qui raccorde la trace au relief naturel (Lot 10 : réglable par tracé).
+func _carve(cells: Array, h: PackedInt32Array, width_m: float, material_key: String, skirt := 12) -> void:
 	var pal := VoxelPalette.get_default()
 	var mat := pal.id(material_key)
 	var rad := maxf(width_m * 0.5 / V, 0.5)
@@ -277,4 +278,4 @@ func _carve(cells: Array, h: PackedInt32Array, width_m: float, material_key: Str
 		placement.access_mask[j] = 1
 		road_cells[j] = hh
 		band[j] = hh
-	TerrainEditor.apply_skirt(field, band, 12)
+	TerrainEditor.apply_skirt(field, band, skirt)

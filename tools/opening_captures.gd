@@ -61,7 +61,7 @@ func _initialize() -> void:
 	for p in map["paths"]:
 		if p["id"] == "sentier_des_falaises":
 			p1 = p["pts"]
-	var e := Vector2(float(p1[11][0]) - 16.0, float(p1[11][1]))
+	var e := Vector2(float(p1[p1.size() - 7][0]) - 16.0, float(p1[p1.size() - 7][1]))
 	ex.teleport(Vector3(e.x, float(scene.call("ground_y_at", e.x + 16.0, e.y)) + 1.0, e.y), PI * 0.5)
 	cam.yaw = -PI * 0.5 + 0.6
 	cam.pitch = -0.45
