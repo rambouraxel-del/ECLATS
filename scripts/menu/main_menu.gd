@@ -7,6 +7,7 @@ const PROFILES := [["settled", "Colonie (habitée)"], ["verdant", "Verdoyante"],
 ## Scènes de prototype accessibles depuis « Outils développeur » : [libellé, scène, raccourci, note].
 var DEV_SCENES := [
 	["Laboratoire développeur — salle grise", App.LAB_ROOM_SCENE, "F12", "sol plat · point, rectangle, pinceau"],
+	["Éditeur de carte (plan, relief, masque)", App.MAP_EDITOR_SCENE, "", "dessiner une île, retoucher le relief, exporter / ouvrir une carte"],
 	["Laboratoire développeur — île vide", App.LAB_ISLAND_SCENE, "", "île vide avec une pente accessible"],
 	["Île générée (Lot 4)", App.GENERATED_SCENE, "F9", "génération structurelle, caméra libre"],
 	["Colonie (Lot 3)", "res://scenes/island/colony_island.tscn", "F4", "village du Lot 3"],
@@ -17,8 +18,11 @@ var DEV_SCENES := [
 
 var _pages := {}
 var _page := ""
-var _profile: OptionButton
 var _seed: SpinBox
+var _width: SpinBox
+var _length: SpinBox
+var _canvas: PlanCanvas
+var _plan: IslandPlan
 
 func _ready() -> void:
 	App.current_path = App.MENU_SCENE
@@ -55,7 +59,7 @@ func _ready() -> void:
 	_pages["dev"] = _page_dev()
 	for k in _pages:
 		add_child(_pages[k])
-	var foot := MenuStyle.note("Menu provisoire · Lot 6", 14)
+	var foot := MenuStyle.note("Menu provisoire · Lot 7", 14)
 	foot.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	foot.offset_top = -34
 	foot.offset_bottom = -10
@@ -86,6 +90,8 @@ func show_page(name: String) -> void:
 	_page = name
 	for k in _pages:
 		(_pages[k] as Control).visible = (k == name)
+	if name == "generate" and _plan == null:
+		_preview_plan.call_deferred()
 	var first := (_pages[name] as Control).find_child("Premier", true, false) as Control
 	if first and DisplayServer.get_name() != "headless":
 		first.grab_focus()
@@ -112,43 +118,108 @@ func _page_main() -> Control:
 	return p
 
 func _page_generate() -> Control:
-	var p := MenuStyle.panel(Vector2(520, 420))
-	p.position.y += 70
+	var p := MenuStyle.panel(Vector2(1240, 640))
+	p.position.y += 46
 	var box := p.get_child(0) as VBoxContainer
-	box.add_child(MenuStyle.title("Générer une île", 32))
-	box.add_child(MenuStyle.note("Générateur du Lot 4 · l'île est calculée à l'ouverture (quelques secondes)."))
-	var row := HBoxContainer.new()
-	box.add_child(row)
-	var l1 := Label.new()
-	l1.text = "Type d'île"
-	l1.custom_minimum_size = Vector2(150, 0)
-	row.add_child(l1)
-	_profile = OptionButton.new()
-	for pr in PROFILES:
-		_profile.add_item(pr[1])
-	_profile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(_profile)
-	var row2 := HBoxContainer.new()
-	box.add_child(row2)
-	var l2 := Label.new()
-	l2.text = "Graine"
-	l2.custom_minimum_size = Vector2(150, 0)
-	row2.add_child(l2)
-	_seed = SpinBox.new()
-	_seed.min_value = 0
-	_seed.max_value = 99999
-	_seed.value = 3
-	_seed.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row2.add_child(_seed)
-	var go := MenuStyle.button("Générer")
-	go.name = "Premier"
-	go.pressed.connect(func() -> void: generate(PROFILES[_profile.selected][0], int(_seed.value)))
-	box.add_child(go)
+	box.add_child(MenuStyle.title("Générer une île", 30))
+	var cols := HBoxContainer.new()
+	cols.add_theme_constant_override("separation", 18)
+	cols.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.add_child(cols)
+	var left := VBoxContainer.new()
+	left.custom_minimum_size = Vector2(300, 0)
+	left.add_theme_constant_override("separation", 9)
+	cols.add_child(left)
+	left.add_child(MenuStyle.note("1. Choisir la graine et les dimensions · 2. Voir le plan · 3. Construire l'île en 3D"))
+	_seed = _spin_row(left, "Graine", 0, 99999, 1, 3)
+	_width = _spin_row(left, "Largeur (m)", 32, 120, 2, 56)
+	_length = _spin_row(left, "Longueur (m)", 32, 120, 2, 48)
+	var prev := MenuStyle.button("Aperçu du plan")
+	prev.name = "Premier"
+	prev.pressed.connect(_preview_plan)
+	left.add_child(prev)
+	var info := Label.new()
+	info.name = "Infos"
+	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info.custom_minimum_size = Vector2(290, 100)
+	info.add_theme_font_size_override("font_size", 15)
+	info.add_theme_color_override("font_color", MenuStyle.MUTED)
+	left.add_child(info)
+	var go := MenuStyle.button("Construire et explorer l'île")
+	go.name = "Construire"
+	go.pressed.connect(func() -> void:
+		if _plan == null:
+			_preview_plan()
+		App.open(App.MAP_ISLAND_SCENE, {"plan": _plan}))
+	left.add_child(go)
+	var ed := MenuStyle.button("Modifier dans l'éditeur de carte")
+	ed.pressed.connect(func() -> void:
+		if _plan == null:
+			_preview_plan()
+		App.open(App.MAP_EDITOR_SCENE, {"plan": _plan}))
+	left.add_child(ed)
 	var back := MenuStyle.button("Retour")
 	back.pressed.connect(show_page.bind("main"))
-	box.add_child(back)
+	left.add_child(back)
+	var holder := Control.new()
+	holder.custom_minimum_size = Vector2(800, 520)
+	holder.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	holder.clip_contents = true
+	cols.add_child(holder)
+	_canvas = PlanCanvas.new()
+	_canvas.name = "ApercuPlan"
+	_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_canvas.show_title = true
+	_canvas.resized.connect(func() -> void:
+		if _canvas.plan != null:
+			_canvas.fit())
+	holder.add_child(_canvas)
 	p.name = "PageGenerate"
 	return p
+
+func _spin_row(parent: Control, label: String, lo: float, hi: float, step: float, val: float) -> SpinBox:
+	var row := HBoxContainer.new()
+	parent.add_child(row)
+	var l := Label.new()
+	l.text = label
+	l.custom_minimum_size = Vector2(130, 0)
+	l.add_theme_font_size_override("font_size", 18)
+	row.add_child(l)
+	var sp := SpinBox.new()
+	sp.min_value = lo
+	sp.max_value = hi
+	sp.step = step
+	sp.value = val
+	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sp.get_line_edit().add_theme_font_size_override("font_size", 18)
+	row.add_child(sp)
+	return sp
+
+## Génère le plan (et le relief, pour l'ombrage et la vérification des pentes), l'affiche dans l'aperçu.
+func _preview_plan() -> void:
+	_plan = PlanGenerator.generate(int(_seed.value), float(_width.value), float(_length.value))
+	var b := PlanTerrain.build(_plan)
+	var reps := PlanTerrain.path_reports(_plan, b.field)
+	_canvas.plan = _plan
+	_canvas.path_reports = reps
+	_canvas.set_field(b.field)
+	_canvas.fit()
+	var probs := _plan.problems()
+	var total := 0.0
+	var grade := 0.0
+	var ok := true
+	for r in reps:
+		total += float(r["length_m"])
+		grade = maxf(grade, float(r["max_grade"]))
+		ok = ok and bool(r["ok"])
+	var txt := "%d zones · %d chemins (%d m) · pente maximale %d %%\n" % [_plan.zones.size(), _plan.paths.size(), roundi(total), roundi(grade * 100.0)]
+	txt += "Chemins praticables : %s" % ("oui" if ok else "non — rupture de pente signalée en rouge")
+	if not probs.is_empty():
+		txt += "\nPlan : " + "; ".join(probs)
+	var info := find_child("Infos", true, false) as Label
+	if info:
+		info.text = txt
 
 func _page_dev() -> Control:
 	var p := MenuStyle.panel(Vector2(700, 600))

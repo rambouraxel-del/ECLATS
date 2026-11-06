@@ -58,20 +58,27 @@ static func lab_map(env_kind: String) -> Dictionary:
 # ------------------------------------------------------------------ construction
 
 func setup(env_kind: String) -> void:
+	var map := lab_map(env_kind)
+	var f := AuthoredTerrain.build_field(map)
+	if env_kind == "room":
+		var gray := VoxelPalette.get_default().id("stone_light")
+		for i in f.n * f.n:
+			if f.top[i] != TerrainField.NO_GROUND:
+				f.material[i] = gray
+	var sx := -9.0 if env_kind == "island" else 0.0
+	var sz := 4.0 if env_kind == "island" else 10.0
+	setup_field(f, env_kind, int(map["seed"]), Vector2(sx, sz))
+
+## Monte le monde éditable sur un terrain déjà construit (laboratoire ou île issue d'un plan, Lot 7).
+func setup_field(p_field: TerrainField, env_kind: String, p_seed: int, spawn_xz: Vector2) -> void:
 	var t0 := Time.get_ticks_msec()
 	kind = env_kind
 	pal = VoxelPalette.get_default()
 	VoxelMesher.palette_warmup()
-	var map := lab_map(env_kind)
 	world = WorldData.new()
-	world.seed = int(map["seed"])
+	world.seed = p_seed
 	world.profile = IslandProfile.load_profile("settled")
-	field = AuthoredTerrain.build_field(map)
-	if env_kind == "room":
-		var gray := pal.id("stone_light")
-		for i in field.n * field.n:
-			if field.top[i] != TerrainField.NO_GROUND:
-				field.material[i] = gray
+	field = p_field
 	world.field = field
 	occ = OccupancyMap.new(field)
 	placement = PlacementSystem.new(field, occ)
@@ -102,10 +109,7 @@ func setup(env_kind: String) -> void:
 	objects_root = Node3D.new()
 	objects_root.name = "Objets"
 	add_child(objects_root)
-	# départ : sur le plat, face à la zone d'essai
-	var sx := -9.0 if env_kind == "island" else 0.0
-	var sz := 4.0 if env_kind == "island" else 10.0
-	spawn = Vector3(sx, field.ground_at_m(sx, sz) + 0.1, sz)
+	spawn = Vector3(spawn_xz.x, field.ground_at_m(spawn_xz.x, spawn_xz.y) + 0.1, spawn_xz.y)
 	build_ms = Time.get_ticks_msec() - t0
 
 func _all_tiles() -> Array:

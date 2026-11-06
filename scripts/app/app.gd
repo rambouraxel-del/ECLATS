@@ -10,6 +10,8 @@ const OPENING_SCENE := "res://scenes/game/opening_island.tscn"
 const GENERATED_SCENE := "res://scenes/world/settled_island.tscn"
 const LAB_ROOM_SCENE := "res://scenes/lab/dev_lab_room.tscn"
 const LAB_ISLAND_SCENE := "res://scenes/lab/dev_lab_island.tscn"
+const MAP_ISLAND_SCENE := "res://scenes/map/map_island.tscn"      # île issue d'un plan (Lot 7)
+const MAP_EDITOR_SCENE := "res://scenes/map/map_editor.tscn"      # éditeur de carte (Lot 7)
 
 const SCENES := {
 	KEY_F1: "res://scenes/lab/graphics_lab.tscn",

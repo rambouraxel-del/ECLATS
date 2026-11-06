@@ -19,6 +19,8 @@ echo "== Tests du Lot 5 (île d'ouverture) =="
 timeout 300 "$GODOT_BIN" --headless -s tests/run_checks_lot5.gd
 echo "== Tests du Lot 6 (laboratoire développeur) =="
 timeout 600 "$GODOT_BIN" --headless -s tests/run_checks_lot6.gd
+echo "== Tests du Lot 7 (plan, terrain, éditeur de carte) =="
+timeout 900 "$GODOT_BIN" --headless -s tests/run_checks_lot7.gd
 if [ "${ECLATS_MONDE:-0}" = "1" ]; then
 	echo "== Îles complètes : validation multi-graines et profils (ECLATS_MONDE=1) =="
 	timeout 900 "$GODOT_BIN" --headless -s tests/run_checks_lot4.gd -- --monde
