@@ -33,6 +33,8 @@ Write-Host "== Tests du Lot 8 (construction, atelier, maisons) =="
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "== Tests du Lot 9 (habitations, placement automatique, composition) =="
 & $Godot --headless -s tests/run_checks_lot9.gd
+Write-Host "== Tests du Lot 10 (remodelage de l'ile d'ouverture) =="
+& $Godot --headless -s tests/run_checks_lot10.gd
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if ($Monde) {
     Write-Host "== Iles completes : validation multi-graines et profils =="

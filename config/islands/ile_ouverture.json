@@ -1561,7 +1561,8 @@
      110.0,
      -8.75
     ]
-   ]
+   ],
+   "skirt": 20
   },
   {
    "id": "pointe_du_guet",
@@ -1578,7 +1579,8 @@
      118.75,
      -5.0
     ]
-   ]
+   ],
+   "skirt": 20
   },
   {
    "id": "detour_du_verger",
@@ -1661,7 +1663,8 @@
      45.0,
      -72.5
     ]
-   ]
+   ],
+   "skirt": 24
   },
   {
    "id": "montee_du_sanctuaire",
@@ -1987,14 +1990,6 @@
    "yaw": 1
   },
   {
-   "id": "decorative_bench",
-   "pos": [
-    115.0,
-    -1.25
-   ],
-   "yaw": 3
-  },
-  {
    "id": "crystal_cluster",
    "pos": [
     117.5,
@@ -2295,6 +2290,110 @@
    "pos": [
     -5.3,
     -9.5
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "signpost",
+   "pos": [
+    110.2,
+    -13.4
+   ],
+   "yaw": 3
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    113.05,
+    -9.51
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    115.69,
+    -4.25
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "decorative_bench",
+   "pos": [
+    121.0,
+    -1.6
+   ],
+   "yaw": 1
+  },
+  {
+   "id": "banner_stand",
+   "pos": [
+    121.4,
+    -9.4
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "decorative_bench",
+   "pos": [
+    91.47,
+    -32.96
+   ],
+   "yaw": 1
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    67.6,
+    -62.73
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "crystal_lamp",
+   "pos": [
+    64.77,
+    -59.9
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "brazier",
+   "pos": [
+    41.6,
+    -70.5
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "brazier",
+   "pos": [
+    41.6,
+    -75.4
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "ruin_arch",
+   "pos": [
+    26.0,
+    -76.6
+   ],
+   "yaw": 1
+  },
+  {
+   "id": "ruin_column",
+   "pos": [
+    33.0,
+    -72.0
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "ruin_column",
+   "pos": [
+    33.0,
+    -80.2
    ],
    "yaw": 0
   }
@@ -2749,6 +2848,74 @@
    ],
    "seed": 31008,
    "scale": 1.0
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    127.0,
+    2.5
+   ],
+   "seed": 33001,
+   "scale": 1.1
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    124.0,
+    6.0
+   ],
+   "seed": 33002,
+   "scale": 1.0
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    105.78,
+    -26.01
+   ],
+   "seed": 33003,
+   "scale": 1.3,
+   "variant": "mass"
+  },
+  {
+   "family": "boulder",
+   "pos": [
+    100.78,
+    -23.29
+   ],
+   "seed": 33004,
+   "scale": 1.1,
+   "variant": "spike"
+  },
+  {
+   "family": "ruin",
+   "pos": [
+    77.43,
+    -57.59
+   ],
+   "seed": 33005,
+   "scale": 1.0,
+   "sub": "column"
+  },
+  {
+   "family": "ruin",
+   "pos": [
+    74.38,
+    -51.51
+   ],
+   "seed": 33006,
+   "scale": 1.0,
+   "sub": "column"
+  },
+  {
+   "family": "ruin",
+   "pos": [
+    22.0,
+    -90.0
+   ],
+   "seed": 33007,
+   "scale": 1.0,
+   "sub": "wall"
   }
  ],
  "trees": [
@@ -4007,6 +4174,46 @@
     8.4
    ],
    "seed": 30019
+  },
+  {
+   "species": "pine",
+   "pos": [
+    110.46,
+    -28.48
+   ],
+   "seed": 32001
+  },
+  {
+   "species": "pine",
+   "pos": [
+    96.41,
+    -22.35
+   ],
+   "seed": 32002
+  },
+  {
+   "species": "pine",
+   "pos": [
+    80.29,
+    -58.84
+   ],
+   "seed": 32003
+  },
+  {
+   "species": "pine",
+   "pos": [
+    70.63,
+    -50.7
+   ],
+   "seed": 32004
+  },
+  {
+   "species": "birch",
+   "pos": [
+    74.56,
+    -63.04
+   ],
+   "seed": 32005
   }
  ],
  "anchor": {

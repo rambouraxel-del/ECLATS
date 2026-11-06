@@ -20,6 +20,7 @@ func _initialize() -> void:
 	_sonde(scene)
 	var ex: Explorer = scene.get("explorer")
 	var cr: ThirdPersonCamera = scene.get("camrig")
+	var fog_saved := {}
 	for c in cad:
 		var nm := String(c["nom"])
 		if only.size() > 0 and not only.has(nm):
@@ -47,6 +48,13 @@ func _initialize() -> void:
 			cam.global_position = Vector3(float(p[0]), h, float(p[1]))
 			cam.look_at(Vector3(float(l[0]), float(c.get("ly", 10.0)), float(l[1])), Vector3.UP)
 			cam.current = true
+			# vue aérienne : brume atténuée pour que le plan reste lisible (les vues au sol gardent la lumière de l'ambiance)
+			fog_saved = {}
+			for we in scene.find_children("*", "WorldEnvironment", true, false):
+				var en := (we as WorldEnvironment).environment
+				if en != null:
+					fog_saved[en] = en.fog_density
+					en.fog_density = en.fog_density * float(c.get("brume", 0.3))
 			for i in 20:
 				await process_frame
 			ex.visible = false
@@ -54,6 +62,8 @@ func _initialize() -> void:
 		root.get_viewport().get_texture().get_image().save_png(path)
 		print("saved ", path)
 		if String(c.get("mode", "fp")) != "fp":
+			for en in fog_saved:
+				en.fog_density = fog_saved[en]
 			ex.visible = true
 			for n in root.get_children():
 				if n is Camera3D:

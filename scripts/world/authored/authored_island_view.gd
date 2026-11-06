@@ -92,7 +92,7 @@ static func create(world: WorldData, parent: Node3D) -> Dictionary:
 	for p in world.props:
 		scatter.add_asset(p["id"], p["xform"])
 	scatter.commit()
-	strip_asset_collisions(scatter)
+	strip_asset_collisions(root)      # Lot 10 : la racine contient « Props » (sur scatter, la recherche ne trouvait rien : la plateforme de l'Ancre gardait un bloc de 90 cm à la première construction)
 	refs["scatter"] = scatter
 	refs["physics"] = create_collisions(world, root)
 	return refs
