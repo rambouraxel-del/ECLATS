@@ -1,0 +1,9 @@
+Contrôles automatisés (godot --headless), version finale de la carte :
+run_checks (Lots 1-3): 180 réussites, 0 échec
+Lot 4: 121, 0 échec
+Lot 5: 50, 0 échec
+Lot 6: 39, 0 échec
+Lot 7: 68, 0 échec
+Lot 8: 104, 0 échec
+Lot 9: 64, 0 échec
+Lot 10: 30, 0 échec

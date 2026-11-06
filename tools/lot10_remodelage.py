@@ -196,7 +196,6 @@ def etape2(d):
     prop("decorative_bench", [121.0, -1.6], 1)                # face au vide, à côté de l'arche
     prop("banner_stand", [121.4, -9.4], 0)
     rock("boulder", [127.0, 2.5], 1.1)                       # parapet de blocs côté vide
-    rock("boulder", [124.0, 6.0], 1.0)
 
     # ---------------------------------------------------------------- CRÊTE : passages resserrés / ouverts
     cr = path_by_id(d, "chemin_de_crete")["pts"]
@@ -212,7 +211,6 @@ def etape2(d):
     rock("ruin", along(cr, 62, -3.4), 1.0, None, "column")
     tree("pine", along(cr, 60, 5.8))
     tree("pine", along(cr, 65, -5.8))
-    tree("birch", along(cr, 67, 7.0))
     # ouvert : dernier belvédère avant la montée (vue sur le sanctuaire)
     prop("crystal_lamp", along(cr, 74, 2.0), 0)
     prop("crystal_lamp", along(cr, 74, -2.0), 0)

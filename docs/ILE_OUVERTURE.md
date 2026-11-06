@@ -56,6 +56,11 @@ détour du verger ≈ 95 m (≈ 30 s).
 - Sauvegarde : `user://eclats_sauvegarde.json`, sous l'identifiant **fixe** de l'île (`ile-ouverture-01`) ; à la
   relance l'Ancre est active (anneau et lueur) et l'objectif n'est plus affiché.
 
+## Lot 10 : île remodelée
+
+La carte a été retouchée à la main (départ sur le ponton, chaussée dallée, butte de révélation du hameau, avenue vers la fontaine, belvédère du Guet, arche du sanctuaire) :
+voir [REMODELAGE_LOT10.md](REMODELAGE_LOT10.md). La carte du Lot 5 est conservée dans `config/islands/archive/`. Nouveautés de format : `spawn.pier_m` (départ sur le tablier) et `skirt` par chemin (largeur de l'épaule de raccord).
+
 ## Modifier l'île
 
 Tout est dans **`config/islands/ile_ouverture.json`** (mètres ; x vers l'est, z vers le sud) :
