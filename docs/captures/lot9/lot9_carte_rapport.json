@@ -1,0 +1,42 @@
+{
+	"controles": [
+		{
+			"controle": "maison en L sur la graine 21 : aucune parcelle, refus expliqué (« Impossible : Aucune parcelle compatible pour Maison en L (graine 3) (emprise 8,8 × 8,3 m) : 896 positions et orientations examinées sur le plateau et  »)",
+			"ok": true
+		},
+		{
+			"controle": "placement automatique : habitation posée (Habitation posée : Cabane (graine 3), parcelle « plateau », porte côté sud, raccord au chemin 3,6 m (0 %) — 896 emplacem)",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z : habitation retirée, terrain restauré",
+			"ok": true
+		},
+		{
+			"controle": "tout est protégé : aucune pose forcée",
+			"ok": true
+		},
+		{
+			"controle": "refus expliqué : Impossible : Aucune parcelle compatible pour Cabane (graine 3) (emprise 4,8 × 4,3 m) : 896 positions et orientations exa",
+			"ok": true
+		},
+		{
+			"controle": "masque retiré (Ctrl+Z)",
+			"ok": true
+		},
+		{
+			"controle": "« maison à deux pièces » posée automatiquement : Habitation posée : Maison à deux pièces (graine 3), parcelle « plateau », porte côté sud, raccord au",
+			"ok": true
+		},
+		{
+			"controle": "île 3D : l'habitation est là",
+			"ok": true
+		},
+		{
+			"controle": "du chemin jusque dans l'habitation par le raccord (x -14.7, z -14.4)",
+			"ok": true
+		}
+	],
+	"duree_s": 25,
+	"echecs": 0
+}

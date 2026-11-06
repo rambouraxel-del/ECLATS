@@ -1,0 +1,18 @@
+  OK    cabane : aperçu prêt (Cabane · graine 7 · emprise bâtie 4,3 × 3,8 m · hauteur 3,6 m · 4 mur(s), 2 ouve)
+  OK    cabane : posée (28 colonnes raccordées)
+  OK    deux_pieces : aperçu prêt (Maison à deux pièces · graine 7 · emprise bâtie 7,8 × 5,8 m · hauteur 4,1 m · 5 )
+  OK    deux_pieces : posée (46 colonnes raccordées)
+  OK    en_L : aperçu prêt (Maison en L · graine 7 · emprise bâtie 7,3 × 7,8 m · hauteur 3,9 m · 7 mur(s), 5)
+  OK    en_L : posée (44 colonnes raccordées)
+  OK    trois habitations différentes
+  OK    recette affichée : /generer habitation --variante en_L --graine 7 --emprise 9x8 --yaw 0 --murs pierre --toit tuiles
+  OK    Ctrl+Z ×3 : les trois habitations disparaissent entièrement
+  OK    sur la pente : 4109 colonnes de sol raccordées
+  OK    habitation posée sur la pente
+  OK    Ctrl+Z : relief et habitation restaurés
+  OK    emprise 3 × 3 m : refus expliqué, monde intact (« [erreur] Impossible : Emprise trop petite : 3,0 × 3,0 m. La plus petit »)
+  OK    composition : aperçu (Marché + végétation : 3 étal(s), 1 caisses, 1 tonneaux, 4 arbre(s) sur 66 m²)
+  OK    l'aperçu ne modifie pas le monde
+  OK    résultat ajusté : Marché + végétation : 2 étal(s), 1 caisses, 1 tonneaux, 1 arbre(s) sur 66 m²
+  OK    composition appliquée en UNE opération (6 nœuds)
+  OK    Ctrl+Z : toute la composition disparaît en une opération
