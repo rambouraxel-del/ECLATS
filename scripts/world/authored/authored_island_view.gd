@@ -120,6 +120,63 @@ static func _box(body: StaticBody3D, box: AABB, xf := Transform3D.IDENTITY) -> v
 	cs.transform = xf * Transform3D(Basis.IDENTITY, box.get_center())
 	body.add_child(cs)
 
+## Collisions d'un bâtiment : murs, planchers, marches (colliders du modèle, rampe dans l'escalier) et meubles.
+static func add_building(builds: StaticBody3D, b: Dictionary) -> void:
+	var model: BuildingModel = b["model"]
+	var xf: Transform3D = b["xform"]
+	var plan: BuildingPlan = b["plan"]
+	var st: BuildingPlan.StairPlan = plan.stair
+	var f0 := float(plan.floor_y(0)) * C
+	var f1 := float(plan.floor_y(1)) * C if plan.floors > 1 else 0.0
+	for a: AABB in model.colliders:
+		# marches de l'escalier (sauf le palier) remplacées par une rampe : montée fluide, mêmes hauteurs
+		if st != null and absf(a.position.x - float(st.x0) * C) < 0.01 and absf(a.size.x - float(st.w) * C) < 0.01 \
+				and absf(a.position.y - f0) < 0.01 and a.end.y < f1 - 0.05:
+			continue
+		_box(builds, a, xf)
+	if st != null and plan.floors > 1:
+		var cx := (float(st.x0) + float(st.w) * 0.5) * C
+		var foot := Vector3(cx, f0, float(st.z0 + st.l) * C)
+		var top := Vector3(cx, f1, float(st.z0 + 3) * C)
+		var u := (top - foot).normalized()
+		var nrm := Vector3(1, 0, 0).cross(u)
+		if nrm.y < 0.0:
+			nrm = -nrm
+		var thick := 0.12
+		var cs_r := CollisionShape3D.new()
+		var bs := BoxShape3D.new()
+		bs.size = Vector3(float(st.w) * C, thick, foot.distance_to(top))
+		cs_r.shape = bs
+		cs_r.transform = xf * Transform3D(Basis(Vector3(1, 0, 0), nrm, u), (foot + top) * 0.5 - nrm * thick * 0.5)
+		builds.add_child(cs_r)
+	for f in model.furniture:
+		var r: Rect2 = f["rect"]
+		var h: float = float(f.get("height", 0.8))
+		if h < 0.25:
+			continue            # tapis, petits objets : on marche dessus
+		var fy := model.floor_y_m(int(f.get("floor", 0)))
+		_box(builds, AABB(Vector3(r.position.x, fy, r.position.y), Vector3(r.size.x, minf(h, 2.0), r.size.y)), xf)
+
+static func add_tree(deco: StaticBody3D, t: Dictionary) -> void:
+	var pl: Dictionary = t["plan"]
+	var r: float = float(pl.get("trunk_r", 0.3))
+	var cs2 := CollisionShape3D.new()
+	var cyl := CylinderShape3D.new()
+	cyl.radius = maxf(r * 0.9, 0.15)
+	cyl.height = 2.6
+	cs2.shape = cyl
+	cs2.position = (t["pos"] as Vector3) + Vector3(0, 1.0, 0)
+	deco.add_child(cs2)
+
+static func add_rock(deco: StaticBody3D, r: Dictionary, occ: OccupancyMap) -> void:
+	var item: Dictionary = occ.items[int(r["item"])] if int(r.get("item", -1)) >= 0 else {}
+	for a: AABB in item.get("hard", []):
+		# boîte un peu rentrée : les rochers sont arrondis
+		var g := a.grow(-0.12)
+		g.position.y = a.position.y - 0.5
+		g.size.y = a.size.y + 0.5
+		_box(deco, g)
+
 static func create_collisions(world: WorldData, parent: Node3D) -> Node3D:
 	var phys := Node3D.new()
 	phys.name = "Physics"
@@ -154,40 +211,7 @@ static func create_collisions(world: WorldData, parent: Node3D) -> Node3D:
 	builds.collision_mask = 0
 	phys.add_child(builds)
 	for b in world.buildings:
-		var model: BuildingModel = b["model"]
-		var xf: Transform3D = b["xform"]
-		var plan: BuildingPlan = b["plan"]
-		var st: BuildingPlan.StairPlan = plan.stair
-		var f0 := float(plan.floor_y(0)) * C
-		var f1 := float(plan.floor_y(1)) * C if plan.floors > 1 else 0.0
-		for a: AABB in model.colliders:
-			# marches de l'escalier (sauf le palier) remplacées par une rampe : montée fluide, mêmes hauteurs
-			if st != null and absf(a.position.x - float(st.x0) * C) < 0.01 and absf(a.size.x - float(st.w) * C) < 0.01 \
-					and absf(a.position.y - f0) < 0.01 and a.end.y < f1 - 0.05:
-				continue
-			_box(builds, a, xf)
-		if st != null and plan.floors > 1:
-			var cx := (float(st.x0) + float(st.w) * 0.5) * C
-			var foot := Vector3(cx, f0, float(st.z0 + st.l) * C)
-			var top := Vector3(cx, f1, float(st.z0 + 3) * C)
-			var u := (top - foot).normalized()
-			var nrm := Vector3(1, 0, 0).cross(u)
-			if nrm.y < 0.0:
-				nrm = -nrm
-			var thick := 0.12
-			var cs_r := CollisionShape3D.new()
-			var bs := BoxShape3D.new()
-			bs.size = Vector3(float(st.w) * C, thick, foot.distance_to(top))
-			cs_r.shape = bs
-			cs_r.transform = xf * Transform3D(Basis(Vector3(1, 0, 0), nrm, u), (foot + top) * 0.5 - nrm * thick * 0.5)
-			builds.add_child(cs_r)
-		for f in model.furniture:
-			var r: Rect2 = f["rect"]
-			var h: float = float(f.get("height", 0.8))
-			if h < 0.25:
-				continue            # tapis, petits objets : on marche dessus
-			var fy := model.floor_y_m(int(f.get("floor", 0)))
-			_box(builds, AABB(Vector3(r.position.x, fy, r.position.y), Vector3(r.size.x, minf(h, 2.0), r.size.y)), xf)
+		add_building(builds, b)
 	# troncs, rochers, objets
 	var deco := StaticBody3D.new()
 	deco.name = "Decor"
@@ -195,23 +219,9 @@ static func create_collisions(world: WorldData, parent: Node3D) -> Node3D:
 	deco.collision_mask = 0
 	phys.add_child(deco)
 	for t in world.trees:
-		var pl: Dictionary = t["plan"]
-		var r: float = float(pl.get("trunk_r", 0.3))
-		var cs2 := CollisionShape3D.new()
-		var cyl := CylinderShape3D.new()
-		cyl.radius = maxf(r * 0.9, 0.15)
-		cyl.height = 2.6
-		cs2.shape = cyl
-		cs2.position = (t["pos"] as Vector3) + Vector3(0, 1.0, 0)
-		deco.add_child(cs2)
+		add_tree(deco, t)
 	for r in world.rocks:
-		var item: Dictionary = world.occ.items[int(r["item"])] if int(r.get("item", -1)) >= 0 else {}
-		for a: AABB in item.get("hard", []):
-			# boîte un peu rentrée : les rochers sont arrondis
-			var g := a.grow(-0.12)
-			g.position.y = a.position.y - 0.5
-			g.size.y = a.size.y + 0.5
-			_box(deco, g)
+		add_rock(deco, r, world.occ)
 	for p in world.props:
 		var info := AssetLibrary.info(String(p["id"]))
 		var xf: Transform3D = p["xform"]

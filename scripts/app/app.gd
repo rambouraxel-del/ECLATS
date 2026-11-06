@@ -3,7 +3,7 @@ extends Node
 ##   Échap : pause (Reprendre / Retour au menu principal) dans toute scène sauf le menu
 ##   F3 : informations techniques (FPS, position, aide)   F11 : plein écran   L : éclairage suivant
 ##   Raccourcis de développement (inchangés) : F1 labo graphique · F2 première île · F4 colonie · F8 matériaux ·
-##   F9 île générée (Lot 4) · F10 île d'ouverture
+##   F9 île générée (Lot 4) · F10 île d'ouverture · F12 laboratoire développeur
 
 const MENU_SCENE := "res://scenes/menu/main_menu.tscn"
 const OPENING_SCENE := "res://scenes/game/opening_island.tscn"
@@ -18,6 +18,7 @@ const SCENES := {
 	KEY_F8: "res://scenes/lab/material_gallery.tscn",
 	KEY_F9: GENERATED_SCENE,
 	KEY_F10: OPENING_SCENE,
+	KEY_F12: LAB_ROOM_SCENE,
 }
 
 signal scene_opened(path: String)
@@ -258,7 +259,7 @@ func _process(_delta: float) -> void:
 		lines.append("Molette vitesse/zoom · Tab vol/orbite · clic pour reprendre la souris · Échap pause")
 	else:
 		lines.append_array(_controls_help)
-	lines.append("F1 labo graphique · F2 île · F4 colonie · F9 île générée · F10 île d'ouverture · F8 matériaux · L éclairage · F3 infos · F11 plein écran")
+	lines.append("F1 labo graphique · F2 île · F4 colonie · F9 île générée · F10 île d'ouverture · F12 laboratoire développeur · F8 matériaux · L éclairage · F3 infos · F11 plein écran")
 	if _extra_help != "":
 		lines.append(_extra_help)
 	_hud.text = "\n".join(lines)

@@ -25,6 +25,13 @@ const ARCHETYPES := {
 		"annex_chance": 0.6, "main_door_w": 10,
 		"rooms": ["hall", "stairs", "kitchen", "chamber", "chamber"], "hearth": "hall",
 	},
+	# Cabane (Lot 6, laboratoire) : une seule pièce, emprise réduite ; hors TYPES : la génération de colonies ne l'emploie pas.
+	"hut": {
+		"name": "Cabane", "floors": [1, 1], "w": [30, 34], "d": [26, 30],
+		"wall_styles": ["stone", "plaster", "timber"], "roofs": ["thatch", "shingle", "tiles", "slate"],
+		"annex_chance": 0.0, "main_door_w": 10,
+		"rooms": ["living"], "hearth": "living",
+	},
 	"workshop": {
 		"name": "Atelier", "floors": [1, 1], "w": [72, 90], "d": [58, 68],
 		"wall_styles": ["stone", "timber"], "roofs": ["shingle", "slate", "tiles"],

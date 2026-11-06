@@ -5,7 +5,10 @@ extends RefCounted
 ## à partir d'un archétype et d'une graine. Déterministe. Ne connaît ni le terrain ni les voxels.
 ## Les règles de conception (portes, escaliers, fenêtres) sont ici, une seule fois, pour TOUS les bâtiments.
 
-static func plan(type: String, seed: int) -> BuildingPlan:
+## `opts` (laboratoire, Lot 6) : W, D (dimensions du bloc, cellules de 10 cm), wall (stone|plaster|timber),
+## roof (thatch|shingle|tiles|slate), annex (false : pas d'annexe). Les tirages de la graine sont toujours
+## consommés dans le même ordre : sans options le plan est identique à celui des lots précédents.
+static func plan(type: String, seed: int, opts := {}) -> BuildingPlan:
 	var arch := BuildingCatalog.get_archetype(type)
 	var rng := WorldRng.stream(seed, "plan:" + type)
 	var p := BuildingPlan.new()
@@ -15,8 +18,16 @@ static func plan(type: String, seed: int) -> BuildingPlan:
 	p.floors = rng.randi_range(int(arch["floors"][0]), int(arch["floors"][1]))
 	p.W = _even(rng.randi_range(int(arch["w"][0]), int(arch["w"][1])))
 	p.D = _even(rng.randi_range(int(arch["d"][0]), int(arch["d"][1])))
+	if opts.has("W"):
+		p.W = _even(int(opts["W"]))
+	if opts.has("D"):
+		p.D = _even(int(opts["D"]))
 	_style(p, rng, arch)
+	if opts.has("wall") and BuildingCatalog.WALL_STYLES.has(String(opts["wall"])):
+		_force_wall(p, String(opts["wall"]))
 	var has_annex := rng.randf() < float(arch["annex_chance"])
+	if not bool(opts.get("annex", true)):
+		has_annex = false
 	var annex_side := 1 if rng.randf() < 0.5 else -1       # (tirage conservé : il fixe la suite du flux de la graine)
 	# Le foyer est contre le pignon ouest ; l'annexe est du côté opposé (est) par défaut.
 	annex_side = 1
@@ -30,9 +41,30 @@ static func plan(type: String, seed: int) -> BuildingPlan:
 		_add_annex(p, rng, annex_w, annex_side)
 	p.footprint = Vector2i(p.mx + p.W + (annex_w if has_annex else 0) + 2, p.mz + p.D + 6)
 	_roof(p, rng)
+	if opts.has("roof") and BuildingCatalog.ROOF_STYLES.has(String(opts["roof"])):
+		_force_roof(p, String(opts["roof"]))
 	_windows(p, rng)
 	_finish(p, rng)
 	return p
+
+static func _force_wall(p: BuildingPlan, ws: String) -> void:
+	var def: Dictionary = BuildingCatalog.WALL_STYLES[ws]
+	p.style["wall_style"] = ws
+	p.style["timber"] = def["timber"]
+	if not (def["low"] as Array).has(p.style["wall_low"]):
+		p.style["wall_low"] = def["low"][0]
+	if not (def["up"] as Array).has(p.style["wall_up"]):
+		p.style["wall_up"] = def["up"][0]
+
+static func _force_roof(p: BuildingPlan, kind: String) -> void:
+	var def: Dictionary = BuildingCatalog.ROOF_STYLES[kind]
+	var mats: Array = def["materials"]
+	p.roof["kind"] = kind
+	p.roof["pitch"] = def["pitch"]
+	p.roof["thick"] = def["thick"]
+	p.roof["overhang"] = def["overhang"]
+	p.roof["material"] = mats[0]
+	p.roof["alt_material"] = mats[1]
 
 static func _even(v: int) -> int:
 	return v - (v % 2)
@@ -118,6 +150,7 @@ static func _layout(p: BuildingPlan, rng: RandomNumberGenerator, arch: Dictionar
 		_wall(p, 0, p.mx + W - BuildingPlan.WALL, p.mz, p.mz + D - 1, f, 2, true, wall_mat)     # E
 	var main_w: int = arch["main_door_w"]
 	match p.type:
+		"hut": _layout_hut(p, rng, ix0, ix1, iz0, iz1, main_w)
 		"house_small": _layout_house_small(p, rng, ix0, ix1, iz0, iz1, main_w)
 		"house_large": _layout_house_large(p, rng, ix0, ix1, iz0, iz1, main_w)
 		"workshop": _layout_workshop(p, rng, ix0, ix1, iz0, iz1, main_w)
@@ -145,6 +178,13 @@ static func _int_door_x(p: BuildingPlan, x: int, u: int, floor_idx: int, a: int,
 
 static func _int_door_z(p: BuildingPlan, z: int, u: int, floor_idx: int, a: int, b: int, thick := BuildingPlan.PART) -> void:
 	_door(p, "I", 2, z, u, BuildingPlan.DOOR_INT_W, BuildingPlan.DOOR_INT_H, floor_idx, thick, 1, Vector2i(a, b))
+
+## Cabane : une pièce unique, porte au sud, foyer contre le pignon ouest.
+static func _layout_hut(p: BuildingPlan, rng: RandomNumberGenerator, ix0: int, ix1: int, iz0: int, iz1: int, main_w: int) -> void:
+	var living := _room(p, 0, ix0, iz0, ix1, iz1, "living", "floor_planks" if rng.randf() < 0.6 else "floor_earth")
+	_main_door(p, rng, ix0 + 9, ix1 - main_w - 2, main_w, living.id)
+	p.hearth = {"room": living.id, "side": "W", "x": ix0, "z": (iz0 + iz1) / 2 - 7, "w": 14, "d": 7, "h": 17}
+	p.furniture = [{"role": "living", "room": living.id}]
 
 static func _layout_house_small(p: BuildingPlan, rng: RandomNumberGenerator, ix0: int, ix1: int, iz0: int, iz1: int, main_w: int) -> void:
 	var wi := ix1 - ix0 + 1

@@ -1,0 +1,112 @@
+{
+	"controles": [
+		{
+			"controle": "salle grise ouverte depuis « Outils développeur » (première personne)",
+			"ok": true
+		},
+		{
+			"controle": "le réticule vise le sol (0.0 ; 1.2)",
+			"ok": true
+		},
+		{
+			"controle": "outil Point : un clic fixe le point (0.0 ; 1.2 m)",
+			"ok": true
+		},
+		{
+			"controle": "arbre : aperçu au point visé",
+			"ok": true
+		},
+		{
+			"controle": "arbre : confirmé",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z (touche réelle) annule l'arbre",
+			"ok": true
+		},
+		{
+			"controle": "outil Rectangle : premier coin posé",
+			"ok": true
+		},
+		{
+			"controle": "rectangle 3,50 × 3,50 m défini par deux clics (Rectangle 3,50 × 3,50 m)",
+			"ok": true
+		},
+		{
+			"controle": "T ouvre la barre de commandes",
+			"ok": true
+		},
+		{
+			"controle": "pendant la saisie, les touches ne déplacent plus le joueur",
+			"ok": true
+		},
+		{
+			"controle": "/generer maison --graine 42 : aperçu prêt",
+			"ok": true
+		},
+		{
+			"controle": "Entrée : maison confirmée ([ok] Appliqué · Maison (cabane) · emprise bâtie 3.4 × 3.4 m · niveau f)",
+			"ok": true
+		},
+		{
+			"controle": "Copier la recette : /generer maison --graine 42 --emprise 3.5x3.5 --yaw 0",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z : la maison disparaît entièrement",
+			"ok": true
+		},
+		{
+			"controle": "emprise 2 × 2 m refusée sans toucher le terrain : Emprise trop petite : 2.00 × 2.00 m (minimum 3.00 × 3.00 m a",
+			"ok": true
+		},
+		{
+			"controle": "Échap : pause dans le laboratoire",
+			"ok": true
+		},
+		{
+			"controle": "retour au menu : laboratoire déchargé",
+			"ok": true
+		},
+		{
+			"controle": "île vide préparée en 1698 ms",
+			"ok": true
+		},
+		{
+			"controle": "recette rejouée sur la pente : aperçu prêt ([ok] Aperçu prêt · Maison (cabane) · emprise bâtie 3.4 × 3.4)",
+			"ok": true
+		},
+		{
+			"controle": "maison confirmée sur la pente (1336 colonnes raccordées)",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z sur la pente : relief et raccord restaurés",
+			"ok": true
+		},
+		{
+			"controle": "outil Pinceau : clic maintenu = 330 colonnes peintes",
+			"ok": true
+		},
+		{
+			"controle": "aplanir : aperçu (Aplanir à 7.20 m · 330 colonnes · déblai max 0.40 m · remblai max 0.60 m)",
+			"ok": true
+		},
+		{
+			"controle": "l'aperçu du pinceau ne modifie pas le terrain",
+			"ok": true
+		},
+		{
+			"controle": "aplanissement appliqué, 0 colonne modifiée hors de la zone (0)",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z : le terrain est restauré à l'identique",
+			"ok": true
+		}
+	],
+	"duree_s": 235,
+	"echecs": 0,
+	"raccord_pente_colonnes": 1336,
+	"recette_salle": "/generer maison --graine 42 --emprise 3.5x3.5 --yaw 0"
+}

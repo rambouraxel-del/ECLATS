@@ -6,6 +6,8 @@ const PROFILES := [["settled", "Colonie (habitée)"], ["verdant", "Verdoyante"],
 
 ## Scènes de prototype accessibles depuis « Outils développeur » : [libellé, scène, raccourci, note].
 var DEV_SCENES := [
+	["Laboratoire développeur — salle grise", App.LAB_ROOM_SCENE, "F12", "sol plat · point, rectangle, pinceau"],
+	["Laboratoire développeur — île vide", App.LAB_ISLAND_SCENE, "", "île vide avec une pente accessible"],
 	["Île générée (Lot 4)", App.GENERATED_SCENE, "F9", "génération structurelle, caméra libre"],
 	["Colonie (Lot 3)", "res://scenes/island/colony_island.tscn", "F4", "village du Lot 3"],
 	["Première île (Lot 2)", "res://scenes/island/first_island.tscn", "F2", "terrain voxel simple"],

@@ -40,22 +40,26 @@ des planches de concept (`docs/references/`).
 1. Télécharger **Godot 4.3 (ou plus récent, 4.x) — version standard**, pas « .NET » :
    <https://godotengine.org/download/windows/> puis dézipper (aucune installation).
 2. Récupérer le projet : bouton **Code → Download ZIP** sur GitHub (branche
-   `claude/nifty-pascal-km2czc` ; Lot 4 : `claude/lot4-generation-coherente` ; **Lot 5 : branche `claude/lot5-ile-ouverture`**),
-   ou `git clone` puis `git checkout claude/lot5-ile-ouverture`.
+   `claude/nifty-pascal-km2czc` ; Lot 4 : `claude/lot4-generation-coherente` ; Lot 5 : `claude/lot5-ile-ouverture` ; **Lot 6 : branche `claude/lot6-menu-laboratoire`**),
+   ou `git clone` puis `git checkout claude/lot6-menu-laboratoire`.
 3. Lancer `Godot_v4.x-stable_win64.exe` → **Importer** → choisir le fichier `project.godot`
    du dossier → **Importer et éditer**. Le premier import prend quelques secondes.
-4. Appuyer sur **F5** (ou le bouton ▶ en haut à droite) : l'**île d'ouverture** s'ouvre (première ouverture :
-   construction de l'île, une à deux minutes, puis quelques secondes les fois suivantes grâce au cache).
-   **F9** ouvre l'île générée du Lot 4, **F1** le laboratoire, **F2** la première île.
+4. Appuyer sur **F5** (ou le bouton ▶ en haut à droite) : le **menu principal** s'ouvre — *Jouer l'île d'ouverture*,
+   *Générer une île*, *Outils développeur* (laboratoire développeur, prototypes), *Quitter*. Première ouverture de l'île d'ouverture :
+   construction, une à deux minutes, puis quelques secondes grâce au cache. **Échap** : pause (Reprendre / Retour au menu principal).
+   Raccourcis de développement inchangés : **F9** île générée du Lot 4, **F10** île d'ouverture, **F12** laboratoire développeur (salle grise), **F1** laboratoire graphique, **F2** première île.
 
 Pour ouvrir une scène précise dans l'éditeur : `scenes/lab/graphics_lab.tscn` ou
 `scenes/island/first_island.tscn`, puis **F6** (lancer la scène courante).
 
 ## Commandes
 
-**Île d'ouverture (F10, Lot 5)** : Z Q S D / W A S D (ou flèches) se déplacer · souris caméra (clic : capturer,
-Échap : libérer) · molette distance · Maj courir · Espace sauter · **E activer l'Ancre** · F5 / F6 / F7 ambiance ·
+**Île d'ouverture (F10, Lots 5-6)** : **première personne** ; Z Q S D / W A S D (ou flèches) se déplacer · souris regarder (clic : recapturer) ·
+Maj courir · Espace sauter · **E activer l'Ancre** · V vue à la troisième personne · Échap pause · F3 infos techniques · F5 / F6 / F7 ambiance ·
 Ctrl + Suppr oublier la sauvegarde de l'île. Détails : [docs/ILE_OUVERTURE.md](docs/ILE_OUVERTURE.md).
+
+**Laboratoire développeur (F12 ou menu, Lot 6)** : 1 / 2 / 3 point · rectangle · pinceau · T barre de commandes (`/generer maison --graine 42`) ·
+G aperçu · Entrée confirmer · X annuler l'aperçu · Ctrl+Z annuler · C copier la recette. Détails : [docs/LABORATOIRE.md](docs/LABORATOIRE.md).
 
 Autres scènes (caméra libre) :
 
@@ -99,7 +103,7 @@ Sous Windows (PowerShell, depuis le dossier du projet) :
 Sous Linux / CI : `GODOT=/chemin/godot tools/check.sh`. La même vérification tourne
 automatiquement sur GitHub à chaque push (`.github/workflows/godot-check.yml`).
 Elle importe le projet en mode headless puis lance `tests/run_checks.gd` (180 contrôles, Lots 1 à 3),
-`tests/run_checks_lot4.gd` (121 contrôles rapides du Lot 4) et `tests/run_checks_lot5.gd` (île d'ouverture).
+`tests/run_checks_lot4.gd` (121 contrôles rapides du Lot 4), `tests/run_checks_lot5.gd` (île d'ouverture) et `tests/run_checks_lot6.gd` (laboratoire développeur).
 Partie jouée automatique du Lot 5 : `godot --headless --fixed-fps 60 -s tools/opening_recette.gd -- rapport.json`. `ECLATS_MONDE=1 tools/check.sh` (ou `check.ps1 -Monde`)
 ajoute la validation d'îles complètes sur plusieurs graines et profils (+ 15 contrôles, ≈ 10 min sans GPU).
 

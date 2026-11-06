@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/lab/dev/dev_lab.gd" id="1_lab"]
+[ext_resource type="Script" path="res://scripts/rendering/environment_manager.gd" id="2_env"]
+
+[node name="DevLabRoom" type="Node3D"]
+script = ExtResource("1_lab")
+kind = "room"
+
+[node name="Environment" type="Node3D" parent="."]
+script = ExtResource("2_env")
+start_preset = "village_day"
+far_islands_enabled = false

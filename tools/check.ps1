@@ -22,6 +22,9 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "== Tests du Lot 5 (ile d'ouverture) =="
 & $Godot --headless -s tests/run_checks_lot5.gd
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Write-Host "== Tests du Lot 6 (laboratoire developpeur) =="
+& $Godot --headless -s tests/run_checks_lot6.gd
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if ($Monde) {
     Write-Host "== Iles completes : validation multi-graines et profils =="
     & $Godot --headless -s tests/run_checks_lot4.gd -- --monde
