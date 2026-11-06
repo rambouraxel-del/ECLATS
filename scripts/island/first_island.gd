@@ -13,7 +13,7 @@ func _ready() -> void:
 func _update_help() -> void:
 	App.set_scene_help("Île : seed %d (N/B) · K couche modifiable %s · V rendu %s · généré en %d ms" % [
 		island.seed, "visible" if island.surface_visible else "masquée (cœur seul)",
-		"Lot 2 (stylisé)" if island.render_style == VoxelMesher.Style.STYLIZED else "Lot 1 (ancien)",
+		"Lot 2 (stylisé)" if island.render_style == EclatsMesher.Style.STYLIZED else "Lot 1 (ancien)",
 		island.last_generation_ms])
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -26,8 +26,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_B:
 			island.seed -= 1
 		KEY_V:
-			var legacy := island.render_style == VoxelMesher.Style.STYLIZED
-			var style := VoxelMesher.Style.LEGACY if legacy else VoxelMesher.Style.STYLIZED
+			var legacy := island.render_style == EclatsMesher.Style.STYLIZED
+			var style := EclatsMesher.Style.LEGACY if legacy else EclatsMesher.Style.STYLIZED
 			for node in get_children():
 				if node is VoxelIsland:
 					node.render_style = style

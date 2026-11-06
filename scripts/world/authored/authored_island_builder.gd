@@ -28,7 +28,7 @@ static func build(map: Dictionary, opts := {}) -> WorldData:
 		var now := Time.get_ticks_msec()
 		w.timings[label] = now - int(clock[0])
 		clock[0] = now
-	VoxelMesher.palette_warmup()
+	EclatsMesher.palette_warmup()
 	w.profile = IslandProfile.load_profile("settled")
 	w.field = AuthoredTerrain.build_field(map)
 	lap.call("relief")
@@ -563,7 +563,7 @@ func _voxels() -> void:
 			for cx in range(0, vol.size.x, 64):
 				uj.append({"min": Vector3i(cx, 0, cz), "max": Vector3i(mini(cx + 64, vol.size.x), vol.size.y, mini(cz + 64, vol.size.z)) - Vector3i.ONE, "arrays": []})
 		var t2 := WorkerThreadPool.add_group_task(func(i: int) -> void:
-			uj[i]["arrays"] = VoxelMesher.build_arrays(vol, 1.0, uj[i]["min"], uj[i]["max"], PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.STYLIZED),
+			uj[i]["arrays"] = EclatsMesher.build_arrays(vol, 1.0, uj[i]["min"], uj[i]["max"], PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.STYLIZED),
 			uj.size(), -1, true, "Sous-face")
 		WorkerThreadPool.wait_for_group_task_completion(t2)
 		for j in uj:
@@ -610,7 +610,7 @@ func _tile_job(job: Dictionary) -> void:
 			var rmin := Vector3i(cx, 0, cz)
 			var rmax := Vector3i(mini(cx + CHUNK, size.x), size.y, mini(cz + CHUNK, size.z)) - Vector3i.ONE
 			for layer in [data.core, data.surface]:
-				var arr := VoxelMesher.build_arrays(layer, V, rmin, rmax, data.solid, data.origin_cell, 0, VoxelMesher.Style.STYLIZED)
+				var arr := EclatsMesher.build_arrays(layer, V, rmin, rmax, data.solid, data.origin_cell, 0, EclatsMesher.Style.STYLIZED)
 				if not arr.is_empty():
 					(job["out"] as Array).append({"arrays": arr, "origin": origin, "name": "T_%d_%d_%s" % [(job["rect"] as Rect2i).position.x + cx, (job["rect"] as Rect2i).position.y + cz, "c" if layer == data.core else "s"]})
 	job["t_mesh"] = Time.get_ticks_usec() - t0 - int(job["t_vox"])

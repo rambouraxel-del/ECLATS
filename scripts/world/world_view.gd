@@ -46,7 +46,7 @@ static func create(world: WorldData, parent: Node3D) -> Dictionary:
 			root.add_child(ropes)
 			for r in world.port["mooring"]["ropes"]:
 				var k := ShipGenerator.rope_kit(r["a"], r["b"], r["sag"])
-				var a2 := VoxelMesher.build_arrays(k["volume"], float(k["grid"]), Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+				var a2 := EclatsMesher.build_arrays(k["volume"], float(k["grid"]), Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 				var rm := _mesh(a2)
 				if rm != null:
 					rm.position = k["origin"]
@@ -83,7 +83,7 @@ static func _pier_node(world: WorldData) -> Node3D:
 	var n := Node3D.new()
 	n.name = "Pier"
 	n.transform = PortBuilder.frame_transform(port)
-	var arrays := VoxelMesher.build_arrays(pier["volume"], C, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+	var arrays := EclatsMesher.build_arrays(pier["volume"], C, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 	var mi := _mesh(arrays)
 	if mi != null:
 		mi.name = "Deck"
@@ -91,7 +91,7 @@ static func _pier_node(world: WorldData) -> Node3D:
 		n.add_child(mi)
 	for r in pier["ropes"]:
 		var kit := PortBuilder.rope_kit(r["a"], r["b"])
-		var a2 := VoxelMesher.build_arrays(kit["volume"], float(kit["grid"]), Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+		var a2 := EclatsMesher.build_arrays(kit["volume"], float(kit["grid"]), Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 		var rm := _mesh(a2)
 		if rm != null:
 			rm.name = "Stay"
@@ -110,7 +110,7 @@ static func _pier_node(world: WorldData) -> Node3D:
 	return n
 
 static func _mesh(arrays: Array) -> MeshInstance3D:
-	var mesh := VoxelMesher.arrays_to_mesh(arrays, VoxelMesher.Style.DETAIL)
+	var mesh := EclatsMesher.arrays_to_mesh(arrays, EclatsMesher.Style.DETAIL)
 	if mesh == null:
 		return null
 	mesh.surface_set_material(0, VoxelMaterials.props_material())
@@ -129,8 +129,8 @@ static func _plants_nodes(world: WorldData, parent: Node3D) -> void:
 		if not meshes.has(kind):
 			var vol := VegetationLibrary.build_plant(kind)
 			meshes[kind] = [
-				VoxelMesher.build(vol, VoxelGrid.DETAIL_SIZE, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL),
-				VoxelMesher.build(vol.downsample(2, 0.25), VoxelGrid.DETAIL_SIZE * 2.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL),
+				EclatsMesher.build(vol, VoxelGrid.DETAIL_SIZE, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL),
+				EclatsMesher.build(vol.downsample(2, 0.25), VoxelGrid.DETAIL_SIZE * 2.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL),
 			]
 		var xs: Array = entry["xforms"]
 		for li in 2:

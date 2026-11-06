@@ -26,8 +26,8 @@ static func extrude(bottom: PackedInt32Array, top: PackedInt32Array, length_m: f
 				vol.set_voxel(0, y, i, id)
 			else:
 				vol.set_voxel(i, y, 0, id)
-	var arrays := VoxelMesher.build_arrays(vol, PIX, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
-	arrays = VoxelMesher.stretch_axis(arrays, ridge_axis, length_m / PIX, PIX)
+	var arrays := EclatsMesher.build_arrays(vol, PIX, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
+	arrays = EclatsMesher.stretch_axis(arrays, ridge_axis, length_m / PIX, PIX)
 	return {"arrays": arrays, "span": span, "height": h, "material": material_key}
 
 ## Profil à deux pans symétriques. Unités : cellules de 10 cm.

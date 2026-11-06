@@ -74,7 +74,7 @@ func setup_field(p_field: TerrainField, env_kind: String, p_seed: int, spawn_xz:
 	var t0 := Time.get_ticks_msec()
 	kind = env_kind
 	pal = VoxelPalette.get_default()
-	VoxelMesher.palette_warmup()
+	EclatsMesher.palette_warmup()
 	world = WorldData.new()
 	world.seed = p_seed
 	world.profile = IslandProfile.load_profile("settled")
@@ -154,7 +154,7 @@ func _underside(blocks: Dictionary) -> Array:
 		for cx in range(0, vol.size.x, 64):
 			uj.append({"min": Vector3i(cx, 0, cz), "max": Vector3i(mini(cx + 64, vol.size.x), vol.size.y, mini(cz + 64, vol.size.z)) - Vector3i.ONE, "arrays": []})
 	var t2 := WorkerThreadPool.add_group_task(func(i: int) -> void:
-		uj[i]["arrays"] = VoxelMesher.build_arrays(vol, 1.0, uj[i]["min"], uj[i]["max"], PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.STYLIZED),
+		uj[i]["arrays"] = EclatsMesher.build_arrays(vol, 1.0, uj[i]["min"], uj[i]["max"], PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.STYLIZED),
 		uj.size(), -1, true, "Sous-face du laboratoire")
 	WorkerThreadPool.wait_for_group_task_completion(t2)
 	for j in uj:
@@ -187,7 +187,7 @@ func rebuild_rect(cols: Rect2i) -> void:
 				terrain_root.remove_child(mi)
 				mi.queue_free()
 	for tl in tiles:
-		var mesh := VoxelMesher.arrays_to_mesh(tl["arrays"], VoxelMesher.Style.STYLIZED)
+		var mesh := EclatsMesher.arrays_to_mesh(tl["arrays"], EclatsMesher.Style.STYLIZED)
 		if mesh == null:
 			continue
 		var mi := MeshInstance3D.new()

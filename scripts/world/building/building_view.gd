@@ -10,11 +10,11 @@ const C := VoxelGrid.STRUCTURE_SIZE
 ## Tableaux de sommets (pur, sans nœud : peut tourner dans un thread).
 static func make_arrays(model: BuildingModel) -> Dictionary:
 	var out := {"structure": [], "lod1": [], "lod2": [], "details": []}
-	out["structure"] = VoxelMesher.build_arrays(model.volume, C, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+	out["structure"] = EclatsMesher.build_arrays(model.volume, C, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 	var s1 := model.volume.downsample(2, 0.3)
-	out["lod1"] = VoxelMesher.build_arrays(s1, C * 2.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+	out["lod1"] = EclatsMesher.build_arrays(s1, C * 2.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 	var s2 := model.volume.downsample(4, 0.35)
-	out["lod2"] = VoxelMesher.build_arrays(s2, C * 4.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+	out["lod2"] = EclatsMesher.build_arrays(s2, C * 4.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 	var det := []
 	for d in model.details:
 		det.append(MeshCache.arrays_for(d["volume"], float(d["grid"])))
@@ -75,7 +75,7 @@ static func create_node(model: BuildingModel, arrays: Dictionary, lod_ranges := 
 	return root
 
 static func _mesh_instance(name: String, arrays: Array, material: Material) -> MeshInstance3D:
-	var mesh := VoxelMesher.arrays_to_mesh(arrays, VoxelMesher.Style.DETAIL)
+	var mesh := EclatsMesher.arrays_to_mesh(arrays, EclatsMesher.Style.DETAIL)
 	if mesh == null:
 		return null
 	mesh.surface_set_material(0, material)

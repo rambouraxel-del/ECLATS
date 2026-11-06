@@ -18,7 +18,7 @@ func _initialize() -> void:
 			ids.append_array(Array(AssetLibrary.ids_in(a.substr(6))))
 		else:
 			ids.append(a)
-	VoxelMesher.palette_warmup()
+	EclatsMesher.palette_warmup()
 	var report := {}
 	var report_path := AssetLibrary.ASSET_DIR + "/assets_report.json"
 	if FileAccess.file_exists(report_path):
@@ -53,12 +53,12 @@ static func bake(id: String) -> Dictionary:
 	var solid := 0
 	var bytes := 0
 	var parts_info := []
-	var detail_style := VoxelMesher.Style.DETAIL
+	var detail_style := EclatsMesher.Style.DETAIL
 	for part in asset.parts:
 		var vol: VoxelVolume = part["volume"]
 		var grid: float = part["grid"]
 		solid += vol.count_solid()
-		var arrays0 := VoxelMesher.build_arrays(vol, grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, detail_style)
+		var arrays0 := EclatsMesher.build_arrays(vol, grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, detail_style)
 		if arrays0.is_empty():
 			continue
 		var node_pos: Vector3 = part["offset"]
@@ -79,7 +79,7 @@ static func bake(id: String) -> Dictionary:
 				if f <= 1:
 					continue
 				var small := vol.downsample(f, LOD_THRESHOLDS.get(f, 0.2))
-				var arr := VoxelMesher.build_arrays(small, grid * f, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, detail_style)
+				var arr := EclatsMesher.build_arrays(small, grid * f, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, detail_style)
 				# Pas de gain réel : on garde le niveau précédent.
 				if arr.is_empty() or _tri_count(arr) > _tri_count(lods[lods.size() - 1]) * 0.8:
 					break
@@ -95,7 +95,7 @@ static func bake(id: String) -> Dictionary:
 				for i in pv2.size():
 					pv2[i].y -= top
 				arrays[Mesh.ARRAY_VERTEX] = pv2
-			var mesh := VoxelMesher.arrays_to_mesh(arrays, detail_style)
+			var mesh := EclatsMesher.arrays_to_mesh(arrays, detail_style)
 			match part["material"]:
 				"cloth": mesh.surface_set_material(0, VoxelMaterials.cloth_material())
 				"crystal": mesh.surface_set_material(0, VoxelMaterials.crystal_material())

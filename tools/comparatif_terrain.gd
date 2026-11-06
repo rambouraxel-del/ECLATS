@@ -244,9 +244,11 @@ func _stroke(q: Vector2) -> void:
 	var t0 := Time.get_ticks_msec()
 	if method == "C":
 		var vw := scene.vw
+		var gs: Array[float] = []
 		for d in dabs:
-			var g := vw.ground_y(d.x, d.y)
-			vw.sculpt_dab(Vector3(d.x, g - 1.25, d.y), 2.5, true)
+			gs.append(vw.ground_y(d.x, d.y))       # sol lu AVANT le trait (sinon le trait s'empile sur lui-même)
+		for k in dabs.size():
+			vw.sculpt_dab(Vector3(dabs[k].x, gs[k] - 1.75, dabs[k].y), 2.5, true)
 		await _wait_voxel_idle()
 	else:
 		var doc := MapDoc.from_plan(IslandPlan.from_dict(plan.to_dict())["plan"] as IslandPlan)
@@ -542,9 +544,13 @@ func _mesure() -> void:
 			# retouche locale : 15 coups
 			var q := _relief_point()
 			var t3 := Time.get_ticks_msec()
+			var gs: Array[float] = []
 			for k in 15:
 				var d := q + Vector2(-3.5 + float(k) * 0.5, 0.0)
-				vw.sculpt_dab(Vector3(d.x, vw.ground_y(d.x, d.y) - 1.25, d.y), 2.5, true)
+				gs.append(vw.ground_y(d.x, d.y))
+			for k in 15:
+				var d := q + Vector2(-3.5 + float(k) * 0.5, 0.0)
+				vw.sculpt_dab(Vector3(d.x, gs[k] - 1.75, d.y), 2.5, true)
 			var t_dabs := Time.get_ticks_msec() - t3
 			var quiet := 0
 			var bb2 := vw.bounds_voxels()

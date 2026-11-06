@@ -52,9 +52,9 @@ func _floor() -> void:
 	mi.mesh = bm
 	_add(mi, Vector3(0, -0.1, 1.5))
 
-func _panel(kit: VoxelModelBuilder, pos: Vector3, label: String, style := VoxelMesher.Style.DETAIL, grid := V) -> void:
+func _panel(kit: VoxelModelBuilder, pos: Vector3, label: String, style := EclatsMesher.Style.DETAIL, grid := V) -> void:
 	var mi := MeshInstance3D.new()
-	mi.mesh = VoxelMesher.build(kit.volume, grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, style)
+	mi.mesh = EclatsMesher.build(kit.volume, grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, style)
 	_add(mi, pos)
 	_label(label, pos + Vector3(kit.volume.size.x * grid * 0.5, kit.volume.size.y * grid + 0.18, 0.0))
 
@@ -148,7 +148,7 @@ func _row_terrain() -> void:
 		vol.fill_box(Vector3i(0, 3, 0), Vector3i(6, 3, 6), pal.id(specs[i][0]))
 		vol.fill_box(Vector3i(0, 4, 0), Vector3i(2, 4, 2), pal.id(specs[i][0]))
 		var mi := MeshInstance3D.new()
-		mi.mesh = VoxelMesher.build(vol, VoxelGrid.VOXEL_SIZE)
+		mi.mesh = EclatsMesher.build(vol, VoxelGrid.VOXEL_SIZE)
 		_add(mi, Vector3(_x(i, 5) - 0.1, 0, z))
 		_label(specs[i][2], Vector3(_x(i, 5) + 0.6, 1.2, z + 0.7))
 

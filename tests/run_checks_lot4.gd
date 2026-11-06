@@ -20,7 +20,7 @@ func check(cond: bool, label: String) -> void:
 func _initialize() -> void:
 	await process_frame
 	print("== ÉCLATS Lot 4 : vérifications ==")
-	VoxelMesher.palette_warmup()
+	EclatsMesher.palette_warmup()
 	_check_rng()
 	_check_terrain()
 	_check_placement()

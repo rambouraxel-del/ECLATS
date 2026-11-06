@@ -71,7 +71,7 @@ func _place_trees(data: IslandData, island: VoxelIsland, rng: RandomNumberGenera
 		var vol := VegetationLibrary.build_tree(data.seed * 131 + placed.size())
 		var mi := MeshInstance3D.new()
 		mi.name = "Tree_%d" % placed.size()
-		mi.mesh = VoxelMesher.build(vol, VoxelGrid.VOXEL_SIZE)
+		mi.mesh = EclatsMesher.build(vol, VoxelGrid.VOXEL_SIZE)
 		var half := vol.size.x / 2
 		# Base du tronc sur la cellule (c.x, c.y), au ras du sol.
 		# (enfoncée d'un voxel pour ancrer les racines).
@@ -100,7 +100,7 @@ func _place_plants(data: IslandData, island: VoxelIsland, rng: RandomNumberGener
 			continue
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = VoxelMesher.build(VegetationLibrary.build_plant(kind), VoxelGrid.DETAIL_SIZE)
+		mm.mesh = EclatsMesher.build(VegetationLibrary.build_plant(kind), VoxelGrid.DETAIL_SIZE)
 		mm.instance_count = list.size()
 		for j in list.size():
 			mm.set_instance_transform(j, list[j])

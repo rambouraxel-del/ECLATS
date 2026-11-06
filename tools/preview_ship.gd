@@ -3,7 +3,7 @@ extends SceneTree
 func _initialize() -> void:
 	await process_frame
 	var args := OS.get_cmdline_user_args()
-	VoxelMesher.palette_warmup()
+	EclatsMesher.palette_warmup()
 	var t0 := Time.get_ticks_msec()
 	var ship := ShipGenerator.build(int(args[0]))
 	print("ship ms ", Time.get_ticks_msec() - t0, " L ", ship["L"], " sails ", ship["sails"].size(), " wood comps ", ship["wood_components"], " removed ", ship["removed_floating"])

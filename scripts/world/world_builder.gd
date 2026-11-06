@@ -18,7 +18,7 @@ static func build(profile_key: String, seed: int, opts := {}) -> WorldData:
 		var now := Time.get_ticks_msec()
 		w.timings[label] = now - int(clock[0])
 		clock[0] = now
-	VoxelMesher.palette_warmup()
+	EclatsMesher.palette_warmup()
 	w.profile = IslandProfile.load_profile(profile_key)
 	var gen := TerrainGenerator.new()
 	w.field = gen.generate(w.profile, seed)

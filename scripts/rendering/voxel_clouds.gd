@@ -34,7 +34,7 @@ func _ready() -> void:
 		var mesh := _puff(rng, size, cell)
 		if mesh == null:
 			continue
-		triangles += VoxelMesher.triangle_count(mesh)
+		triangles += EclatsMesher.triangle_count(mesh)
 		var mi := MeshInstance3D.new()
 		mi.name = "Cloud%d" % i
 		mi.mesh = mesh
@@ -72,9 +72,9 @@ func _puff(rng: RandomNumberGenerator, size: Vector3i, cell: float) -> ArrayMesh
 					f *= 0.55     # fond presque plat
 				if f > 0.42:
 					vol.set_voxel(x, y, z, dim if VoxelGrid.hash01(x, y, z, 3) < 0.25 else white)
-	var arrays := VoxelMesher.build_arrays(vol, cell, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.STYLIZED)
+	var arrays := EclatsMesher.build_arrays(vol, cell, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.STYLIZED)
 	if arrays.is_empty():
 		return null
-	var mesh := VoxelMesher.arrays_to_mesh(arrays, VoxelMesher.Style.STYLIZED)
+	var mesh := EclatsMesher.arrays_to_mesh(arrays, EclatsMesher.Style.STYLIZED)
 	mesh.surface_set_material(0, _material)
 	return mesh

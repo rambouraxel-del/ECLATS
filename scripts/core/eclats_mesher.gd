@@ -1,5 +1,5 @@
 @tool
-class_name VoxelMesher
+class_name EclatsMesher
 extends RefCounted
 ## Transforme une VoxelVolume en ArrayMesh. Seules les faces en contact avec l'air sont
 ## générées (aucune face intérieure), avec occlusion ambiante par sommet.

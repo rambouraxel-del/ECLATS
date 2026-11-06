@@ -27,7 +27,7 @@ const CHUNK := 32
 		hill_height_m = v
 		_queue_regen()
 ## Rendu du terrain : STYLIZED (Lot 2) ou LEGACY (Lot 1, pour comparaison).
-@export var render_style: VoxelMesher.Style = VoxelMesher.Style.STYLIZED:
+@export var render_style: EclatsMesher.Style = EclatsMesher.Style.STYLIZED:
 	set(v):
 		render_style = v
 		if is_inside_tree() and data != null:
@@ -114,14 +114,14 @@ func _rebuild_meshes() -> void:
 	var style := render_style
 	var results := []
 	results.resize(jobs.size())
-	VoxelMesher.palette_warmup()
+	EclatsMesher.palette_warmup()
 	var task := WorkerThreadPool.add_group_task(func(i: int) -> void:
 		var j: Array = jobs[i]
-		results[i] = VoxelMesher.build_arrays(j[1], VoxelGrid.VOXEL_SIZE, j[2], j[3], data.solid, data.origin_cell, 0, style),
+		results[i] = EclatsMesher.build_arrays(j[1], VoxelGrid.VOXEL_SIZE, j[2], j[3], data.solid, data.origin_cell, 0, style),
 		jobs.size(), -1, true, "VoxelIsland meshing")
 	WorkerThreadPool.wait_for_group_task_completion(task)
 	for i in jobs.size():
-		var mesh := VoxelMesher.arrays_to_mesh(results[i], style)
+		var mesh := EclatsMesher.arrays_to_mesh(results[i], style)
 		if mesh == null:
 			continue
 		var rmin: Vector3i = jobs[i][2]
@@ -158,7 +158,7 @@ func count_triangles() -> int:
 		if root == null:
 			continue
 		for mi in root.get_children():
-			total += VoxelMesher.triangle_count((mi as MeshInstance3D).mesh)
+			total += EclatsMesher.triangle_count((mi as MeshInstance3D).mesh)
 	return total
 
 ## Hauteur (m) du sol au point (x, z) du repère du nœud (valeur de la colonne de 20 cm).

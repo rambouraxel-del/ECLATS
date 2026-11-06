@@ -51,7 +51,7 @@ func _check_grid() -> void:
 	check(VoxelGrid.hash01(3, 4, 5, 9) == VoxelGrid.hash01(3, 4, 5, 9), "bruit de cellule déterministe")
 
 func _faces(vol: VoxelVolume) -> int:
-	var arrays := VoxelMesher.build_arrays(vol, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.LEGACY)
+	var arrays := EclatsMesher.build_arrays(vol, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.LEGACY)
 	return 0 if arrays.is_empty() else (arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 4
 
 func _check_mesher() -> void:
@@ -69,7 +69,7 @@ func _check_mesher() -> void:
 	var mask := PackedByteArray()
 	mask.resize(one.data.size())
 	mask.fill(1)
-	check(_faces(one) == 6 and VoxelMesher.build_arrays(one, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), mask, Vector3i.ZERO, 0, VoxelMesher.Style.LEGACY).is_empty(),
+	check(_faces(one) == 6 and EclatsMesher.build_arrays(one, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), mask, Vector3i.ZERO, 0, EclatsMesher.Style.LEGACY).is_empty(),
 		"masque d'occupation : faces cachées contre la couche voisine")
 
 func _check_island() -> void:
@@ -124,7 +124,7 @@ func _check_island() -> void:
 	var expected := _exposed_faces(s)
 	var got := 0
 	for vol in [s.core, s.surface]:
-		var arrays := VoxelMesher.build_arrays(vol, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), s.solid, Vector3i.ZERO, 0, VoxelMesher.Style.LEGACY)
+		var arrays := EclatsMesher.build_arrays(vol, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), s.solid, Vector3i.ZERO, 0, EclatsMesher.Style.LEGACY)
 		if not arrays.is_empty():
 			got += (arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 4
 	check(got == expected, "île (rendu Lot 1) : %d faces générées = %d faces exposées" % [got, expected])
@@ -191,7 +191,7 @@ func _check_greedy() -> void:
 	print("Maillage fusionné (Lot 2)")
 	var cube := VoxelVolume.new(Vector3i(8, 8, 8))
 	cube.fill_box(Vector3i.ZERO, Vector3i(7, 7, 7), 1)
-	var g := VoxelMesher.build_arrays(cube, 0.02)
+	var g := EclatsMesher.build_arrays(cube, 0.02)
 	check((g[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 4 == 6, "cube plein 8³ : 6 quads fusionnés (au lieu de 384)")
 	# Même surface visible qu'avec une face par voxel.
 	var gen := IslandGenerator.new()
@@ -201,8 +201,8 @@ func _check_greedy() -> void:
 	var tot_g := Vector2.ZERO
 	var tot_l := Vector2.ZERO
 	for vol in [d.core, d.surface]:
-		var a := VoxelMesher.build_arrays(vol, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), d.solid, Vector3i.ZERO, 0, VoxelMesher.Style.STYLIZED)
-		var b := VoxelMesher.build_arrays(vol, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), d.solid, Vector3i.ZERO, 0, VoxelMesher.Style.LEGACY)
+		var a := EclatsMesher.build_arrays(vol, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), d.solid, Vector3i.ZERO, 0, EclatsMesher.Style.STYLIZED)
+		var b := EclatsMesher.build_arrays(vol, 0.2, Vector3i.ZERO, Vector3i(-1, -1, -1), d.solid, Vector3i.ZERO, 0, EclatsMesher.Style.LEGACY)
 		if not a.is_empty():
 			tot_g += _area_and_quads(a, 0.2)
 		if not b.is_empty():
@@ -215,7 +215,7 @@ func _check_greedy() -> void:
 	two.set_voxel(1, 0, 0, 1)
 	two.set_voxel(2, 0, 0, 2)
 	two.set_voxel(3, 0, 0, 2)
-	var t := VoxelMesher.build_arrays(two, 0.02)
+	var t := EclatsMesher.build_arrays(two, 0.02)
 	check((t[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 4 == 10, "matières différentes : pas de fusion (10 quads)")
 	# Pas de variation par cellule : mêmes couleurs de sommet pour deux voxels identiques.
 	var cols := t[Mesh.ARRAY_COLOR] as PackedColorArray
@@ -253,7 +253,7 @@ func _check_assets() -> void:
 		for i in a.parts.size():
 			var vol: VoxelVolume = a.parts[i]["volume"]
 			same = same and vol.checksum() == (a2.parts[i]["volume"] as VoxelVolume).checksum()
-			var arr := VoxelMesher.build_arrays(vol, a.parts[i]["grid"], Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+			var arr := EclatsMesher.build_arrays(vol, a.parts[i]["grid"], Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 			var pv := arr[Mesh.ARRAY_VERTEX] as PackedVector3Array
 			verts += pv.size()
 			tris += (arr[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3
@@ -276,7 +276,7 @@ func _check_assets() -> void:
 		check(cok and a.colliders.size() > 0, "%s : boîtes de collision dans l'emprise" % id)
 		# Aucune face intérieure : chaque quad est un vrai contact plein/vide (pièce principale).
 		var vol0: VoxelVolume = a.parts[0]["volume"]
-		var legacy := VoxelMesher.build_arrays(vol0, 0.02, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.LEGACY)
+		var legacy := EclatsMesher.build_arrays(vol0, 0.02, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.LEGACY)
 		var exposed := _exposed_quads(vol0)
 		check((legacy[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 4 == exposed, "%s : aucune face interne (%d faces exposées)" % [id, exposed])
 		# Scène générée (bake).
@@ -346,7 +346,7 @@ func _check_pixel_rule() -> void:
 	# Une matière = une couleur par pixel : les maillages ne portent aucune variation de teinte par cellule.
 	var vol := VoxelVolume.new(Vector3i(6, 1, 6))
 	vol.fill_box(Vector3i.ZERO, Vector3i(5, 0, 5), pal.id("wood_planks"))
-	var arr := VoxelMesher.build_arrays(vol, 0.02, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+	var arr := EclatsMesher.build_arrays(vol, 0.02, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 	var colors := {}
 	for c in arr[Mesh.ARRAY_COLOR]:
 		colors[Color(c.r, c.g, c.b, 1.0)] = true
@@ -422,7 +422,7 @@ func _check_library() -> void:
 	for id in ["water_well", "crystal_lamp", "barrel_set", "garden_fence", "tree_birch_1", "boulder_1", "brazier"]:
 		var a := AssetLibrary.build(id)
 		var vol0: VoxelVolume = a.parts[0]["volume"]
-		var legacy := VoxelMesher.build_arrays(vol0, a.parts[0]["grid"], Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.LEGACY)
+		var legacy := EclatsMesher.build_arrays(vol0, a.parts[0]["grid"], Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.LEGACY)
 		var q: int = (legacy[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 4
 		if q != _exposed_quads(vol0):
 			inner_ok = false

@@ -35,8 +35,8 @@ static func crystal_material() -> Material:
 
 static func material_for(style: int) -> Material:
 	match style:
-		VoxelMesher.Style.LEGACY: return voxel_material()
-		VoxelMesher.Style.DETAIL: return props_material()
+		EclatsMesher.Style.LEGACY: return voxel_material()
+		EclatsMesher.Style.DETAIL: return props_material()
 	return stylized_material()
 
 ## Matériaux qui partagent le shader stylisé (pour piloter les paramètres globaux :

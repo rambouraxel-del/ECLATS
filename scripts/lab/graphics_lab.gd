@@ -82,7 +82,7 @@ func _build_material_samples() -> void:
 		var vol := VoxelVolume.new(Vector3i(3, 3, 3))
 		vol.fill_box(Vector3i.ZERO, Vector3i(2, 2, 2), id)
 		var mi := MeshInstance3D.new()
-		mi.mesh = VoxelMesher.build(vol, V, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), VoxelGrid.world_to_cell(pos))
+		mi.mesh = EclatsMesher.build(vol, V, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), VoxelGrid.world_to_cell(pos))
 		_add(mi, pos)
 		_label(pal.names[id], pos + Vector3(0.3, 0.85 + (i % 2) * 0.35, 0.3), 44)
 
@@ -130,7 +130,7 @@ func _build_seam_test() -> void:
 	vol.fill_box(Vector3i(8, 3, 0), Vector3i(14, 3, 6), 0)    # un creux pour poser des blocs
 	vol.fill_box(Vector3i(8, 3, 0), Vector3i(14, 3, 6), 0)
 	var mi := MeshInstance3D.new()
-	mi.mesh = VoxelMesher.build(vol, V, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), VoxelGrid.world_to_cell(origin))
+	mi.mesh = EclatsMesher.build(vol, V, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), VoxelGrid.world_to_cell(origin))
 	_add(mi, origin)
 	# Blocs posés : comblent une partie du creux et s'empilent sur l'herbe.
 	var placed := [
@@ -159,7 +159,7 @@ func _build_scale_refs() -> void:
 	for y in 10:
 		vol.set_voxel(0, y, 0, pal.id("wood_dark") if y % 2 == 0 else pal.id("mortar"))
 	var mi := MeshInstance3D.new()
-	mi.mesh = VoxelMesher.build(vol, V)
+	mi.mesh = EclatsMesher.build(vol, V)
 	_add(mi, origin)
 	_label("1 m", origin + Vector3(-0.35, 1.0, 0.1), 32)
 	_label("2 m", origin + Vector3(-0.35, 2.0, 0.1), 32)
@@ -172,7 +172,7 @@ func _build_scale_refs() -> void:
 	b.box(9, 17, 1, 9, 27, 4, "iron")
 	b.box(3, 29, 1, 6, 35, 4, "stone")        # tête
 	var sil := MeshInstance3D.new()
-	sil.mesh = VoxelMesher.build(b.volume, VoxelGrid.LEGACY_DETAIL_SIZE)
+	sil.mesh = EclatsMesher.build(b.volume, VoxelGrid.LEGACY_DETAIL_SIZE)
 	_add(sil, origin + Vector3(1.0, 0, 0))
 	_label("Repère 1,80 m", origin + Vector3(1.25, 2.3, 0.15), 36)
 
@@ -239,7 +239,7 @@ func _build_diorama() -> void:
 	var flat_h := 4
 	var vol := TerrainPatch.generate(90, 45, 77, 3, 4, flats, flat_h)
 	var mi := MeshInstance3D.new()
-	mi.mesh = VoxelMesher.build(vol, V)
+	mi.mesh = EclatsMesher.build(vol, V)
 	_add(mi, DIORAMA_ORIGIN)
 	for p in placed:
 		var c: Vector2i = p[1]
@@ -269,7 +269,7 @@ func _build_diorama() -> void:
 	for kind in lists:
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = VoxelMesher.build(VegetationLibrary.build_plant(kind), VoxelGrid.DETAIL_SIZE)
+		mm.mesh = EclatsMesher.build(VegetationLibrary.build_plant(kind), VoxelGrid.DETAIL_SIZE)
 		mm.instance_count = lists[kind].size()
 		for j in lists[kind].size():
 			mm.set_instance_transform(j, lists[kind][j])
@@ -281,11 +281,11 @@ func _build_diorama() -> void:
 ## Comparaison : mêmes voxels, rendu Lot 1 (gauche) et Lot 2 (droite).
 func _build_terrain_comparison() -> void:
 	var vol := TerrainPatch.generate(30, 30, 12, 2, 6)
-	var styles := [[VoxelMesher.Style.LEGACY, "Lot 1 : ancien rendu", -7.0], [VoxelMesher.Style.STYLIZED, "Lot 2 : rendu stylisé", 1.0]]
+	var styles := [[EclatsMesher.Style.LEGACY, "Lot 1 : ancien rendu", -7.0], [EclatsMesher.Style.STYLIZED, "Lot 2 : rendu stylisé", 1.0]]
 	for st in styles:
 		var origin := Vector3(st[2], 0, COMPARE_Z)
 		var mi := MeshInstance3D.new()
-		mi.mesh = VoxelMesher.build(vol, V, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(),
+		mi.mesh = EclatsMesher.build(vol, V, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(),
 				VoxelGrid.world_to_cell(origin), 0, st[0])
 		_add(mi, origin)
 		_label(st[1], origin + Vector3(3.0, 0.9, 6.5), 52)

@@ -22,7 +22,7 @@ static func create(world: WorldData, parent: Node3D) -> Dictionary:
 	terrain.name = "Terrain"
 	root.add_child(terrain)
 	for t in world.authored.get("terrain_meshes", []):
-		var mesh := VoxelMesher.arrays_to_mesh(t["arrays"], VoxelMesher.Style.STYLIZED)
+		var mesh := EclatsMesher.arrays_to_mesh(t["arrays"], EclatsMesher.Style.STYLIZED)
 		if mesh == null:
 			continue
 		var mi := MeshInstance3D.new()
@@ -34,7 +34,7 @@ static func create(world: WorldData, parent: Node3D) -> Dictionary:
 	under.name = "Underside"
 	root.add_child(under)
 	for t in world.authored.get("underside_meshes", []):
-		var mesh := VoxelMesher.arrays_to_mesh(t["arrays"], VoxelMesher.Style.STYLIZED)
+		var mesh := EclatsMesher.arrays_to_mesh(t["arrays"], EclatsMesher.Style.STYLIZED)
 		if mesh == null:
 			continue
 		var mi := MeshInstance3D.new()
@@ -63,7 +63,7 @@ static func create(world: WorldData, parent: Node3D) -> Dictionary:
 			root.add_child(ropes)
 			for r in world.port["mooring"]["ropes"]:
 				var k := ShipGenerator.rope_kit(r["a"], r["b"], r["sag"])
-				var a2 := VoxelMesher.build_arrays(k["volume"], float(k["grid"]), Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+				var a2 := EclatsMesher.build_arrays(k["volume"], float(k["grid"]), Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 				var rm := WorldView._mesh(a2)
 				if rm != null:
 					rm.position = k["origin"]

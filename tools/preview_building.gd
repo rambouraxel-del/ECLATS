@@ -4,7 +4,7 @@ extends SceneTree
 func _initialize() -> void:
 	await process_frame
 	var args := OS.get_cmdline_user_args()
-	VoxelMesher.palette_warmup()
+	EclatsMesher.palette_warmup()
 	var plan := BuildingPlanner.plan(args[0], int(args[1]))
 	var model := BuildingBuilder.build(plan)
 	var cut := int(OS.get_environment("CUT")) if OS.get_environment("CUT") != "" else 0

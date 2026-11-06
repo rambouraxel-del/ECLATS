@@ -29,7 +29,7 @@ func _part(parent: Node3D, size: Vector3i, anchor: Vector3, pivot: Vector3, fill
 	pv.name = pname
 	pv.position = pivot
 	parent.add_child(pv)
-	var mesh := VoxelMesher.build(b.volume, G, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+	var mesh := EclatsMesher.build(b.volume, G, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 	if mesh != null:
 		mesh.surface_set_material(0, VoxelMaterials.props_material())
 		var mi := MeshInstance3D.new()

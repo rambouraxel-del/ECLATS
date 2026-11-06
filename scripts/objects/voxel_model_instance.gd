@@ -45,7 +45,7 @@ func _mesh_for(model: Dictionary) -> ArrayMesh:
 	if model["world_tint"]:
 		# Bloc posé : teinte calculée à sa position dans la grille monde (comme le terrain).
 		var cell := VoxelGrid.world_to_cell(global_position + Vector3.ONE * grid * 0.5)
-		return VoxelMesher.build(model["volume"], grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), cell)
+		return EclatsMesher.build(model["volume"], grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), cell)
 	if not _mesh_cache.has(model["key"]):
-		_mesh_cache[model["key"]] = VoxelMesher.build(model["volume"], grid)
+		_mesh_cache[model["key"]] = EclatsMesher.build(model["volume"], grid)
 	return _mesh_cache[model["key"]]

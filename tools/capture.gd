@@ -19,7 +19,7 @@ func _initialize() -> void:
 	if args.size() >= 3 and args[2] == "legacy":
 		for n in inst.get_children():
 			if n is VoxelIsland:
-				n.render_style = VoxelMesher.Style.LEGACY
+				n.render_style = EclatsMesher.Style.LEGACY
 		args.remove_at(2)
 	if args.size() >= 4 and args[2] == "view":
 		cam.set_process(false)

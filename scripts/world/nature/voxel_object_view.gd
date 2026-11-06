@@ -6,7 +6,7 @@ extends RefCounted
 ## selon la distance ; jamais de nœud par voxel.
 
 static func _arrays(vol: VoxelVolume, grid: float) -> Array:
-	return VoxelMesher.build_arrays(vol, grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+	return EclatsMesher.build_arrays(vol, grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 
 ## parts : [{volume, origin(Vector3 m), grid(float), material("props"|"cloth"|"crystal")}]
 ## Renvoie une liste (une entrée par partie) de 3 tableaux de sommets. Sans nœud : peut tourner dans un thread.
@@ -40,7 +40,7 @@ static func create_node(node_name: String, parts: Array, arrays: Array, ranges :
 		for li in 3:
 			if li > 0 and lods[li] == lods[0]:
 				continue
-			var mesh := VoxelMesher.arrays_to_mesh(lods[li], VoxelMesher.Style.DETAIL)
+			var mesh := EclatsMesher.arrays_to_mesh(lods[li], EclatsMesher.Style.DETAIL)
 			if mesh == null:
 				continue
 			mesh.surface_set_material(0, _material(p.get("material", "props")))

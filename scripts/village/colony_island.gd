@@ -270,8 +270,8 @@ func _scatter_plants(grass: Dictionary) -> void:
 		var vol := VegetationLibrary.build_plant(kind)
 		# Deux niveaux : 2 cm de près (< 16 m), 4 cm plus loin (jusqu'à 48 m).
 		var meshes := [
-			VoxelMesher.build(vol, VoxelGrid.DETAIL_SIZE, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL),
-			VoxelMesher.build(vol.downsample(2, 0.25), VoxelGrid.DETAIL_SIZE * 2.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL),
+			EclatsMesher.build(vol, VoxelGrid.DETAIL_SIZE, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL),
+			EclatsMesher.build(vol.downsample(2, 0.25), VoxelGrid.DETAIL_SIZE * 2.0, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL),
 		]
 		for key in lists[kind]:
 			var xs: Array = lists[kind][key]

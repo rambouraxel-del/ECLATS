@@ -19,7 +19,7 @@ static func arrays_for(vol: VoxelVolume, grid: float) -> Array:
 	_mutex.unlock()
 	if found != null:
 		return found
-	var arr := VoxelMesher.build_arrays(vol, grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, VoxelMesher.Style.DETAIL)
+	var arr := EclatsMesher.build_arrays(vol, grid, Vector3i.ZERO, Vector3i(-1, -1, -1), PackedByteArray(), Vector3i.ZERO, 0, EclatsMesher.Style.DETAIL)
 	_mutex.lock()
 	_cache[key] = arr
 	misses += 1

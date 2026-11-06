@@ -7,7 +7,7 @@ extends SceneTree
 func _tri(mi: MeshInstance3D) -> int:
 	if mi.mesh == null:
 		return 0
-	return VoxelMesher.triangle_count(mi.mesh)
+	return EclatsMesher.triangle_count(mi.mesh)
 
 func _initialize() -> void:
 	await process_frame
@@ -52,7 +52,7 @@ func _initialize() -> void:
 			cats[cat][lod] += _tri(mi)
 		elif n is MultiMeshInstance3D:
 			var mm := (n as MultiMeshInstance3D).multimesh
-			var tri := VoxelMesher.triangle_count(mm.mesh) * mm.instance_count
+			var tri := EclatsMesher.triangle_count(mm.mesh) * mm.instance_count
 			if not cats.has(cat):
 				cats[cat] = [0, 0, 0]
 			cats[cat][0 if (n as MultiMeshInstance3D).visibility_range_begin <= 0.0 else 1] += tri
