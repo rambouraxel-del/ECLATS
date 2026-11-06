@@ -314,6 +314,8 @@ static func from_dict(d: Dictionary) -> Dictionary:
 	p.settings = (d.get("settings", {"relief": 1.0}) as Dictionary).duplicate(true)
 	if p.settings.has("relief") and not _in(p.settings["relief"], 0.0, 10.0):
 		return {"ok": false, "error": "Carte invalide : réglage de relief hors limites (0 à 10)."}
+	if p.settings.has("method") and not (typeof(p.settings["method"]) == TYPE_STRING and String(p.settings["method"]) in ["A", "B", "C"]):
+		return {"ok": false, "error": "Carte invalide : méthode de génération inconnue (A, B ou C)."}
 	p.generated = bool(d.get("generated", false))
 	p._uid = int(d.get("uid", 0)) if _is_num(d.get("uid", 0)) else 0
 	if typeof(d["outline"]) != TYPE_ARRAY or typeof(d["zones"]) != TYPE_ARRAY or typeof(d["paths"]) != TYPE_ARRAY or typeof(d["landmarks"]) != TYPE_ARRAY:

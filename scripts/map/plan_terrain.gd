@@ -26,6 +26,9 @@ class Build extends RefCounted:
 	var path_h: Dictionary = {}             # id de chemin → hauteurs aux sommets (m)
 	var ms := 0
 	var plan_sig := 0
+	var method := "A"                       # A : générateur du Lot 11 · B : relief enrichi (FastNoiseLite) · S : structure seule (pour C)
+	var detail_w := PackedFloat32Array()    # méthode S : poids du détail (0 sur les zones plates et près des chemins)
+	var detail_a := PackedFloat32Array()    # méthode S : amplitude du détail (m)
 
 	## Même relief de base, sur une autre copie du terrain (vue 3D).
 	func with_field(f: TerrainField) -> Build:
@@ -37,12 +40,21 @@ class Build extends RefCounted:
 		b.path_h = path_h
 		b.ms = ms
 		b.plan_sig = plan_sig
+		b.method = method
+		b.detail_w = detail_w
+		b.detail_a = detail_a
 		return b
 
 static func build(plan: IslandPlan, opts := {}) -> Build:
 	var t0 := Time.get_ticks_msec()
 	var b := Build.new()
 	b.plan_sig = plan.signature()
+	var method := String(opts.get("method", plan.settings.get("method", "A")))
+	if method == "C":
+		method = "S"                        # C : le squelette du plan ; le détail est généré par Voxel Tools (scène voxel)
+	if not method in ["A", "B", "S"]:
+		method = "A"
+	b.method = method
 	var pal := VoxelPalette.get_default()
 	var variation := int(opts.get("variation", 0))
 	var outline: Array = []
@@ -147,6 +159,10 @@ static func build(plan: IslandPlan, opts := {}) -> Build:
 	# ---- colonnes : relief + bruit + zones plates
 	var nz1 := WorldRng.noise(plan.seed + variation * 7919, "plan_relief", 0.07, 2)
 	var nz2 := WorldRng.noise(plan.seed + variation * 7919, "plan_relief_fine", 0.21, 1)
+	var nb := ReliefNoise.new(plan.seed + variation * 7919) if method == "B" else null
+	if method == "S":
+		b.detail_a.resize(n * n)
+		b.detail_w.resize(n * n)
 	var relief := float(plan.settings.get("relief", 1.0))
 	var wflat := PackedFloat32Array()
 	wflat.resize(n * n)
@@ -185,10 +201,18 @@ static func build(plan: IslandPlan, opts := {}) -> Build:
 			var h0 := _sample(hs, gn, gx0, gz0, q.x, q.y)
 			var a := _sample(amp, gn, gx0, gz0, q.x, q.y) * relief
 			var w := wflat[i]
-			h0 += (nz1.get_noise_2d(q.x, q.y) * 0.7 + nz2.get_noise_2d(q.x, q.y) * 0.3) * a * (1.0 - w) * 1.6
+			if method == "B":
+				h0 += nb.detail(q) * a * (1.0 - w) * 2.8
+			elif method == "S":
+				b.detail_a[i] = a
+				b.detail_w[i] = 1.0 - w
+			else:
+				h0 += (nz1.get_noise_2d(q.x, q.y) * 0.7 + nz2.get_noise_2d(q.x, q.y) * 0.3) * a * (1.0 - w) * 1.6
 			Hc[i] = lerpf(h0, hflat[i], w) if w > 0.0 else h0
 	# ---- chemins creusés
 	b.path_cols = _carve(plan, f, Hc, b.path_h)
+	if method == "S":
+		_path_falloff(b, n)
 	# ---- quantification
 	for i in n * n:
 		if f.top[i] == TerrainField.NO_GROUND:
@@ -206,6 +230,73 @@ static func build(plan: IslandPlan, opts := {}) -> Build:
 	b.base_mat = f.material.duplicate()
 	b.ms = Time.get_ticks_msec() - t0
 	return b
+
+## Méthode B : relief enrichi avec FastNoiseLite — crêtes (bruit « ridged »), vallées incisées, flancs plus irréguliers, le tout
+## gauchi par un bruit de déformation pour éviter les motifs réguliers. Amplitude ≈ ×2,2 par rapport à A, nulle sur les zones plates.
+class ReliefNoise extends RefCounted:
+	var ridge: FastNoiseLite
+	var body: FastNoiseLite
+	var valley: FastNoiseLite
+	var warp: FastNoiseLite
+	var fine: FastNoiseLite
+
+	func _init(seed: int) -> void:
+		ridge = WorldRng.noise(seed, "relief_b_ridge", 0.055, 4)
+		ridge.fractal_type = FastNoiseLite.FRACTAL_RIDGED
+		ridge.fractal_gain = 0.55
+		body = WorldRng.noise(seed, "relief_b_body", 0.034, 4)
+		body.fractal_type = FastNoiseLite.FRACTAL_FBM
+		valley = WorldRng.noise(seed, "relief_b_valley", 0.028, 2)
+		warp = WorldRng.noise(seed, "relief_b_warp", 0.045, 2)
+		fine = WorldRng.noise(seed, "relief_b_fine", 0.19, 2)
+
+	## Valeur sans unité (≈ −1,6 … 1,6) ; à multiplier par l'amplitude locale.
+	func detail(q: Vector2) -> float:
+		var w := Vector2(warp.get_noise_2d(q.x, q.y), warp.get_noise_2d(q.y + 37.0, q.x - 19.0)) * 5.0
+		var p := q + w
+		var r := ridge.get_noise_2d(p.x, p.y)                  # [-1, 1], crêtes vers 1
+		var crest := maxf(r, -0.2) * 1.25
+		var v := valley.get_noise_2d(p.x, p.y)
+		var incision := smoothstep(0.02, 0.45, -v) * 1.1       # vallées : creux continus
+		return body.get_noise_2d(p.x, p.y) * 0.9 + crest * 0.8 - incision + fine.get_noise_2d(q.x, q.y) * 0.25
+
+## Méthode S : le détail s'estompe à moins de 3,5 m d'un chemin (distance à l'axe, transformée en distance de chanfrein).
+static func _path_falloff(b: Build, n: int) -> void:
+	var d := PackedFloat32Array()
+	d.resize(n * n)
+	d.fill(99.0)
+	for i in n * n:
+		if b.path_cols[i] == 1:
+			d[i] = 0.0
+	var cs := V
+	for z in n:
+		for x in n:
+			var i := x + z * n
+			var v := d[i]
+			if x > 0:
+				v = minf(v, d[i - 1] + cs)
+			if z > 0:
+				v = minf(v, d[i - n] + cs)
+				if x > 0:
+					v = minf(v, d[i - n - 1] + cs * 1.414)
+				if x < n - 1:
+					v = minf(v, d[i - n + 1] + cs * 1.414)
+			d[i] = v
+	for z in range(n - 1, -1, -1):
+		for x in range(n - 1, -1, -1):
+			var i := x + z * n
+			var v := d[i]
+			if x < n - 1:
+				v = minf(v, d[i + 1] + cs)
+			if z < n - 1:
+				v = minf(v, d[i + n] + cs)
+				if x < n - 1:
+					v = minf(v, d[i + n + 1] + cs * 1.414)
+				if x > 0:
+					v = minf(v, d[i + n - 1] + cs * 1.414)
+			d[i] = v
+	for i in n * n:
+		b.detail_w[i] *= smoothstep(0.4, 3.5, d[i])
 
 static func _end_free(plan: IslandPlan, p: Vector2) -> bool:
 	var z := plan.zone_at(p)

@@ -8,6 +8,8 @@ extends Node3D
 var plan: IslandPlan
 var build: PlanTerrain.Build
 var lab: LabWorld
+var vw: VoxelProtoIsland = null            # méthode C : terrain en blocs Voxel Tools (à la place de `lab`)
+var method := "A"                     # A : générateur du Lot 11 · B : relief enrichi · C : Voxel Tools
 var explorer: Explorer
 var camrig: ThirdPersonCamera
 var aerial_cam: Camera3D
@@ -52,7 +54,10 @@ func _ready() -> void:
 		plan = PlanGenerator.generate(int(launch["seed"]), float(launch.get("width", 56.0)), float(launch.get("length", 48.0)))
 	else:
 		plan = PlanGenerator.generate(7, 56.0, 48.0)
-	_plant_trees = bool(launch.get("trees", true))
+	if launch.has("method"):
+		plan.settings["method"] = String(launch["method"])
+	method = String(plan.settings.get("method", "A"))
+	_plant_trees = bool(launch.get("trees", true)) and method != "C"
 	_hud = CanvasLayer.new()
 	_hud.layer = 20
 	add_child(_hud)
@@ -77,6 +82,14 @@ func _ready() -> void:
 ## changé depuis ; sinon il est calculé dans un fil de calcul, l'écran de chargement restant animé.
 func _make_terrain() -> void:
 	var doc: MapDoc = session.doc if session != null else null
+	if method == "C":
+		var task_c := WorkerThreadPool.add_task(func() -> void:
+			_built = PlanTerrain.build(plan, {"method": "S"}), false, "Squelette du plan")
+		while not WorkerThreadPool.is_task_completed(task_c):
+			await get_tree().process_frame
+		WorkerThreadPool.wait_for_task_completion(task_c)
+		build = _built
+		return
 	if doc != null and doc.build != null and doc.field != null and doc.plan == plan and doc.build.plan_sig == plan.signature():
 		build = doc.build.with_field(doc.field.duplicate_field())
 		reused_field = true
@@ -95,11 +108,22 @@ var _built: PlanTerrain.Build = null
 func _build() -> void:
 	var t0 := Time.get_ticks_msec()
 	await _make_terrain()
-	lab = LabWorld.new()
-	lab.name = "Lab"
-	add_child(lab)
-	lab.setup_field(build.field, "plan", plan.seed, plan.start)
-	_spawn_houses()
+	if method == "C":
+		if not VoxelProtoIsland.available():
+			push_error("Méthode C : ce moteur n'embarque pas Voxel Tools.")
+			_loading.text = "Méthode C indisponible : ce moteur n'embarque pas Voxel Tools\n(voir docs/COMPARATIF_TERRAIN.md)"
+			return
+		vw = VoxelProtoIsland.new()
+		vw.name = "VoxelIle"
+		add_child(vw)
+		vw.setup(plan, build, String(App.launch.get("voxel_db", "")))
+		await vw.wait_loaded()
+	else:
+		lab = LabWorld.new()
+		lab.name = "Lab"
+		add_child(lab)
+		lab.setup_field(build.field, "plan", plan.seed, plan.start)
+		_spawn_houses()
 	if env != null:
 		env.setup(plan.seed)
 	explorer = Explorer.new()
@@ -108,7 +132,7 @@ func _build() -> void:
 	explorer.kill_y = _lowest() - 25.0
 	explorer.fell.connect(_on_fell)
 	var yaw := _start_yaw()
-	explorer.teleport(lab.spawn, yaw)
+	explorer.teleport(_spawn_pos(), yaw)
 	camrig = ThirdPersonCamera.new()
 	camrig.name = "CameraRig"
 	camrig.target = explorer
@@ -129,7 +153,7 @@ func _build() -> void:
 	ready_to_play = true
 	if DisplayServer.get_name() != "headless":
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	print("[île du plan] prête en %d ms (terrain %d ms, %d arbres)" % [load_ms, build.ms, trees_planted])
+	print("[île du plan · méthode %s] prête en %d ms (relief %d ms, %d arbres)" % [method, load_ms, build.ms, trees_planted])
 
 ## Maisons posées dans l'éditeur : modèle intégré à la carte → construction visitable (collisions réelles, ouvertures découpées).
 func _spawn_houses() -> void:
@@ -149,6 +173,12 @@ func _spawn_houses() -> void:
 		var c0 := lab.field.col_of_m(rm.position.x - 0.6, rm.position.y - 0.6)
 		var c1 := lab.field.col_of_m(rm.end.x + 0.6, rm.end.y + 0.6)
 		lab.occ.reserve(Rect2i(c0, c1 - c0 + Vector2i.ONE), PlacementSpec.TAG_PLOT, lab.occ.new_owner())
+
+func _spawn_pos() -> Vector3:
+	return vw.spawn if vw != null else lab.spawn
+
+func _ground_y(x: float, z: float) -> float:
+	return vw.ground_y(x, z) if vw != null else lab.ground_y(x, z)
 
 func _lowest() -> float:
 	var lo := 1.0e9
@@ -331,7 +361,7 @@ func set_aerial(on: bool) -> void:
 
 func _on_fell() -> void:
 	falls += 1
-	explorer.teleport(lab.spawn, camrig.yaw)
+	explorer.teleport(_spawn_pos(), camrig.yaw)
 	camrig.snap()
 	_toast_msg("Retour au point de départ")
 
@@ -389,7 +419,7 @@ func _near_path(q: Vector2, margin: float) -> bool:
 
 ## Place le joueur au sol en (x, z) (essais et captures).
 func place_player(x: float, z: float, yaw: float, pitch := 0.0) -> void:
-	var g := lab.ground_y(x, z)
+	var g := _ground_y(x, z)
 	explorer.teleport(Vector3(x, (0.0 if is_nan(g) else g) + 0.05, z), yaw)
 	camrig.yaw = yaw
 	camrig.pitch = pitch

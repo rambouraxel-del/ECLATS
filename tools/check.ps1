@@ -37,6 +37,8 @@ Write-Host "== Tests du Lot 10 (remodelage de l'ile d'ouverture) =="
 & $Godot --headless -s tests/run_checks_lot10.gd
 Write-Host "== Tests du Lot 11 (fiabilite : cartes, sauvegardes, maisons) =="
 & $Godot --headless -s tests/run_checks_lot11.gd
+Write-Host "== Tests du comparatif de génération du terrain =="
+& $Godot --headless -s tests/run_checks_comparatif.gd
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if ($Monde) {
     Write-Host "== Iles completes : validation multi-graines et profils =="

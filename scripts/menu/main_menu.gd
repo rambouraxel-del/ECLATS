@@ -23,6 +23,8 @@ var _width: SpinBox
 var _length: SpinBox
 var _canvas: PlanCanvas
 var _plan: IslandPlan
+var _method: OptionButton
+const METHODS := [["A", "A · générateur actuel (Lot 11)"], ["B", "B · relief enrichi (FastNoiseLite)"], ["C", "C · prototype Voxel Tools"]]
 
 func _ready() -> void:
 	App.current_path = App.MENU_SCENE
@@ -134,6 +136,21 @@ func _page_generate() -> Control:
 	_seed = _spin_row(left, "Graine", 0, 99999, 1, 3)
 	_width = _spin_row(left, "Largeur (m)", 32, 120, 2, 56)
 	_length = _spin_row(left, "Longueur (m)", 32, 120, 2, 48)
+	var mrow := HBoxContainer.new()
+	left.add_child(mrow)
+	var ml := Label.new()
+	ml.text = "Méthode"
+	ml.custom_minimum_size = Vector2(130, 0)
+	ml.add_theme_font_size_override("font_size", 18)
+	mrow.add_child(ml)
+	_method = OptionButton.new()
+	_method.name = "Methode"
+	_method.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_method.add_theme_font_size_override("font_size", 15)
+	for m in METHODS:
+		_method.add_item(String(m[1]))
+	_method.item_selected.connect(func(_i: int) -> void: _preview_plan())
+	mrow.add_child(_method)
 	var prev := MenuStyle.button("Aperçu du plan")
 	prev.name = "Premier"
 	prev.pressed.connect(_preview_plan)
@@ -199,6 +216,7 @@ func _spin_row(parent: Control, label: String, lo: float, hi: float, step: float
 ## Génère le plan (et le relief, pour l'ombrage et la vérification des pentes), l'affiche dans l'aperçu.
 func _preview_plan() -> void:
 	_plan = PlanGenerator.generate(int(_seed.value), float(_width.value), float(_length.value))
+	_plan.settings["method"] = String(METHODS[_method.selected][0])
 	var b := PlanTerrain.build(_plan)
 	var reps := PlanTerrain.path_reports(_plan, b.field)
 	_canvas.plan = _plan
@@ -222,7 +240,7 @@ func _preview_plan() -> void:
 		info.text = txt
 
 func _page_dev() -> Control:
-	var p := MenuStyle.panel(Vector2(700, 600))
+	var p := MenuStyle.panel(Vector2(700, 660))
 	p.position.y += 60
 	var box := p.get_child(0) as VBoxContainer
 	box.add_theme_constant_override("separation", 8)
@@ -236,6 +254,11 @@ func _page_dev() -> Control:
 			first = false
 		b.pressed.connect(App.open.bind(String(e[1])))
 		box.add_child(b)
+	var cmp := MenuStyle.button("Comparatif de génération du terrain (A · B · C)")
+	cmp.name = "Comparatif"
+	cmp.tooltip_text = "graine, dimensions et méthode : A actuel · B FastNoiseLite · C Voxel Tools"
+	cmp.pressed.connect(show_page.bind("generate"))
+	box.add_child(cmp)
 	var back := MenuStyle.button("Retour")
 	back.pressed.connect(show_page.bind("main"))
 	box.add_child(back)
