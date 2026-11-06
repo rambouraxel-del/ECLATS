@@ -134,6 +134,7 @@ Diagnostic d'une génération (rapport lisible + JSON) :
 - [docs/BILAN_LOT7.md](docs/BILAN_LOT7.md) — bilan du Lot 7 (recette, captures, limites).
 - [docs/CONSTRUCTION.md](docs/CONSTRUCTION.md) — **construction joueur, format de maison, placement sur une carte, habitations générées, composition** (Lots 8 et 9).
 - [docs/BILAN_LOT8_9.md](docs/BILAN_LOT8_9.md) — bilan des Lots 8 et 9 (recette, captures, limites).
+- [docs/FIABILITE_LOT11.md](docs/FIABILITE_LOT11.md) · [docs/BILAN_LOT11.md](docs/BILAN_LOT11.md) — **Lot 11** : fiabilité de l'éditeur, des sauvegardes et des maisons ; mesures de performance avant / après.
 - [docs/BILAN_LOT10.md](docs/BILAN_LOT10.md) · [docs/REMODELAGE_LOT10.md](docs/REMODELAGE_LOT10.md) — **Lot 10** : île d'ouverture remodelée à hauteur de joueur (quai, hameau, crête, sanctuaire), recette, captures avant / après.
 - [docs/ILE_OUVERTURE.md](docs/ILE_OUVERTURE.md) — **île d'ouverture** : accès, commandes, parcours, modifier la carte (Lot 5).
 - [docs/BILAN_LOT5.md](docs/BILAN_LOT5.md) — bilan du Lot 5 (recette jouée, mesures, captures, limites).

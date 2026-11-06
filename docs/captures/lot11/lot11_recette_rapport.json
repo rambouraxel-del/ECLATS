@@ -1,0 +1,70 @@
+{
+	"controles": [
+		{
+			"controle": "plan généré, rien de modifié : aucun dialogue à prévoir",
+			"ok": true
+		},
+		{
+			"controle": "relief monté au pinceau (+25 cellules), une opération annulable, carte « modifiée »",
+			"ok": true
+		},
+		{
+			"controle": "vue 3D : le relief du document est réutilisé (pas recalculé)",
+			"ok": true
+		},
+		{
+			"controle": "retour de la 3D : même document, historique Ctrl+Z conservé, relief non recalculé, terrain identique",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z après le retour : le trait est annulé (terrain d'origine)",
+			"ok": true
+		},
+		{
+			"controle": "sortie demandée avec une carte modifiée : dialogue ouvert, on reste dans l'éditeur",
+			"ok": true
+		},
+		{
+			"controle": "« Annuler » : l'éditeur est inchangé, la carte reste modifiée",
+			"ok": true
+		},
+		{
+			"controle": "échec d'enregistrement : erreur expliquée, carte ouverte et modifiée intacte (« Enregistrement impossible : Écriture interrompue (disque plein ou accès refusé) (île_21_56_x_48_m_4.eclats-car »)",
+			"ok": true
+		},
+		{
+			"controle": "« Enregistrer puis continuer » : carte enregistrée (île_21_56_x_48_m_4.eclats-carte.json) puis retour au menu",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : retouches retrouvées, carte « propre »",
+			"ok": true
+		},
+		{
+			"controle": "maison posée en pente : Implantation possible · niveau du sol 4,60 m · déblai 201 / remblai 374 cellules · 2531 colonnes de terrain ra",
+			"ok": true
+		},
+		{
+			"controle": "zone ajoutée à côté : relief de base recalculé, plateforme de la maison inchangée",
+			"ok": true
+		},
+		{
+			"controle": "chemin déplacé loin de la maison : refusé avec explication (« Modification refusée (« Déplacer le chemin ») : elle casserait une maison posée. Le chemin s'éloignerait du raccord de « »)",
+			"ok": true
+		},
+		{
+			"controle": "carte avec maison enregistrée",
+			"ok": true
+		},
+		{
+			"controle": "3D : maison présente, relief réutilisé",
+			"ok": true
+		},
+		{
+			"controle": "du chemin jusque dans la maison, par le raccord, après modification du terrain",
+			"ok": true
+		}
+	],
+	"duree_s": 54,
+	"echecs": 0
+}

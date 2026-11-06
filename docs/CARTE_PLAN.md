@@ -79,3 +79,10 @@ champ manquant ou un type de zone inconnu sont refusés avec une phrase d'explic
 ## Format v2 (Lot 8) : maisons
 
 `eclats-carte` passe en **version 2** : champ optionnel `maisons` = liste de `{id, name, model (eclats-construction), pos, yaw, ground_m, rect, door}`. Les retouches de terrain de la pose (plateforme, talus, raccord) sont dans `layers` comme celles d'un pinceau. Une carte v1 se rouvre ; une carte d'une version supérieure à 2 est refusée avec explication. Voir `CONSTRUCTION.md`.
+
+## Format v3 (Lot 11) : retouches de relief sur 16 bits, terrain des maisons
+
+`eclats-carte` passe en **version 3** : `layers.delta16` (entiers 16 bits signés, compressés, base64) remplace `layers.delta` (octets, 128 = aucune retouche) ; la limite passe de ±127 à **±2000 cellules**
+(±400 m). Les cartes v1 et v2 se relisent par migration exacte. Chaque maison peut porter `terrain` (colonnes aménagées, retouches d'avant et de la pose, pour garder la plateforme cohérente et restaurer le terrain à la suppression)
+et `link` (point du chemin où le seuil est raccordé). Un fichier est refusé, avec une phrase d'explication, si : version inconnue, champ manquant ou mal typé, coordonnée hors de ±5000 m, identifiant en double,
+type de zone ou de repère inconnu, couche de taille inattendue, masque autre que 0/1, matière absente de la palette, retouche hors limites. Les écritures passent par un fichier temporaire vérifié ; l'ancienne version reste en `.bak`.

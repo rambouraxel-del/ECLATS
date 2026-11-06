@@ -1,0 +1,17 @@
+{
+	"captures": [],
+	"chargement_ms": 4821,
+	"defauts": [],
+	"depuis_cache": true,
+	"etapes": [],
+	"relance": {
+		"ancre_active_au_chargement": true,
+		"invite_visible_pres_de_l_ancre": false,
+		"objectif": "",
+		"sauvegarde": {
+			"anchor_active": true,
+			"discovered_at": "2026-11-06T15:07:52",
+			"map": "3e1aaa6f"
+		}
+	}
+}

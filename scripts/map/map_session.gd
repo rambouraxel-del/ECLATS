@@ -9,6 +9,10 @@ static var current: MapSession = null
 var doc: MapDoc
 var path := ""                       # dernier fichier enregistré ou ouvert ("" = jamais enregistré)
 var dir := "user://cartes/"
+var tool := ""                       # outil actif de l'éditeur (repris au retour de la 3D)
+var graine := 0                      # réglages du générateur (idem)
+var largeur := 56.0
+var longueur := 48.0
 
 static func begin(p_doc: MapDoc, p_path := "") -> MapSession:
 	var s := MapSession.new()

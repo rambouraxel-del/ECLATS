@@ -90,7 +90,11 @@ func _ready() -> void:
 		doc = MapDoc.blank()
 		session = MapSession.begin(doc)
 	_build_ui()
-	select_tool("contour" if doc.plan.outline.size() < 3 else "zones")
+	select_tool(session.tool if session.tool != "" and doc.plan.outline.size() >= 3 else ("contour" if doc.plan.outline.size() < 3 else "zones"))
+	if session.graine != 0:
+		_g_seed.value = session.graine
+		_g_w.value = session.largeur
+		_g_l.value = session.longueur
 	_refresh(true)
 	canvas.fit.call_deferred()
 
@@ -281,6 +285,8 @@ func _opt_btn(text: String, fn: Callable) -> Button:
 # ------------------------------------------------------------------ outils
 
 func select_tool(t: String) -> void:
+	if session != null:
+		session.tool = t
 	_finish_drafts(false)
 	tool = t
 	for k in _tool_buttons:
@@ -661,6 +667,9 @@ func _on_verify() -> void:
 	if doc.field == null:
 		say("Tracez d'abord un contour : il n'y a pas encore d'île à explorer.")
 		return
+	session.graine = int(_g_seed.value)
+	session.largeur = float(_g_w.value)
+	session.longueur = float(_g_l.value)
 	App.open(App.MAP_ISLAND_SCENE, {"plan": doc.plan, "session": session, "from_editor": true})
 
 # ------------------------------------------------------------------ dialogues (exporter / ouvrir)
