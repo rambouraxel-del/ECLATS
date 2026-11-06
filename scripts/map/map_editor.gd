@@ -11,6 +11,7 @@ const TOOLS := [["contour", "1  Contour"], ["zones", "2  Zones"], ["chemins", "3
 const DIR := "user://cartes/"
 
 var doc: MapDoc
+var session: MapSession          # session d'édition : document + fichier + protection des modifications non enregistrées
 var canvas: PlanCanvas
 var tool := "contour"
 var pal: VoxelPalette
@@ -75,12 +76,19 @@ func _ready() -> void:
 	pal = VoxelPalette.get_default()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	var launch: Dictionary = App.launch
-	if launch.has("plan"):
+	if launch.has("session") and launch["session"] != null:
+		# retour de la vue 3D : le document (plan, relief, historique Ctrl+Z) est repris tel quel, sans recalcul
+		session = launch["session"] as MapSession
+		MapSession.current = session
+		doc = session.doc
+	elif launch.has("plan"):
 		doc = MapDoc.from_plan(launch["plan"] as IslandPlan)
 		if doc.plan.outline.size() < 3:
 			doc = MapDoc.blank()
+		session = MapSession.begin(doc)
 	else:
 		doc = MapDoc.blank()
+		session = MapSession.begin(doc)
 	_build_ui()
 	select_tool("contour" if doc.plan.outline.size() < 3 else "zones")
 	_refresh(true)
@@ -400,7 +408,7 @@ func _scan_houses() -> void:
 
 func _build_house_options() -> void:
 	_scan_houses()
-	_opts.add_child(_label("Choisissez un modèle (atelier ou exemple), orientez-le avec R, visez la parcelle : l'aperçu dit si l'implantation est possible. Clic : poser · Ctrl+Z : annuler · clic droit sur une maison : la retirer."))
+	_opts.add_child(_label("Choisissez un modèle (atelier ou exemple), orientez-le avec R, visez la parcelle : l'aperçu dit si l'implantation est possible. Clic : poser · Ctrl+Z : annuler · clic droit sur une maison : la retirer en RESTAURANT le terrain (Maj + clic droit : garder le terrain aménagé)."))
 	var names: Array = []
 	for f in _house_files:
 		var nm := String(f).get_file().replace(".eclats-maison.json", "")
@@ -560,6 +568,11 @@ func _delete_selected() -> void:
 func say(t: String) -> void:
 	_msg.text = t
 
+## Message d'attente affiché AVANT un calcul long (le calcul se fait ensuite dans le fil principal : l'écran est rafraîchi d'abord).
+func _say_busy(t: String) -> void:
+	if _msg != null:
+		_msg.text = t
+
 ## full : image du relief, masque, chemins recalculés. Sinon : rectangle de colonnes seulement.
 func _refresh(full: bool, rect := Rect2i()) -> void:
 	canvas.plan = doc.plan
@@ -601,13 +614,17 @@ func _end_op(_structural: bool) -> void:
 	if err != "":
 		say(err)
 	else:
-		say(doc.message)
+		say(doc.message + ("  ⚠ Limite de relief atteinte (±%d m) : les hauteurs ont été limitées." % (PlanLayers.MAX_DELTA / 5) if doc.limit_hit else ""))
 	_refresh(true)
 
 # ------------------------------------------------------------------ barre du haut
 
 func _on_blank() -> void:
+	MapSession.ask(self, _do_blank)
+
+func _do_blank() -> void:
 	doc = MapDoc.blank("Nouvelle île dessinée")
+	session = MapSession.begin(doc)
 	_selected_path = ""
 	canvas.draft_outline = []
 	canvas.draft_path = []
@@ -618,8 +635,14 @@ func _on_blank() -> void:
 	say("Canevas vide : tracez le contour de l'île (clics, Entrée pour fermer).")
 
 func _on_generate() -> void:
+	MapSession.ask(self, _do_generate)
+
+func _do_generate() -> void:
+	_say_busy("Calcul du relief…")
+	await get_tree().process_frame
 	var p := PlanGenerator.generate(int(_g_seed.value), float(_g_w.value), float(_g_l.value))
 	doc = MapDoc.from_plan(p)
+	session = MapSession.begin(doc)
 	_refresh(true)
 	canvas.fit()
 	say("Plan généré : %s" % p.name)
@@ -638,7 +661,7 @@ func _on_verify() -> void:
 	if doc.field == null:
 		say("Tracez d'abord un contour : il n'y a pas encore d'île à explorer.")
 		return
-	App.open(App.MAP_ISLAND_SCENE, {"plan": doc.plan, "from_editor": true})
+	App.open(App.MAP_ISLAND_SCENE, {"plan": doc.plan, "session": session, "from_editor": true})
 
 # ------------------------------------------------------------------ dialogues (exporter / ouvrir)
 
@@ -687,9 +710,9 @@ func _open_dialog(which: String) -> void:
 			if list.get_selected_items().is_empty():
 				info2.text = "Choisissez une carte dans la liste."
 				return
-			open_file(DIR + list.get_item_text(list.get_selected_items()[0])))
+			request_open(DIR + list.get_item_text(list.get_selected_items()[0])))
 		box.add_child(go2)
-		list.item_activated.connect(func(i: int) -> void: open_file(DIR + list.get_item_text(i)))
+		list.item_activated.connect(func(i: int) -> void: request_open(DIR + list.get_item_text(i)))
 	var cancel := MenuStyle.button("Fermer")
 	cancel.pressed.connect(_close_dialog)
 	box.add_child(cancel)
@@ -707,6 +730,7 @@ func export_as(name: String, show := true) -> Dictionary:
 		clean += ".eclats-carte.json"
 	var r := doc.export_to(DIR + clean)
 	if bool(r["ok"]):
+		session.path = DIR + clean
 		say("Carte exportée : %s" % ProjectSettings.globalize_path(DIR + clean))
 		if _dialog != null:
 			var info := _dialog.find_child("Info", true, false) as Label
@@ -715,6 +739,10 @@ func export_as(name: String, show := true) -> Dictionary:
 	else:
 		say(String(r["error"]))
 	return r
+
+## Ouvre un fichier après avoir protégé les modifications non enregistrées de la carte courante (dialogue de sortie).
+func request_open(path: String) -> void:
+	MapSession.ask(self, func() -> void: open_file(path))
 
 ## Ouvre un fichier ; en cas d'erreur l'île ouverte est gardée et l'erreur expliquée (dans le dialogue et le panneau).
 func open_file(path: String) -> Dictionary:
@@ -731,6 +759,7 @@ func open_file(path: String) -> Dictionary:
 				info.text = "Ouverture impossible : %s" % r["error"]
 		return r
 	doc = d
+	session = MapSession.begin(doc, path)
 	_close_dialog()
 	_selected_path = ""
 	canvas.draft_outline = []
@@ -1090,7 +1119,7 @@ func _on_right(p: Vector2, _screen: Vector2) -> void:
 		"maisons":
 			var hid := doc.house_at(p)
 			if hid != "":
-				doc.remove_house(hid)
+				doc.remove_house(hid, not Input.is_key_pressed(KEY_SHIFT))      # Maj + clic droit : garder le terrain aménagé
 				say(doc.message + " Ctrl+Z pour la remettre.")
 				_refresh(true)
 			else:

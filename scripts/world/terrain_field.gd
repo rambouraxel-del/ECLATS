@@ -50,6 +50,27 @@ func init_size(p_n: int) -> void:
 	zone.resize(count)
 	edge_dist.resize(count)
 
+## Copie indépendante (tableaux dupliqués) : la vue 3D travaille sur sa copie (elle y ajoute la sous-face, etc.) sans toucher
+## le terrain de l'éditeur (Lot 11 : plus de recalcul du relief au passage éditeur → 3D).
+func duplicate_field() -> TerrainField:
+	var f := TerrainField.new()
+	f.seed = seed
+	f.profile_key = profile_key
+	f.n = n
+	f.origin = origin
+	f.top = top.duplicate()
+	f.natural_top = natural_top.duplicate()
+	f.core_top = core_top.duplicate()
+	f.bottom = bottom.duplicate()
+	f.material = material.duplicate()
+	f.zone = zone.duplicate()
+	f.edge_dist = edge_dist.duplicate()
+	f.plateaus = plateaus.duplicate(true)
+	f.radius_m = radius_m
+	f.landmarks = landmarks.duplicate(true)
+	f.edits = edits.duplicate(true)
+	return f
+
 func idx(cx: int, cz: int) -> int:
 	return cx + cz * n
 

@@ -27,6 +27,18 @@ class Build extends RefCounted:
 	var ms := 0
 	var plan_sig := 0
 
+	## Même relief de base, sur une autre copie du terrain (vue 3D).
+	func with_field(f: TerrainField) -> Build:
+		var b := Build.new()
+		b.field = f
+		b.base_top = base_top
+		b.base_mat = base_mat
+		b.path_cols = path_cols
+		b.path_h = path_h
+		b.ms = ms
+		b.plan_sig = plan_sig
+		return b
+
 static func build(plan: IslandPlan, opts := {}) -> Build:
 	var t0 := Time.get_ticks_msec()
 	var b := Build.new()

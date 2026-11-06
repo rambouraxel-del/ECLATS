@@ -27,6 +27,8 @@ const SLAB_T := 0.2
 const FOUND_DEPTH := 0.6
 const LEVEL_H := 3.0
 const MAX_LEVELS := 3
+const MAX_ELEMENTS := 4000           # garde-fou à l'import (une maison courante en compte quelques dizaines)
+const MAX_COORD := 4000              # unités de 0,5 m : 2 km
 const TARIFF := 1
 const DOOR_COST := 4
 const WINDOW_COST := 2
@@ -464,6 +466,8 @@ static func _int_keys(e: Dictionary, keys: Array) -> bool:
 	for k in keys:
 		if not e.has(k) or (typeof(e[k]) != TYPE_INT and typeof(e[k]) != TYPE_FLOAT):
 			return false
+		if typeof(e[k]) == TYPE_FLOAT and (is_nan(e[k]) or is_inf(e[k]) or e[k] != floorf(e[k])):
+			return false          # 1.5 ou NaN : pas un entier de grille
 	return true
 
 static func from_dict(d: Dictionary) -> Dictionary:
@@ -476,7 +480,10 @@ static func from_dict(d: Dictionary) -> Dictionary:
 		return {"ok": false, "error": "Construction enregistrée avec une version plus récente (v%d) que celle de ce jeu (v%d) : mettez le jeu à jour." % [ver, VERSION]}
 	if typeof(d.get("elements", null)) != TYPE_ARRAY:
 		return {"ok": false, "error": "Construction incomplète : la liste des éléments manque."}
+	if (d["elements"] as Array).size() > MAX_ELEMENTS:
+		return {"ok": false, "error": "Construction invalide : trop d'éléments (%d, au plus %d)." % [(d["elements"] as Array).size(), MAX_ELEMENTS]}
 	var c := Construction.new()
+	var seen_ids := {}
 	c.name = String(d.get("name", "Sans titre"))
 	var maxid := 0
 	for raw in d["elements"]:
@@ -490,12 +497,17 @@ static func from_dict(d: Dictionary) -> Dictionary:
 			return {"ok": false, "error": "Construction invalide : un élément a un niveau hors limites (0 à %d)." % (MAX_LEVELS - 1)}
 		if not MATS.has(String(e.get("mat", ""))):
 			return {"ok": false, "error": "Construction invalide : matière inconnue (« %s »)." % str(e.get("mat", "absente"))}
+		if seen_ids.has(int(e["id"])):
+			return {"ok": false, "error": "Construction invalide : l'identifiant d'élément %d apparaît deux fois." % int(e["id"])}
+		seen_ids[int(e["id"])] = true
 		var n: Dictionary = {"id": int(e["id"]), "t": t, "lv": int(e["lv"]), "mat": String(e["mat"])}
 		if t == "wall":
 			if not _int_keys(e, ["ax", "az", "bx", "bz"]) or not e.has("h"):
 				return {"ok": false, "error": "Construction invalide : un mur n'a pas toutes ses coordonnées."}
 			for k in ["ax", "az", "bx", "bz"]:
 				n[k] = int(e[k])
+				if absi(int(n[k])) > MAX_COORD:
+					return {"ok": false, "error": "Construction invalide : une coordonnée de mur dépasse %d unités (%s m)." % [MAX_COORD, str(float(MAX_COORD) * 0.5)]}
 			if (int(n["ax"]) != int(n["bx"]) and int(n["az"]) != int(n["bz"])) or (int(n["ax"]) == int(n["bx"]) and int(n["az"]) == int(n["bz"])):
 				return {"ok": false, "error": "Construction invalide : un mur n'est pas aligné sur la grille (ni nul)."}
 			if int(n["ax"]) > int(n["bx"]) or int(n["az"]) > int(n["bz"]):
@@ -521,6 +533,8 @@ static func from_dict(d: Dictionary) -> Dictionary:
 				return {"ok": false, "error": "Construction invalide : un sol ou un toit n'a pas toutes ses coordonnées."}
 			for k in ["x0", "z0", "x1", "z1"]:
 				n[k] = int(e[k])
+				if absi(int(n[k])) > MAX_COORD:
+					return {"ok": false, "error": "Construction invalide : une coordonnée de sol ou de toit dépasse %d unités (%s m)." % [MAX_COORD, str(float(MAX_COORD) * 0.5)]}
 			if int(n["x1"]) <= int(n["x0"]) or int(n["z1"]) <= int(n["z0"]):
 				return {"ok": false, "error": "Construction invalide : un sol ou un toit a une surface nulle."}
 		maxid = maxi(maxid, int(n["id"]))
@@ -529,15 +543,11 @@ static func from_dict(d: Dictionary) -> Dictionary:
 	return {"ok": true, "construction": c}
 
 static func save_file(c: Construction, path: String) -> Dictionary:
-	var dir := path.get_base_dir()
-	if not DirAccess.dir_exists_absolute(dir):
-		DirAccess.make_dir_recursive_absolute(dir)
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f == null:
-		return {"ok": false, "error": "Impossible d'écrire « %s » (erreur %d)." % [path, FileAccess.get_open_error()]}
-	f.store_string(c.normalized().to_json())
-	f.close()
-	return {"ok": true, "path": path}
+	# écriture sûre (Lot 11) : fichier temporaire relu et validé avant de remplacer la version précédente
+	var verify := func(text: String) -> String:
+		var r := from_json(text)
+		return "" if bool(r["ok"]) else String(r["error"])
+	return SafeFile.write_text(path, c.normalized().to_json(), verify)
 
 static func load_file(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):

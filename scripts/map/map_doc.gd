@@ -25,6 +25,10 @@ var _target := 0.0
 var _stroke_dirty := Rect2i()
 var _stroke_has := false
 var _regen_n := 0
+var serial := 0                      # compteur d'opérations validées (sert à savoir si le document a changé depuis l'enregistrement)
+var saved_serial := 0
+var limit_hit := false               # une retouche a atteint la limite de relief (±PlanLayers.MAX_DELTA) pendant le trait en cours
+var last_conflict := ""              # dernière opération refusée parce qu'elle casserait une maison (explication)
 
 static func from_plan(p: IslandPlan) -> MapDoc:
 	var d := MapDoc.new()
@@ -37,6 +41,13 @@ static func blank(p_name := "Nouvelle île") -> MapDoc:
 	d.plan = IslandPlan.blank(p_name)
 	return d
 
+## Modifications non enregistrées ? (une carte générée et intacte, ou tout juste enregistrée / ouverte, n'est pas modifiée)
+func is_dirty() -> bool:
+	return serial != saved_serial
+
+func mark_saved() -> void:
+	saved_serial = serial
+
 func has_terrain() -> bool:
 	return field != null
 
@@ -44,24 +55,96 @@ func layers() -> PlanLayers:
 	return plan.layers
 
 ## Recalcule le relief de base si la structure du plan a changé, puis ré-applique les retouches.
-func rebuild(force := false) -> void:
+## keep_houses : changement DEMANDÉ par l'utilisateur (déplacer un chemin, une zone…) → les colonnes de terrain des maisons gardent
+## leur hauteur absolue (voir HouseTerrain) ; faux pour l'annulation et l'ouverture, où les couches sont déjà cohérentes avec leur base.
+func rebuild(force := false, keep_houses := false) -> void:
 	if plan.outline.size() < 3:
 		build = null
 		field = null
 		path_reports = []
 		return
 	if force or build == null or plan.signature() != build.plan_sig:
+		var old_build := build
 		build = PlanTerrain.build(plan)
 		field = build.field
 		rebuilds += 1
 		if plan.layers == null:
 			plan.layers = PlanLayers.create(field.n, field.origin)
 		else:
+			var old_n := plan.layers.n
+			var old_o := Vector2i(plan.layers.ox, plan.layers.oz)
 			plan.layers.fit(field.n, field.origin)
+			if keep_houses and old_build != null and not plan.houses.is_empty():
+				_carry_houses(old_build, old_n, old_o)
 	elif plan.layers == null:
 		plan.layers = PlanLayers.create(field.n, field.origin)
 	PlanTerrain.apply_layers(build, plan)
 	path_reports = PlanTerrain.path_reports(plan, field)
+
+## Maisons : conserve la hauteur absolue des colonnes aménagées quand le relief de base change (appelée APRÈS le recalage des couches).
+## Pour chaque colonne de chaque maison : nouvelle retouche = retouche actuelle + (ancien relief de base − nouveau relief de base), ce qui
+## garde absolu = base + retouche, y compris les retouches indépendantes faites depuis la pose. Les valeurs « avant pose » et « posées »
+## de la maison sont décalées de la même façon (restauration cohérente) et ses indices convertis dans la nouvelle grille.
+## Retouche hors limites (±MAX_DELTA) ou colonne sortie de la grille : `carry_problems` le dit (conflit signalé par finish_op).
+func _carry_houses(old_build: PlanTerrain.Build, old_n: int, old_o: Vector2i) -> void:
+	var L := plan.layers
+	var nf := build.field
+	var nn := nf.n
+	carry_problems.clear()
+	var shifted := {}
+	for h in plan.houses:
+		if not h.has("terrain"):
+			continue
+		var t: Dictionary = h["terrain"]
+		var cells: PackedInt32Array = t["cells"]
+		var tbd: PackedInt32Array = t["before_d"]
+		var tpd: PackedInt32Array = t["placed_d"]
+		var tbm: PackedByteArray = t["before_m"]
+		var tpm: PackedByteArray = t["placed_m"]
+		var keep := PackedInt32Array()
+		var kbd := PackedInt32Array()
+		var kpd := PackedInt32Array()
+		var kbm := PackedByteArray()
+		var kpm := PackedByteArray()
+		var lost := 0
+		for k in cells.size():
+			var oi := cells[k]
+			var tn := int(t["n"])
+			var nx := (oi % tn) + int(t["ox"]) - nf.origin.x       # la maison suit la grille des couches (t["n"], t["ox"], t["oz"])
+			var nz := (oi / tn) + int(t["oz"]) - nf.origin.y
+			if nx < 0 or nz < 0 or nx >= nn or nz >= nn or oi >= old_build.base_top.size():
+				lost += 1
+				continue
+			var ni := nx + nz * nn
+			var ob: int = old_build.base_top[oi]
+			var nb: int = build.base_top[ni]
+			if ob == TerrainField.NO_GROUND or nb == TerrainField.NO_GROUND:
+				lost += 1
+				continue
+			var shift := ob - nb
+			if not shifted.has(ni):
+				shifted[ni] = true
+				if absi(L.delta[ni] + shift) > PlanLayers.MAX_DELTA:
+					carry_problems.append("%s : le relief de base change de %.1f m sous la maison, au-delà de la limite de retouche." % [h["name"], absf(float(shift)) * 0.2])
+				else:
+					L.delta[ni] += shift
+			keep.append(ni)
+			kbd.append(tbd[k] + shift)
+			kpd.append(tpd[k] + shift)
+			kbm.append(tbm[k])
+			kpm.append(tpm[k])
+		if lost > 0:
+			carry_problems.append("%s : %d colonnes d'aménagement sortiraient de l'île." % [h["name"], lost])
+		t["cells"] = keep
+		t["before_d"] = kbd
+		t["placed_d"] = kpd
+		t["before_m"] = kbm
+		t["placed_m"] = kpm
+		t["n"] = nn
+		t["ox"] = nf.origin.x
+		t["oz"] = nf.origin.y
+
+var carry_problems: Array[String] = []
 
 # ------------------------------------------------------------------ opérations et annulation
 
@@ -69,6 +152,8 @@ func begin_op(label: String) -> void:
 	_snap = {"label": label, "plan": plan.copy()}
 
 ## Termine l'opération : l'état d'avant est empilé (annulable). Renvoie "" ou une raison de refus (opération défaite).
+## Refus (rien ne change) : contour qui se croise ; ou modification du plan qui casserait l'implantation d'une maison posée
+## (fondations, seuil, raccord au chemin) — la raison est expliquée en détail.
 func finish_op(do_rebuild := true) -> String:
 	if _snap.is_empty():
 		return ""
@@ -80,13 +165,76 @@ func finish_op(do_rebuild := true) -> String:
 		message = "Contour refusé : il se croise lui-même. L'opération est annulée."
 		return message
 	if do_rebuild:
-		rebuild()
+		var structural := build == null or plan.signature() != build.plan_sig
+		rebuild(false, true)
+		if structural and not plan.houses.is_empty():
+			var cf := house_conflicts()
+			if not cf.is_empty():
+				var snap2 := _snap
+				_snap = {}
+				plan = snap2["plan"]
+				rebuild(true)
+				last_conflict = "Modification refusée (« %s ») : elle casserait une maison posée. %s L'opération est annulée, rien n'a changé." % [snap2["label"], " ".join(PackedStringArray(cf))]
+				message = last_conflict
+				return message
 	undo_stack.append(_snap)
 	if undo_stack.size() > UNDO_MAX:
 		undo_stack.pop_front()
 	message = String(_snap["label"])
 	_snap = {}
+	serial += 1
 	return ""
+
+## Maisons dont l'implantation ne tient plus sur le terrain actuel : liste de phrases (vide = tout est cohérent).
+func house_conflicts() -> Array[String]:
+	var out: Array[String] = []
+	for s in carry_problems:
+		out.append(s)
+	carry_problems.clear()
+	if field == null:
+		return out
+	for h in plan.houses:
+		var nm := String(h["name"])
+		var rect_m: Rect2 = h["rect"]
+		var c0 := field.col_of_m(rect_m.position.x, rect_m.position.y)
+		var c1 := field.col_of_m(rect_m.end.x - 0.001, rect_m.end.y - 0.001)
+		var off := false
+		for cz in range(c0.y, c1.y + 1):
+			for cx in range(c0.x, c1.x + 1):
+				if not field.has_ground(cx, cz) or field.edge_dist[field.idx(cx, cz)] < HousePad.EDGE_MIN_M * 0.5:
+					off = true
+		if off:
+			out.append("« %s » ne serait plus entièrement sur l'île (ou trop près du bord)." % nm)
+			continue
+		if h.has("link"):
+			var lk: Dictionary = h["link"]
+			var q: Vector2 = lk["to"]
+			var np := HousePad.nearest_path(plan.paths, q)
+			var hw := 0.7
+			if not np.is_empty():
+				var pa := plan.path_by_id(String(np["path_id"]))
+				hw = float(pa.get("width", 2.0)) * 0.5
+			if np.is_empty() or float(np["d"]) > hw + 0.6:
+				out.append("Le chemin s'éloignerait du raccord de « %s » : le seuil ne serait plus relié au chemin (écart %s m)." % [nm, Construction.fm(float(np["d"]) if not np.is_empty() else 99.0, 1)])
+		if h.has("terrain"):
+			var t: Dictionary = h["terrain"]
+			var inside := {}
+			for i in t["cells"]:
+				inside[i] = true
+			var worst := 0
+			for i in t["cells"]:
+				if field.top[i] == TerrainField.NO_GROUND:
+					continue
+				var cx2: int = i % field.n
+				var cz2: int = i / field.n
+				for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var nx: int = cx2 + o.x
+					var nz: int = cz2 + o.y
+					if field.has_ground(nx, nz) and not inside.has(field.idx(nx, nz)):
+						worst = maxi(worst, absi(field.top[i] - field.top[field.idx(nx, nz)]))
+			if worst > HousePad.CUT + HousePad.FILL:
+				out.append("Le terrain autour de « %s » changerait de %s m : sa plateforme se raccorderait par une falaise." % [nm, Construction.fm(float(worst) * V, 1)])
+	return out
 
 func cancel_op() -> void:
 	if _snap.is_empty():
@@ -111,6 +259,7 @@ func undo() -> String:
 	var structure_changed := (e["plan"] as IslandPlan).signature() != plan.signature()
 	plan = e["plan"]
 	rebuild(structure_changed or build == null)
+	serial += 1
 	message = "Annulé : %s" % e["label"]
 	return String(e["label"])
 
@@ -256,6 +405,7 @@ func is_protected(i: int) -> bool:
 func stroke_begin(label: String, tool: String, at: Vector2) -> void:
 	begin_op(label)
 	_stroke_has = false
+	limit_hit = false
 	_stroke_dirty = Rect2i()
 	if tool in ["monter", "creuser", "aplanir", "adoucir"]:
 		var n := field.n
@@ -336,6 +486,10 @@ func stroke_dab(tool: String, center: Vector2, radius: float, strength := 0.5, m
 							if c > 0:
 								_hf[i] = lerpf(_hf[i], s / float(c), clampf(strength * w * 1.2, 0.0, 1.0))
 					var nt := maxi(roundi(_hf[i]), field.core_top[i] + TerrainField.MIN_SURFACE)
+					var lim := PlanLayers.limit_top(build.base_top[i], nt)
+					if lim != nt:
+						limit_hit = true        # jamais écrêté en silence : l'éditeur le dit
+						nt = lim
 					if nt != field.top[i]:
 						field.top[i] = nt
 						L.set_delta(i, nt - build.base_top[i])
@@ -436,6 +590,7 @@ func regenerate(rect_m: Rect2, variation := -1) -> Dictionary:
 				continue
 			var nt := roundi(lerpf(float(field.top[i]), float(vb.base_top[i]), w))
 			nt = maxi(nt, field.core_top[i] + TerrainField.MIN_SURFACE)
+			nt = PlanLayers.limit_top(build.base_top[i], nt)
 			if nt != field.top[i]:
 				field.top[i] = nt
 				L.set_delta(i, nt - build.base_top[i])
@@ -482,14 +637,21 @@ func place_house(model: Construction, pos: Vector2, yaw: int, hname := "", need_
 	var label := hname if hname != "" else model.name
 	begin_op("Poser la maison « %s »" % label)
 	var L := plan.layers
+	var before_d := L.delta.duplicate()
+	var before_m := L.mat.duplicate()
 	for i in res["changed"]:
 		if field.top[i] != before_top[i]:
-			L.set_delta(i, field.top[i] - build.base_top[i])
+			var lim := PlanLayers.limit_top(build.base_top[i], field.top[i])
+			field.top[i] = lim
+			L.set_delta(i, lim - build.base_top[i])
 		if field.material[i] != before_mat[i]:
 			L.mat[i] = field.material[i]
 	var r: Rect2 = res["rect_m"]
 	var h := {"id": plan.new_id("maison"), "name": label, "model": model.to_dict(), "pos": res["pos"], "yaw": posmod(yaw, 4), "ground_m": float(res["ground_m"]),
-		"rect": r, "door": res.get("door", Vector2.ZERO)}
+		"rect": r, "door": res.get("door", Vector2.ZERO), "terrain": HouseTerrain.make(L, before_d, before_m, res["changed"])}
+	var lk: Dictionary = res.get("link", {})
+	if not lk.is_empty() and bool(lk.get("ok", false)):
+		h["link"] = {"to": lk["to"], "path_id": String(lk["path_id"])}
 	plan.houses.append(h)
 	finish_op(false)
 	path_reports = PlanTerrain.path_reports(plan, field)
@@ -623,15 +785,52 @@ func _auto_refusal(model: Construction, examined: int, counts: Dictionary) -> St
 	return "Aucune parcelle compatible pour %s (emprise %s × %s m) : %d positions et orientations examinées sur le plateau et la pelouse, toutes refusées — %s. Rien n'est posé." % [
 		model.name, Construction.fm(sz.x), Construction.fm(sz.y), examined, ", ".join(PackedStringArray(parts))]
 
-func remove_house(id: String) -> bool:
+## Retire une maison. restore_terrain (défaut) : le terrain est RESTAURÉ colonne par colonne là où il n'a pas été retouché depuis la pose
+## (une colonne dont la retouche ou la matière a changé depuis — sculptée, repeinte — est CONSERVÉE telle quelle) ; sinon (ou pour une maison
+## posée avant le Lot 11, qui n'a pas gardé son terrain d'origine) le terrain aménagé reste. `remove_stats` dit ce qui s'est passé.
+## Une seule opération annulable (Ctrl+Z remet la maison ET son terrain).
+func remove_house(id: String, restore_terrain := true) -> bool:
 	for i in plan.houses.size():
-		if String(plan.houses[i]["id"]) == id:
-			begin_op("Retirer la maison")
-			plan.houses.remove_at(i)
-			finish_op(false)
-			message = "Maison retirée (le terrain aménagé reste)."
-			return true
+		if String(plan.houses[i]["id"]) != id:
+			continue
+		var h: Dictionary = plan.houses[i]
+		begin_op("Retirer la maison")
+		var restored := 0
+		var kept := 0
+		var legacy := not h.has("terrain")
+		if restore_terrain and not legacy:
+			var L := plan.layers
+			var t: Dictionary = h["terrain"]
+			for k in (t["cells"] as PackedInt32Array).size():
+				var ci: int = t["cells"][k]
+				var touched := false
+				if L.delta[ci] == int(t["placed_d"][k]):
+					L.delta[ci] = int(t["before_d"][k])
+				else:
+					touched = true
+				if L.mat[ci] == int(t["placed_m"][k]):
+					L.mat[ci] = int(t["before_m"][k])
+				else:
+					touched = true
+				if touched:
+					kept += 1
+				else:
+					restored += 1
+		plan.houses.remove_at(i)
+		finish_op(false)
+		rebuild(false)
+		path_reports = PlanTerrain.path_reports(plan, field)
+		remove_stats = {"restored": restored, "kept": kept, "legacy": legacy, "restore": restore_terrain}
+		if not restore_terrain:
+			message = "Maison retirée (terrain aménagé conservé comme demandé)."
+		elif legacy:
+			message = "Maison retirée. Elle avait été posée avant le Lot 11 : son terrain d'origine n'est pas connu, le terrain aménagé reste (Ctrl+Z pour tout annuler)."
+		else:
+			message = "Maison retirée : terrain restauré sur %d colonnes%s." % [restored, ", %d colonnes retouchées depuis la pose ont été conservées" % kept if kept > 0 else ""]
+		return true
 	return false
+
+var remove_stats := {}
 
 func house_at(p: Vector2) -> String:
 	for h in plan.houses:
@@ -641,8 +840,14 @@ func house_at(p: Vector2) -> String:
 
 # ------------------------------------------------------------------ export / ouverture
 
+## Enregistre la carte (écriture sûre). Le document n'est marqué « enregistré » que si l'écriture a réussi : sinon il reste ouvert et modifié.
 func export_to(path: String) -> Dictionary:
-	return IslandPlan.save_file(plan, path)
+	var r := IslandPlan.save_file(plan, path)
+	if bool(r["ok"]):
+		mark_saved()
+	else:
+		message = String(r["error"])
+	return r
 
 ## Remplace le document par la carte du fichier. En cas d'erreur, le document courant est conservé ET l'erreur est expliquée.
 func open_from(path: String) -> Dictionary:
@@ -656,6 +861,8 @@ func open_from(path: String) -> Dictionary:
 	build = null
 	field = null
 	rebuild(true)
+	serial = 0
+	saved_serial = 0
 	message = "Carte ouverte : %s" % plan.name
 	return {"ok": true, "plan": plan}
 

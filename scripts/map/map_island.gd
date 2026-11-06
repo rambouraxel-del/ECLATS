@@ -30,6 +30,8 @@ var _toast_t := 0.0
 var _reticle: Control
 var _aerial_h := 0.0
 var _plant_trees := true
+var session: MapSession = null        # session d'édition d'où l'on vient (retour par F6 sans rien perdre)
+var reused_field := false              # vrai : le relief de l'éditeur est réutilisé (pas recalculé)
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
@@ -41,6 +43,9 @@ func _ready() -> void:
 	App.set_scene_help("Île issue d'un plan · F5 vue aérienne · V changer de vue")
 	env = get_node_or_null("Environment") as EnvironmentManager
 	var launch: Dictionary = App.launch
+	if launch.has("session"):
+		session = launch["session"] as MapSession
+		MapSession.current = session
 	if launch.has("plan"):
 		plan = launch["plan"] as IslandPlan
 	elif launch.has("seed"):
@@ -68,10 +73,28 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await _build()
 
+## Relief de la scène. Venant de l'éditeur, le relief déjà calculé du document est réutilisé (copie indépendante) si le plan n'a pas
+## changé depuis ; sinon il est calculé dans un fil de calcul, l'écran de chargement restant animé.
+func _make_terrain() -> void:
+	var doc: MapDoc = session.doc if session != null else null
+	if doc != null and doc.build != null and doc.field != null and doc.plan == plan and doc.build.plan_sig == plan.signature():
+		build = doc.build.with_field(doc.field.duplicate_field())
+		reused_field = true
+		return
+	var task := WorkerThreadPool.add_task(func() -> void:
+		var b := PlanTerrain.build(plan)
+		PlanTerrain.apply_layers(b, plan)
+		_built = b, false, "Relief du plan")
+	while not WorkerThreadPool.is_task_completed(task):
+		await get_tree().process_frame
+	WorkerThreadPool.wait_for_task_completion(task)
+	build = _built
+
+var _built: PlanTerrain.Build = null
+
 func _build() -> void:
 	var t0 := Time.get_ticks_msec()
-	build = PlanTerrain.build(plan)
-	PlanTerrain.apply_layers(build, plan)
+	await _make_terrain()
 	lab = LabWorld.new()
 	lab.name = "Lab"
 	add_child(lab)
@@ -277,7 +300,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if key.keycode == KEY_F5:
 		set_aerial(not aerial)
 	elif key.keycode == KEY_F6 and bool(App.launch.get("from_editor", false)):
-		App.open(App.MAP_EDITOR_SCENE, {"plan": plan, "from_island": true})
+		App.open(App.MAP_EDITOR_SCENE, {"plan": plan, "session": session, "from_island": true})
 
 func _unhandled_input(event: InputEvent) -> void:
 	if aerial and event is InputEventMouseButton and (event as InputEventMouseButton).pressed:

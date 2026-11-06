@@ -25,6 +25,8 @@ var anchor_fx: AnchorFx
 var nodes: Node3D
 var island_id := ""
 var anchor_active := false
+var save_ok := true                  # faux tant que l'activation de l'Ancre n'a pas pu être enregistrée
+var _save_retry_t := -1.0
 var ready_to_play := false
 var interiors: Array = []
 var spawn_pos := Vector3.ZERO
@@ -344,8 +346,16 @@ func activate_anchor() -> bool:
 	anchor_active = true
 	anchor_fx.activate()
 	show_banner("Île découverte")
-	GameSave.set_island(island_id, {"anchor_active": true, "discovered_at": Time.get_datetime_string_from_system(), "map": String(map.get("_hash", ""))})
+	save_ok = _save_progress()
+	if not save_ok:
+		# la progression n'est PAS confirmée : le joueur le sait, et l'écriture est retentée (voir _process)
+		show_toast("⚠ Progression non enregistrée : %s" % GameSave.last_error)
+		_save_retry_t = 8.0
 	return true
+
+## Écrit l'activation de l'Ancre ; vrai seulement si le fichier a été écrit et relu.
+func _save_progress() -> bool:
+	return GameSave.set_island(island_id, {"anchor_active": true, "discovered_at": Time.get_datetime_string_from_system(), "map": String(map.get("_hash", ""))})
 
 func _on_fell() -> void:
 	falls += 1
@@ -371,6 +381,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				show_banner("Sauvegarde de l'île oubliée")
 
 func _process(delta: float) -> void:
+	if _save_retry_t >= 0.0 and anchor_active and not save_ok:
+		_save_retry_t -= delta
+		if _save_retry_t < 0.0:
+			save_ok = _save_progress()
+			if save_ok:
+				show_toast("Progression enregistrée")
+			else:
+				_save_retry_t = 15.0
 	if _loading_cache:
 		var st := ResourceLoader.load_threaded_get_status(_cache_path)
 		if st == ResourceLoader.THREAD_LOAD_LOADED or st == ResourceLoader.THREAD_LOAD_FAILED or st == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:

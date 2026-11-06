@@ -113,7 +113,7 @@ static func run(t: SceneTree) -> void:
 	var d1 := PlanGenerator.generate(5, 56, 48).to_dict()
 	d1["version"] = 1
 	t.check(IslandPlan.from_dict(d1)["ok"], "une carte v1 (Lot 7) se rouvre sans changement")
-	d1["version"] = 3
+	d1["version"] = 99
 	t.check(not IslandPlan.from_dict(d1)["ok"], "une carte plus récente que le jeu est refusée avec explication")
 	var bad := doc.plan.to_dict()
 	(bad["maisons"] as Array)[0]["model"]["elements"] = [{"t": "mur"}]

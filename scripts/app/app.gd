@@ -74,6 +74,15 @@ func _ready() -> void:
 
 ## Ouvre une scène : état de chargement affiché, scène précédente fermée et déchargée.
 func open(path: String, params := {}) -> void:
+	# Lot 11 : une carte en cours d'édition n'est jamais perdue en silence (menu, autre scène…). L'éditeur et la vue 3D
+	# de la même session passent librement de l'un à l'autre.
+	if MapSession.current != null and path != MAP_EDITOR_SCENE and path != MAP_ISLAND_SCENE:
+		if MapSession.current.is_dirty() and not bool(params.get("_quitter_ok", false)):
+			var p2 := params.duplicate()
+			p2["_quitter_ok"] = true
+			MapSession.ask(self, func() -> void: open(path, p2))
+			return
+		MapSession.current = null
 	launch = params
 	_hide_pause()
 	_extra_help = ""
