@@ -74,3 +74,8 @@ champ manquant ou un type de zone inconnu sont refusés avec une phrase d'explic
 - Chaque changement de structure (contour, zone, chemin) recalcule le relief de base (≈ 1 s) ; les pinceaux sont immédiats.
 - Les retouches sont des écarts par rapport au relief du plan : déplacer un chemin après avoir sculpté garde les écarts (ils s'ajoutent au nouveau relief).
 - Pas de bâtiments ni de placement automatique (lots suivants) ; arbres de décor seulement dans les zones boisées de l'île 3D.
+
+
+## Format v2 (Lot 8) : maisons
+
+`eclats-carte` passe en **version 2** : champ optionnel `maisons` = liste de `{id, name, model (eclats-construction), pos, yaw, ground_m, rect, door}`. Les retouches de terrain de la pose (plateforme, talus, raccord) sont dans `layers` comme celles d'un pinceau. Une carte v1 se rouvre ; une carte d'une version supérieure à 2 est refusée avec explication. Voir `CONSTRUCTION.md`.

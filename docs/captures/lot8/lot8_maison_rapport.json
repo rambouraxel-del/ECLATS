@@ -1,0 +1,139 @@
+{
+	"controles": [
+		{
+			"controle": "éditeur de carte ouvert depuis le menu",
+			"ok": true
+		},
+		{
+			"controle": "touche 9 : outil Maisons, modèle « Maison d'exemple » chargé",
+			"ok": true
+		},
+		{
+			"controle": "une parcelle compatible existe sur le plateau (graine 21)",
+			"ok": true
+		},
+		{
+			"controle": "R : orientation choisie (porte côté sud)",
+			"ok": true
+		},
+		{
+			"controle": "aperçu : Implantation possible · niveau du sol 4,20 m · déblai 218 / remblai 166 cellules · 2565 colonnes de terrain ra",
+			"ok": true
+		},
+		{
+			"controle": "l'aperçu ne modifie ni le relief ni la carte",
+			"ok": true
+		},
+		{
+			"controle": "masque peint sous la parcelle (205 colonnes)",
+			"ok": true
+		},
+		{
+			"controle": "aperçu refusé sur zone protégée : Zone protégée : la plateforme de la maison et son raccord de terrain toucheraien",
+			"ok": true
+		},
+		{
+			"controle": "clic sur un refus : rien ne change (relief, maisons, historique)",
+			"ok": true
+		},
+		{
+			"controle": "masque retiré : l'implantation redevient possible",
+			"ok": true
+		},
+		{
+			"controle": "clic : maison posée",
+			"ok": true
+		},
+		{
+			"controle": "terrain adapté localement : 2473 colonnes (plateforme, talus, raccord)",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z : la maison est retirée",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z : le terrain est restauré à l'identique (2473 colonnes)",
+			"ok": true
+		},
+		{
+			"controle": "maison reposée",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Exporter la carte »",
+			"ok": true
+		},
+		{
+			"controle": "carte exportée : /root/.local/share/godot/app_userdata/ÉCLATS/cartes/carte_maison_lot8.eclats-carte.json",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Vérifier en 3D »",
+			"ok": true
+		},
+		{
+			"controle": "île 3D chargée",
+			"ok": true
+		},
+		{
+			"controle": "île 3D : la maison est dans l'île 3D",
+			"ok": true
+		},
+		{
+			"controle": "île 3D : porte et fenêtres vides dans la collision, quatre murs pleins (1 porte, 2 fenêtres, 4 murs)",
+			"ok": true
+		},
+		{
+			"controle": "île 3D : marche du chemin jusqu'au seuil par le raccord",
+			"ok": true
+		},
+		{
+			"controle": "île 3D : le joueur entre dans la maison par la porte (x -3.2, z -7.6, y 4.41)",
+			"ok": true
+		},
+		{
+			"controle": "nouvelle session : carte vide",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Ouvrir une carte »",
+			"ok": true
+		},
+		{
+			"controle": "ouverture de la carte",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : la maison est là, terrain identique colonne pour colonne",
+			"ok": true
+		},
+		{
+			"controle": "position conservée, 3 ouvertures conservées",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Vérifier en 3D » (carte rouverte)",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : la maison est dans l'île 3D",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : porte et fenêtres vides dans la collision, quatre murs pleins (1 porte, 2 fenêtres, 4 murs)",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : marche du chemin jusqu'au seuil par le raccord",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : le joueur entre dans la maison par la porte (x -3.2, z -7.6, y 4.41)",
+			"ok": true
+		}
+	],
+	"duree_s": 62,
+	"echecs": 0,
+	"fichier_carte": "/root/.local/share/godot/app_userdata/ÉCLATS/cartes/carte_maison_lot8.eclats-carte.json"
+}

@@ -8,7 +8,7 @@ extends RefCounted
 ## Format de fichier : JSON versionné « eclats-carte » (voir to_json / from_json).
 
 const FORMAT := "eclats-carte"
-const VERSION := 1
+const VERSION := 2                     # v2 : maisons posées (optionnel) ; les cartes v1 se relisent sans changement
 const MIN_SIZE := 32.0
 const MAX_SIZE := 120.0
 
@@ -44,6 +44,7 @@ var paths: Array[Dictionary] = []        # {id, width, pts: Array[Vector2], from
 var landmarks: Array[Dictionary] = []    # {id, kind, pos: Vector2, label}
 var start := Vector2.ZERO
 var layers: PlanLayers = null            # retouches (null = aucune)
+var houses: Array[Dictionary] = []      # maisons posées : {id, name, model (dict eclats-construction), pos: Vector2, yaw, ground_m, rect: [x0,z0,x1,z1] (m), door: Vector2}
 var generated := true                    # vrai tant que la carte vient du générateur sans canevas vide
 var _uid := 0
 
@@ -65,6 +66,8 @@ func copy() -> IslandPlan:
 		p.paths.append(q)
 	for l in landmarks:
 		p.landmarks.append(l.duplicate(true))
+	for h in houses:
+		p.houses.append(h.duplicate(true))
 	p.start = start
 	p.layers = layers.copy() if layers != null else null
 	p.generated = generated
@@ -244,6 +247,14 @@ func to_dict() -> Dictionary:
 		var ld := layers.to_dict()
 		if not ld.is_empty():
 			d["layers"] = ld
+	if not houses.is_empty():
+		var hs: Array = []
+		for h in houses:
+			var r: Rect2 = h["rect"]
+			hs.append({"id": h["id"], "name": h.get("name", "Maison"), "model": h["model"], "pos": _v(h["pos"]), "yaw": int(h["yaw"]),
+				"ground_m": snappedf(float(h["ground_m"]), 0.001), "rect": [snappedf(r.position.x, 0.001), snappedf(r.position.y, 0.001), snappedf(r.end.x, 0.001), snappedf(r.end.y, 0.001)],
+				"door": _v(h.get("door", Vector2.ZERO))})
+		d["maisons"] = hs
 	return d
 
 func to_json() -> String:
@@ -308,6 +319,22 @@ static func from_dict(d: Dictionary) -> Dictionary:
 		if lay == null:
 			return {"ok": false, "error": "Carte invalide : les couches de retouches (relief, matières, masque) sont illisibles."}
 		p.layers = lay
+	if d.has("maisons"):
+		if typeof(d["maisons"]) != TYPE_ARRAY:
+			return {"ok": false, "error": "Carte invalide : la liste des maisons est mal formée."}
+		for h in d["maisons"]:
+			if typeof(h) != TYPE_DICTIONARY or not h.has("model") or not h.has("pos") or not h.has("rect") or typeof(h["model"]) != TYPE_DICTIONARY:
+				return {"ok": false, "error": "Carte invalide : une maison est mal formée (modèle, position ou emprise manquants)."}
+			var mr := Construction.from_dict(h["model"])
+			if not bool(mr["ok"]):
+				return {"ok": false, "error": "Carte invalide : le modèle d'une maison est illisible — %s" % String(mr["error"])}
+			var rr: Array = h["rect"]
+			if rr.size() != 4:
+				return {"ok": false, "error": "Carte invalide : l'emprise d'une maison est mal formée."}
+			p.houses.append({"id": String(h.get("id", "maison")), "name": String(h.get("name", "Maison")), "model": h["model"], "pos": _p(h["pos"]),
+				"yaw": posmod(int(h.get("yaw", 0)), 4), "ground_m": float(h.get("ground_m", 0.0)),
+				"rect": Rect2(Vector2(float(rr[0]), float(rr[1])), Vector2(float(rr[2]) - float(rr[0]), float(rr[3]) - float(rr[1]))),
+				"door": _p(h.get("door", [0, 0]))})
 	if p.outline.size() >= 3 and p.width <= 0.0:
 		return {"ok": false, "error": "Carte invalide : dimensions nulles."}
 	return {"ok": true, "plan": p}

@@ -32,6 +32,7 @@ var sel_color := Color(0.30, 0.85, 1.0, 0.35)
 var draft_outline: Array = []            # contour en cours de tracé
 var draft_path: Array = []               # chemin en cours de tracé
 var hint := ""
+var house_ghost := {}                    # aperçu d'une maison à poser : {rect (Rect2 m), door (Vector2), ok (bool), link (Dictionary), label}
 
 var _img: Image
 var _tex: ImageTexture
@@ -265,6 +266,18 @@ func _draw() -> void:
 			draw_circle(q, 5.0, Color(1, 0.9, 0.3))
 		if cursor_world != Vector2.INF:
 			draw_line(pl[pl.size() - 1], w2s(cursor_world), Color(1, 0.9, 0.3, 0.6), 2.0)
+	# maisons posées et aperçu
+	for h in plan.houses:
+		_draw_house(h["rect"], h.get("door", Vector2.ZERO), Color(0.86, 0.62, 0.38, 0.95), false)
+	if not house_ghost.is_empty():
+		var okc := Color(0.45, 0.95, 0.55, 0.9) if bool(house_ghost.get("ok", false)) else Color(1.0, 0.38, 0.32, 0.9)
+		_draw_house(house_ghost["rect"], house_ghost.get("door", Vector2.ZERO), okc, true)
+		var lk: Dictionary = house_ghost.get("link", {})
+		if not lk.is_empty() and lk.has("from") and lk.has("to"):
+			draw_dashed_line(w2s(lk["from"]), w2s(lk["to"]), okc, 3.0, 6.0)
+		if String(house_ghost.get("label", "")) != "":
+			var rr: Rect2 = house_ghost["rect"]
+			_text(w2s(rr.position) + Vector2(0.0, -8.0), String(house_ghost["label"]), 14, okc.lightened(0.3), HORIZONTAL_ALIGNMENT_LEFT, 420.0)
 	# anomalies de pente
 	for rep in path_reports:
 		for q: Vector2 in rep["breaks"]:
@@ -302,6 +315,18 @@ func _draw() -> void:
 		_draw_legend()
 	if hint != "":
 		_text(Vector2(size.x * 0.5, size.y - 16.0), hint, 15, Color(1, 1, 0.8), HORIZONTAL_ALIGNMENT_CENTER, size.x - 40.0)
+
+func _draw_house(r: Rect2, door: Vector2, col: Color, ghost: bool) -> void:
+	var a := w2s(r.position)
+	var b := w2s(r.end)
+	var rect := Rect2(a, b - a)
+	draw_rect(rect, Color(col.r, col.g, col.b, 0.35 if ghost else 0.55))
+	draw_rect(rect, Color(0.04, 0.06, 0.09, 0.9), false, 4.5)
+	draw_rect(rect, col, false, 2.5)
+	if door != Vector2.ZERO:
+		var d := w2s(door)
+		draw_circle(d, 6.0, Color(0.04, 0.06, 0.09))
+		draw_circle(d, 4.0, Color(1, 1, 1))
 
 func _draw_grid() -> void:
 	var step := 10.0

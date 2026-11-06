@@ -7,7 +7,7 @@ extends Control
 ## la sélection · molette : zoom · bouton du milieu : déplacer la vue.
 
 const TOOLS := [["contour", "1  Contour"], ["zones", "2  Zones"], ["chemins", "3  Chemins"], ["reperes", "4  Repères"],
-	["relief", "5  Relief"], ["matiere", "6  Matériau"], ["masque", "7  Masque"], ["regen", "8  Régénérer"]]
+	["relief", "5  Relief"], ["matiere", "6  Matériau"], ["masque", "7  Masque"], ["regen", "8  Régénérer"], ["maisons", "9  Maisons"]]
 const DIR := "user://cartes/"
 
 var doc: MapDoc
@@ -27,6 +27,15 @@ var lm_kind := "vue"
 var lm_label := "Point de vue"
 var path_width := 2.2
 var regen_variation := 0
+var house_model: Construction = null            # maison choisie (modèle normalisé)
+var house_source := ""
+var house_yaw := 0
+var house_eval: Dictionary = {}                # dernier aperçu d'implantation
+var house_pos := Vector2.INF
+var _house_info: Label
+var _house_pick: OptionButton
+var _house_files: Array[String] = []
+var _eval_t := 0
 
 # état de manipulation
 var _dragging := false
@@ -268,6 +277,8 @@ func select_tool(t: String) -> void:
 	canvas.cursor_radius = 0.0
 	canvas.sel_rect = Rect2()
 	canvas.hint = ""
+	canvas.house_ghost = {}
+	_house_info = null
 	_selected_path = ""
 	_selected_lm = ""
 	canvas.selected_path = ""
@@ -345,6 +356,8 @@ func _build_options() -> void:
 			_option(["Protéger (peindre)", "Retirer la protection"], 0 if mask_mode == "peindre" else 1, func(i: int) -> void: mask_mode = "peindre" if i == 0 else "gommer")
 			_slider("Rayon", 0.5, 9.0, 0.25, brush_radius, func(v: float) -> void: brush_radius = v)
 			_opt_btn("Retirer tout le masque", _clear_mask)
+		"maisons":
+			_build_house_options()
 		"regen":
 			_opts.add_child(_label("1. Tracez un rectangle (deux coins) : c'est la zone où le relief est relancé. 2. Cliquez « Régénérer ». Le masque est respecté ; les retouches hors du rectangle sont conservées."))
 			var sp := SpinBox.new()
@@ -365,6 +378,111 @@ func _build_options() -> void:
 						hi = hi.max(p)
 					canvas.sel_rect = Rect2(lo, hi - lo)
 					canvas.queue_redraw())
+
+# ------------------------------------------------------------------ maisons (Lot 8)
+
+const HOUSE_DIRS := ["res://assets/maisons/", "user://maisons/"]
+
+func _scan_houses() -> void:
+	_house_files.clear()
+	for d in HOUSE_DIRS:
+		var da := DirAccess.open(d)
+		if da == null:
+			continue
+		var fl := da.get_files()
+		fl.sort()
+		for f in fl:
+			if f.ends_with(".eclats-maison.json"):
+				_house_files.append(d + f)
+
+func _build_house_options() -> void:
+	_scan_houses()
+	_opts.add_child(_label("Choisissez un modèle (atelier ou exemple), orientez-le avec R, visez la parcelle : l'aperçu dit si l'implantation est possible. Clic : poser · Ctrl+Z : annuler · clic droit sur une maison : la retirer."))
+	var names: Array = []
+	for f in _house_files:
+		var nm := String(f).get_file().replace(".eclats-maison.json", "")
+		names.append(("Exemple · " if String(f).begins_with("res://") else "Atelier · ") + nm)
+	if names.is_empty():
+		names.append("(aucune maison enregistrée)")
+	_house_pick = _option(names, maxi(_house_files.find(house_source), 0), func(i: int) -> void: _load_house(i))
+	_opt_btn("Tourner la maison (R)", _rotate_house)
+	_opt_btn("Actualiser la liste", func() -> void: _build_options())
+	_house_info = _label("", 13, Color(0.85, 0.95, 1.0))
+	_house_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_house_info.custom_minimum_size = Vector2(290, 150)
+	_opts.add_child(_house_info)
+	if not _house_files.is_empty():
+		_load_house(maxi(_house_files.find(house_source), 0))
+
+func _load_house(i: int) -> void:
+	if i < 0 or i >= _house_files.size():
+		return
+	var r := Construction.load_file(_house_files[i])
+	if not bool(r["ok"]):
+		say("Maison illisible : %s" % String(r["error"]))
+		house_model = null
+		return
+	house_model = r["construction"]
+	house_source = _house_files[i]
+	house_eval = {}
+	if _house_info != null:
+		_house_info.text = "%s\n%s" % [house_model.summary(), "Visez la parcelle sur le plan."]
+	_update_house_preview(house_pos if house_pos.x < 1.0e8 else Vector2.INF, true)
+
+func _rotate_house() -> void:
+	house_yaw = (house_yaw + 1) % 4
+	_update_house_preview(house_pos, true)
+
+static func door_side_name(dir: Vector2i) -> String:
+	if dir == Vector2i(0, 1): return "sud"
+	if dir == Vector2i(0, -1): return "nord"
+	if dir == Vector2i(1, 0): return "est"
+	return "ouest"
+
+## Aperçu d'implantation (limité à ~10 par seconde : chaque évaluation relit le relief autour de la parcelle).
+func _update_house_preview(p: Vector2, force := false) -> void:
+	if house_model == null or doc.field == null or p.x > 1.0e8:
+		canvas.house_ghost = {}
+		canvas.queue_redraw()
+		return
+	var now := Time.get_ticks_msec()
+	if not force and now - _eval_t < 100:
+		return
+	_eval_t = now
+	house_pos = Vector2(snappedf(p.x, 0.1), snappedf(p.y, 0.1))
+	house_eval = doc.evaluate_house(house_model, house_pos, house_yaw)
+	var rm: Rect2 = house_eval["rect_m"]
+	var ok := bool(house_eval["ok"])
+	var dir: Vector2i = house_eval.get("dir", Vector2i.ZERO)
+	canvas.house_ghost = {"rect": rm, "door": house_eval.get("door", Vector2.ZERO), "ok": ok, "link": house_eval.get("link", {}),
+		"label": "%s · porte côté %s" % [house_model.name, door_side_name(dir)] if dir != Vector2i.ZERO else house_model.name}
+	if _house_info != null:
+		var t := "%s\nOrientation : porte côté %s (R pour tourner)\n" % [house_model.summary(), door_side_name(dir) if dir != Vector2i.ZERO else "—"]
+		if ok:
+			t += "✔ %s" % String(house_eval["text"])
+		else:
+			t += "✖ %s\nRien ne sera modifié." % " ".join(PackedStringArray(house_eval["reasons"]))
+		_house_info.text = t
+		_house_info.add_theme_color_override("font_color", Color(0.65, 1.0, 0.7) if ok else Color(1.0, 0.65, 0.6))
+	canvas.queue_redraw()
+
+func place_house_here() -> Dictionary:
+	if house_model == null or house_pos.x > 1.0e8:
+		say("Choisissez une maison et visez la parcelle.")
+		return {"ok": false}
+	var r := doc.place_house(house_model, house_pos, house_yaw)
+	if bool(r["ok"]):
+		say("%s — Ctrl+Z pour annuler." % doc.message)
+		_refresh(true)
+		canvas.house_ghost = {}
+		house_eval = {}
+		if _house_info != null:
+			_house_info.text = "%s\n✔ Maison posée. Déplacez la souris pour en poser une autre, ou Ctrl+Z pour annuler." % house_model.summary()
+			_house_info.add_theme_color_override("font_color", Color(0.65, 1.0, 0.7))
+	else:
+		say("Impossible : %s Rien n'est modifié." % " ".join(PackedStringArray(r["reasons"])))
+		_update_house_preview(house_pos, true)
+	return r
 
 func _delete_selected() -> void:
 	if tool == "chemins" and _selected_path != "":
@@ -405,7 +523,7 @@ func _update_status() -> void:
 		lines.append("Canevas vide : tracez un contour (outil 1) pour créer une île.")
 	else:
 		lines.append("%s · %.0f × %.0f m" % [p.name, p.width, p.length])
-		lines.append("%d zones · %d chemins · %d repères" % [p.zones.size(), p.paths.size(), p.landmarks.size()])
+		lines.append("%d zones · %d chemins · %d repères · %d maison(s)" % [p.zones.size(), p.paths.size(), p.landmarks.size(), p.houses.size()])
 		if doc.plan.layers != null:
 			lines.append("Retouches : %d colonnes de relief, %d de matière · masque : %d" % [p.layers.count_delta(), p.layers.count_mat(), p.layers.count_mask()])
 		for r in doc.path_reports:
@@ -586,7 +704,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif key.keycode == KEY_DELETE:
 		_delete_selected()
-	elif key.keycode >= KEY_1 and key.keycode <= KEY_8 and not key.ctrl_pressed and not (get_viewport().gui_get_focus_owner() is LineEdit):
+	elif key.keycode == KEY_R and tool == "maisons":
+		_rotate_house()
+	elif key.keycode >= KEY_1 and key.keycode <= KEY_9 and not key.ctrl_pressed and not (get_viewport().gui_get_focus_owner() is LineEdit):
 		select_tool(TOOLS[key.keycode - KEY_1][0])
 
 ## Termine (accept) ou abandonne un tracé en cours (contour ou chemin).
@@ -684,6 +804,9 @@ func _near_landmark(p: Vector2) -> String:
 
 func _on_press(p: Vector2, dbl: bool, _screen: Vector2) -> void:
 	match tool:
+		"maisons":
+			_update_house_preview(p, true)
+			place_house_here()
 		"contour":
 			if _new_outline or doc.plan.outline.size() < 3:
 				if canvas.draft_outline.size() >= 3 and p.distance_to(canvas.draft_outline[0]) <= _hit_radius_m():
@@ -831,6 +954,8 @@ func _dab(p: Vector2) -> void:
 
 func _on_motion(p: Vector2) -> void:
 	_update_cursor(p)
+	if tool == "maisons":
+		_update_house_preview(p)
 	if _stroke and _lmb:
 		_dab(p)
 	elif _dragging:
@@ -905,6 +1030,14 @@ func _on_release(p: Vector2) -> void:
 
 func _on_right(p: Vector2, _screen: Vector2) -> void:
 	match tool:
+		"maisons":
+			var hid := doc.house_at(p)
+			if hid != "":
+				doc.remove_house(hid)
+				say(doc.message + " Ctrl+Z pour la remettre.")
+				_refresh(true)
+			else:
+				say("Aucune maison à cet endroit.")
 		"contour":
 			if not canvas.draft_outline.is_empty():
 				_finish_drafts(true)

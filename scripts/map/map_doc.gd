@@ -454,6 +454,65 @@ func regenerate(rect_m: Rect2, variation := -1) -> Dictionary:
 func cancel_op_keep() -> void:
 	_snap = {}
 
+# ------------------------------------------------------------------ maisons (Lot 8)
+
+func house_ctx(need_link := true) -> Dictionary:
+	var avoid: Array = []
+	for h in plan.houses:
+		avoid.append(h["rect"])
+	return {"mask": plan.layers.mask if plan.layers != null else PackedByteArray(), "paths": plan.paths, "avoid": avoid,
+		"path_cols": build.path_cols if build != null else PackedByteArray(), "keep_clear": [plan.start], "need_link": need_link and not plan.paths.is_empty()}
+
+## Aperçu : implantation d'une maison (modèle normalisé) centrée en `pos`, tournée de `yaw` quarts de tour. Ne modifie rien.
+func evaluate_house(model: Construction, pos: Vector2, yaw: int, need_link := true) -> Dictionary:
+	if field == null:
+		return {"ok": false, "reasons": ["Aucune île : dessinez d'abord un contour."], "changed": []}
+	return HousePad.evaluate(field, model, pos, yaw, house_ctx(need_link), false)
+
+## Pose la maison : plateforme, cour et raccord du seuil au chemin sont écrits dans les couches de relief ; une opération, annulable.
+## Refus : rien ne change (ni relief, ni liste de maisons, ni pile d'annulation).
+func place_house(model: Construction, pos: Vector2, yaw: int, hname := "", need_link := true) -> Dictionary:
+	if field == null:
+		return {"ok": false, "reasons": ["Aucune île : dessinez d'abord un contour."], "changed": []}
+	var before_top := field.top.duplicate()
+	var before_mat := field.material.duplicate()
+	var res := HousePad.evaluate(field, model, pos, yaw, house_ctx(need_link), true)
+	if not bool(res["ok"]):
+		return res
+	var label := hname if hname != "" else model.name
+	begin_op("Poser la maison « %s »" % label)
+	var L := plan.layers
+	for i in res["changed"]:
+		if field.top[i] != before_top[i]:
+			L.set_delta(i, field.top[i] - build.base_top[i])
+		if field.material[i] != before_mat[i]:
+			L.mat[i] = field.material[i]
+	var r: Rect2 = res["rect_m"]
+	var h := {"id": plan.new_id("maison"), "name": label, "model": model.to_dict(), "pos": res["pos"], "yaw": posmod(yaw, 4), "ground_m": float(res["ground_m"]),
+		"rect": r, "door": res.get("door", Vector2.ZERO)}
+	plan.houses.append(h)
+	finish_op(false)
+	path_reports = PlanTerrain.path_reports(plan, field)
+	message = "Maison posée : %s" % label
+	res["id"] = h["id"]
+	return res
+
+func remove_house(id: String) -> bool:
+	for i in plan.houses.size():
+		if String(plan.houses[i]["id"]) == id:
+			begin_op("Retirer la maison")
+			plan.houses.remove_at(i)
+			finish_op(false)
+			message = "Maison retirée (le terrain aménagé reste)."
+			return true
+	return false
+
+func house_at(p: Vector2) -> String:
+	for h in plan.houses:
+		if (h["rect"] as Rect2).has_point(p):
+			return String(h["id"])
+	return ""
+
 # ------------------------------------------------------------------ export / ouverture
 
 func export_to(path: String) -> Dictionary:

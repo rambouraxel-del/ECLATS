@@ -1,0 +1,113 @@
+{
+	"dims": {
+		"hauteur_m": 3.82,
+		"largeur_m": 6.2,
+		"niveaux": 1,
+		"profondeur_m": 4.2
+	},
+	"elements": [
+		{
+			"id": 1,
+			"lv": 0,
+			"mat": "planches",
+			"t": "floor",
+			"x0": 0,
+			"x1": 12,
+			"z0": 0,
+			"z1": 8
+		},
+		{
+			"ax": 0,
+			"az": 0,
+			"bx": 12,
+			"bz": 0,
+			"grp": 1,
+			"h": 2.5,
+			"id": 2,
+			"lv": 0,
+			"mat": "enduit",
+			"ops": [
+				{
+					"at": 5,
+					"id": 7,
+					"k": "window",
+					"w": 2
+				}
+			],
+			"t": "wall"
+		},
+		{
+			"ax": 0,
+			"az": 8,
+			"bx": 12,
+			"bz": 8,
+			"grp": 1,
+			"h": 2.5,
+			"id": 3,
+			"lv": 0,
+			"mat": "enduit",
+			"ops": [
+				{
+					"at": 5,
+					"id": 6,
+					"k": "door",
+					"w": 2
+				}
+			],
+			"t": "wall"
+		},
+		{
+			"ax": 0,
+			"az": 0,
+			"bx": 0,
+			"bz": 8,
+			"grp": 1,
+			"h": 2.5,
+			"id": 4,
+			"lv": 0,
+			"mat": "enduit",
+			"ops": [],
+			"t": "wall"
+		},
+		{
+			"ax": 12,
+			"az": 0,
+			"bx": 12,
+			"bz": 8,
+			"grp": 1,
+			"h": 2.5,
+			"id": 5,
+			"lv": 0,
+			"mat": "enduit",
+			"ops": [
+				{
+					"at": 3,
+					"id": 8,
+					"k": "window",
+					"w": 2
+				}
+			],
+			"t": "wall"
+		},
+		{
+			"id": 9,
+			"lv": 0,
+			"mat": "tuiles",
+			"t": "roof",
+			"x0": 0,
+			"x1": 12,
+			"z0": 0,
+			"z1": 8
+		}
+	],
+	"format": "eclats-construction",
+	"materiaux": [
+		"planches",
+		"enduit",
+		"tuiles"
+	],
+	"name": "Maison d'exemple",
+	"next_id": 10,
+	"tarif": 1,
+	"version": 1
+}

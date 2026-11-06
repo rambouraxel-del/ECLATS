@@ -48,3 +48,22 @@ Un niveau = 3,0 m sol à sol. Un mur dont un sol est posé au-dessus monte jusqu
 
 ## Vérifié
 Voir `BILAN_LOT8_9.md`. Tests : `tests/run_checks_lot8.gd` (headless) ; essai joué : `tools/lot8_recette_atelier.gd`.
+
+## Enregistrer et rouvrir une maison (atelier)
+
+Dans le mode construction : **Enregistrer / ouvrir une maison…** → nom → *Enregistrer* (fichier `maisons/<nom>.eclats-maison.json` dans les données du jeu ; le chemin complet est affiché). *Ouvrir* rend la maison modifiable, devant le joueur (annulable, gratuit : l'atelier n'est pas une économie).
+
+Format **`eclats-construction` v1** (distinct de `eclats-carte`) : `{format, version, name, dims, materiaux, tarif, elements[]}`. Les coordonnées sont des entiers en demi-mètres, normalisées (coin minimum à 0). Il conserve **dimensions, niveaux, matériaux, ouvertures et toit**. Un fichier abîmé, d'une version plus récente, ou qui est en fait une carte est refusé avec une phrase d'explication et la construction en cours est gardée.
+
+## Placer une maison sur une carte (éditeur d'îles, outil 9 « Maisons »)
+
+1. Choisir un modèle (exemple fourni ou maison de l'atelier). **R** : tourner d'un quart de tour.
+2. Viser la parcelle : l'**aperçu** montre l'emprise (verte = possible, rouge = refusée), la porte, le **raccord prévu jusqu'au chemin**, et dit pourquoi en cas de refus.
+3. **Clic** : pose. **Ctrl+Z** : retire la maison **et** restaure le terrain (une opération). Clic droit sur une maison : la retirer (le terrain aménagé reste).
+
+Ce que fait la pose (`HousePad`, mêmes règles que l'atelier du Lot 6) :
+- **plateforme plate** sous l'emprise (+ 60 cm de cour) au niveau médian de la parcelle, talus 1:2 ou soutènement autour ; déblai et remblai limités à 4 cellules (80 cm) chacun, soit 1,60 m de dénivelé rattrapé. Les fondations de la maison (60 cm) reposent sur cette plateforme ;
+- **raccord seuil → chemin** : bande de 1,40 m de la porte au point le plus proche d'un chemin, hauteur interpolée, matière « chemin de terre ». Au plus **14 m** et **30 %** de pente ;
+- **refus expliqués, rien ne change** : hors de l'île · trop près du bord · emprise occupée (autre maison, chemin, point de départ) · relief trop accidenté · **zone protégée** (le masque est respecté : si la plateforme ou le raccord toucheraient une colonne protégée, la pose est refusée) · aucun chemin à moins de 14 m · chemin derrière la maison (tourner la maison) · raccord trop raide · maison sans porte.
+
+Les retouches sont écrites dans les couches de relief de la carte (comme un pinceau), la maison est **embarquée dans le fichier de carte** (`eclats-carte` **v2**, champ `maisons` ; les cartes v1 se rouvrent sans changement). Dans l'île 3D (« Vérifier en 3D »), la maison est visitable : portes et fenêtres sont de vraies découpes, les arbres du décor ne poussent pas dedans.

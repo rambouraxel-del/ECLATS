@@ -17,6 +17,7 @@ var aerial := false
 var load_ms := 0
 var falls := 0
 var trees_planted := 0
+var house_nodes: Array[Node3D] = []
 var reached: Array[String] = []
 var target_index := 0
 var _hud: CanvasLayer
@@ -75,6 +76,7 @@ func _build() -> void:
 	lab.name = "Lab"
 	add_child(lab)
 	lab.setup_field(build.field, "plan", plan.seed, plan.start)
+	_spawn_houses()
 	if env != null:
 		env.setup(plan.seed)
 	explorer = Explorer.new()
@@ -105,6 +107,25 @@ func _build() -> void:
 	if DisplayServer.get_name() != "headless":
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	print("[île du plan] prête en %d ms (terrain %d ms, %d arbres)" % [load_ms, build.ms, trees_planted])
+
+## Maisons posées dans l'éditeur : modèle intégré à la carte → construction visitable (collisions réelles, ouvertures découpées).
+func _spawn_houses() -> void:
+	for h in plan.houses:
+		var r := Construction.from_dict(h["model"])
+		if not bool(r["ok"]):
+			push_warning("Maison illisible : %s" % String(r["error"]))
+			continue
+		var model: Construction = r["construction"]
+		var node := ConstructionView.create(model, {"collide": true})
+		node.name = "Maison_%s" % String(h["id"])
+		node.transform = HousePad.node_transform(model, h["pos"], int(h["yaw"]), float(h["ground_m"]))
+		lab.add_child(node)
+		house_nodes.append(node)
+		# réserve l'emprise : les arbres du décor ne poussent pas dans la maison
+		var rm: Rect2 = h["rect"]
+		var c0 := lab.field.col_of_m(rm.position.x - 0.6, rm.position.y - 0.6)
+		var c1 := lab.field.col_of_m(rm.end.x + 0.6, rm.end.y + 0.6)
+		lab.occ.reserve(Rect2i(c0, c1 - c0 + Vector2i.ONE), PlacementSpec.TAG_PLOT, lab.occ.new_owner())
 
 func _lowest() -> float:
 	var lo := 1.0e9

@@ -400,3 +400,22 @@ static func add_roof(c: Construction, wall_id: int, mat := "tuiles") -> Dictiona
 	gr["id"] = cand.next_id
 	gr["y_override"] = cand.roof_base(roof)
 	return _ok("roof", cand, cost, [gr], text)
+
+# ------------------------------------------------------------------ maison d'exemple
+
+## Petite maison de démonstration (6 × 4 m, porte au sud, deux fenêtres, toit à deux pans) : sert aux essais et à l'éditeur de cartes.
+static func demo_house(wall_mat := "enduit", roof_mat := "tuiles") -> Construction:
+	var c := Construction.new()
+	c.name = "Maison d'exemple"
+	var r := add_room(c, 0, Vector2i(0, 0), Vector2i(12, 8), 2.5, "S", wall_mat, "planches")
+	c = r["cand"]
+	for w in c.of_type("wall", 0):
+		var sp := C.wall_span(w)
+		var line := C.wall_line(w)
+		var along_x := C.wall_axis(w) == 0
+		if along_x and line == 0:         # mur nord : une fenêtre
+			c = add_opening(c, int(w["id"]), "window", float(sp.x + sp.y) * 0.5)["cand"]
+		elif not along_x and line == 12:  # mur est : une fenêtre
+			c = add_opening(c, int(w["id"]), "window", float(sp.x + sp.y) * 0.5)["cand"]
+	c = add_roof(c, int(c.of_type("wall", 0)[0]["id"]), roof_mat)["cand"]
+	return c
