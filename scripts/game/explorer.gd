@@ -85,7 +85,7 @@ func _move(delta: float, dir: Vector3, sprint: bool, jump: bool) -> void:
 		_try_step(hv * delta)
 	move_and_slide()
 	if model:
-		model.position = model.position.lerp(Vector3.ZERO, clampf(14.0 * delta, 0.0, 1.0))
+		model.position = model.position.lerp(Vector3.ZERO, clampf(9.0 * delta, 0.0, 1.0))      # lissage des marches (vue 1re personne : pas d'à-coup)
 	if global_position.y < kill_y:
 		fell.emit()
 	if model:
@@ -96,8 +96,10 @@ func _move(delta: float, dir: Vector3, sprint: bool, jump: bool) -> void:
 func _try_step(motion: Vector3) -> bool:
 	var dir := motion.normalized()
 	var xf := global_transform
-	if not test_move(xf, dir * maxf(motion.length(), 0.05)):
+	var hit0 := KinematicCollision3D.new()
+	if not test_move(xf, dir * maxf(motion.length(), 0.05), hit0):
 		return false
+	var slope_contact := hit0.get_normal().angle_to(Vector3.UP) <= floor_max_angle    # on touche une surface praticable
 	var up := Vector3(0, STEP_H, 0)
 	if test_move(xf, up):
 		return false
@@ -109,6 +111,11 @@ func _try_step(motion: Vector3) -> bool:
 	if not test_move(raised.translated(probe), -up * 1.05, col):
 		return false
 	var dy := raised.origin.y + col.get_travel().y - xf.origin.y
+	# Rampe d'escalier ou versant : le contact est praticable ET la surface d'arrivée est inclinée → c'est une pente, que
+	# move_and_slide monte normalement. Sans ce test, l'explorateur était hissé à chaque image sur une rampe (en première
+	# personne la vue montait par à-coups de 25 cm). Une vraie marche a un contact presque vertical ou un dessus plat.
+	if slope_contact and col.get_normal().angle_to(Vector3.UP) > 0.35:
+		return false
 	if dy < 0.03 or col.get_normal().angle_to(Vector3.UP) > floor_max_angle:
 		return false
 	var landing := raised.origin + probe + col.get_travel() + Vector3(0, 0.005, 0)

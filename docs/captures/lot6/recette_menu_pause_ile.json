@@ -1,0 +1,14 @@
+{
+	"ancre_a_portee": true,
+	"demarre_au_menu": true,
+	"ile_dechargee": true,
+	"interieur_au_pied_de_l_escalier": true,
+	"invite": "E · Activer l'Ancre",
+	"modele_masque": true,
+	"palier_a_l_etage": true,
+	"pause_active": true,
+	"pause_fermee": true,
+	"premiere_personne": true,
+	"reprise_ok": true,
+	"retour_menu": true
+}

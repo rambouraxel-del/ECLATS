@@ -1,0 +1,204 @@
+{
+	"ancre": {
+		"a_portee": true,
+		"active": true,
+		"banniere": "Île découverte",
+		"fichier": "/root/.local/share/godot/app_userdata/ÉCLATS/eclats_sauvegarde.json",
+		"invite": "E · Activer l'Ancre",
+		"invite_apres": false,
+		"invite_visible": true,
+		"objectif_apres": "",
+		"objectif_avant": "◆ Rejoindre le sanctuaire",
+		"sauvegarde": {
+			"anchor_active": true,
+			"discovered_at": "2026-11-06T08:54:47",
+			"map": "b1cbb561"
+		},
+		"touche_attendue": "E"
+	},
+	"captures": [
+		{
+			"nom": "01_quai_depart",
+			"pitch": -0.22,
+			"pos": [
+				-67.5,
+				3.09499979019165,
+				100
+			],
+			"yaw": 0.982793723247329
+		},
+		{
+			"nom": "02_sentier_des_falaises",
+			"pitch": -0.18,
+			"pos": [
+				-117.091087341309,
+				6.41886520385742,
+				55.7908134460449
+			],
+			"yaw": 0.578059353933807
+		},
+		{
+			"nom": "03_col_pierre_levee",
+			"pitch": -0.18,
+			"pos": [
+				-93.3610992431641,
+				14.018798828125,
+				-37.2581062316895
+			],
+			"yaw": -1.32423875503548
+		},
+		{
+			"nom": "03b_vue_sur_le_hameau",
+			"pitch": -0.18,
+			"pos": [
+				-65.8396530151367,
+				12.6824913024902,
+				-33.996166229248
+			],
+			"yaw": -2.45841586873453
+		},
+		{
+			"nom": "04_maison_visitable",
+			"pitch": -0.12,
+			"pos": [
+				-9.74707317352295,
+				9.01888465881348,
+				-13.7623910903931
+			],
+			"yaw": 0.000637985036268593
+		},
+		{
+			"nom": "05_interieur_rdc",
+			"pitch": -0.2,
+			"pos": [
+				-9.74990367889404,
+				9.20522022247314,
+				-17.1824073791504
+			],
+			"yaw": 0.000028602353087966
+		},
+		{
+			"nom": "06_etage",
+			"pitch": -0.25,
+			"pos": [
+				-7.50262928009033,
+				11.8112335205078,
+				-21.8370323181152
+			],
+			"yaw": -0.00116187185749
+		},
+		{
+			"nom": "08_pointe_du_guet",
+			"pitch": -0.12,
+			"pos": [
+				117.946449279785,
+				24.2187423706055,
+				-5.31695938110352
+			],
+			"yaw": -1.97483154354766
+		},
+		{
+			"nom": "09_chemin_de_crete",
+			"pitch": -0.18,
+			"pos": [
+				70.798583984375,
+				26.2178077697754,
+				-57.0950889587402
+			],
+			"yaw": 0.809688942121348
+		},
+		{
+			"nom": "10_pied_de_la_montee",
+			"pitch": -0.1,
+			"pos": [
+				45.7443351745605,
+				27.0189723968506,
+				-72.0291900634766
+			],
+			"yaw": 1.32735641971382
+		},
+		{
+			"nom": "11_invite_ancre",
+			"pitch": -0.15,
+			"pos": [
+				19.2786178588867,
+				31.9055728912354,
+				-77.2826156616211
+			],
+			"yaw": 1.44917857144557
+		},
+		{
+			"nom": "07_detour_du_verger",
+			"pitch": -0.15,
+			"pos": [
+				45,
+				12.3000001907349,
+				27.5
+			],
+			"yaw": -1.95130270390726
+		}
+	],
+	"chargement_ms": 4189,
+	"chute": {
+		"retour_au_quai": true,
+		"temps_s": 6.4
+	},
+	"defauts": [],
+	"depuis_cache": true,
+	"detour": {
+		"rejoint_le_chemin_principal": true,
+		"temps_s": 33
+	},
+	"etapes": [
+		{
+			"etape": "Sentier des falaises",
+			"temps_s": 74.8
+		},
+		{
+			"etape": "Descente du col",
+			"temps_s": 39
+		},
+		{
+			"etape": "Place du hameau",
+			"temps_s": 9.7
+		},
+		{
+			"etape": "Rue du hameau",
+			"temps_s": 11.6
+		},
+		{
+			"etape": "Lacets des hauteurs",
+			"temps_s": 56.5
+		},
+		{
+			"etape": "Pointe du Guet",
+			"temps_s": 4.2
+		},
+		{
+			"etape": "Chemin de crête",
+			"temps_s": 41.5
+		},
+		{
+			"etape": "Montée du sanctuaire",
+			"temps_s": 4.8
+		}
+	],
+	"maison": {
+		"camera_dy_max_cm_par_image": {
+			"escalier": 5.6,
+			"porte": 2.8
+		},
+		"camera_interieur": true,
+		"chemin_rdc_points": 5,
+		"entre": true,
+		"etage_atteint": true,
+		"hauteur_etage": 2.61,
+		"id": "maison_visitable",
+		"marches_franchies": 66,
+		"ressorti": true,
+		"temps_visite_s": 17.6
+	},
+	"trajet_principal_min": 4.18,
+	"trajet_principal_s": 250.7,
+	"vitesse_marche_mps": 2.2
+}

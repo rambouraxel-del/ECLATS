@@ -1,15 +1,16 @@
 # Île d'ouverture (Lot 5)
 
 Première île **jouable** d'ÉCLATS : une île **fixe**, dessinée à la main, beaucoup plus grande que l'île de test
-du Lot 4 (≈ 41 500 m² de terre contre ≈ 2 100 m²), parcourue par un explorateur à la troisième personne, du quai
-jusqu'au sanctuaire de l'Ancre.
+du Lot 4 (≈ 41 500 m² de terre contre ≈ 2 100 m²), parcourue **en première personne** (Lot 6 ; **V** : vue à la troisième personne),
+du quai jusqu'au sanctuaire de l'Ancre.
 
 ![Plan de l'île](captures/lot5/00_plan.png)
 
 ## Accès
 
-- **Lancer le projet** (F5 dans l'éditeur, ou l'exécutable) : l'île d'ouverture est la scène de démarrage.
-- **F10** depuis n'importe quelle scène ; **F9** reste l'accès au prototype précédent (île générée du Lot 4).
+- **Lancer le projet** (F5 dans l'éditeur, ou l'exécutable) : le **menu principal** s'ouvre (Lot 6) → *Jouer l'île d'ouverture*.
+- **F10** depuis n'importe quelle scène ; **F9** reste l'accès au prototype précédent (île générée du Lot 4, aussi dans *Outils développeur*).
+- **Échap** : pause (*Reprendre* / *Retour au menu principal*). **F3** : informations techniques à la demande.
 - Scène : `scenes/game/opening_island.tscn`.
 - Première ouverture : l'île est **construite** (≈ 1 à 2 min selon la machine) puis mise en cache
   (`user://cache/`, ≈ 70 Mo) ; les ouvertures suivantes la rechargent en quelques secondes.
@@ -19,8 +20,9 @@ jusqu'au sanctuaire de l'Ancre.
 | Touche | Action |
 |---|---|
 | Z Q S D (AZERTY) / W A S D (QWERTY), ou flèches | Se déplacer (touches **physiques** : les deux claviers marchent, l'aide affiche les lettres du clavier réel) |
-| Souris | Tourner la caméra (clic gauche : capturer la souris ; Échap : la libérer) |
-| Molette | Rapprocher / éloigner la caméra |
+| Souris | Regarder (clic gauche : recapturer la souris après une pause) |
+| V | Changer de vue : première personne (défaut) / troisième personne |
+| Molette | Distance de la caméra (troisième personne) |
 | Maj | Courir |
 | Espace | Sauter |
 | **E** | Activer l'Ancre (à portée du cristal ; l'invite affiche la touche réellement assignée) |
@@ -28,7 +30,7 @@ jusqu'au sanctuaire de l'Ancre.
 | Ctrl + Suppr | Oublier la sauvegarde de l'île (pour rejouer l'activation) |
 | F3 / F11 | Aide / plein écran |
 
-La caméra se rapproche automatiquement dans les maisons. Une chute dans le vide ramène au quai.
+À la troisième personne, la caméra se rapproche automatiquement dans les maisons. Une chute dans le vide ramène au quai.
 
 ## Parcours
 

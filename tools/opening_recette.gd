@@ -17,6 +17,10 @@ var ex: Explorer
 var report := {"etapes": [], "defauts": [], "captures": []}
 var map: Dictionary
 var S := 1.0
+## Confort de la première personne : écart vertical de la caméra d'une image à l'autre (m), par segment de visite.
+var _sample := ""
+var _cam_y := NAN
+var _dy := {}
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
@@ -73,6 +77,19 @@ func _capture(name: String, yaw_toward: Vector2 = Vector2.INF, pitch := -0.22) -
 	var yaw := (ex.model.rotation.y) if yaw_toward == Vector2.INF else atan2(-(yaw_toward.x - p.x), -(yaw_toward.y - p.z))
 	report["captures"].append({"nom": name, "pos": [p.x, p.y, p.z], "yaw": yaw, "pitch": pitch})
 
+func _sample_camera() -> void:
+	if _sample == "":
+		return
+	var cam: ThirdPersonCamera = scene.get("camrig")
+	if cam == null or not cam.first_person:
+		return
+	var y := cam.cam.global_position.y
+	if not is_nan(_cam_y):
+		_dy[_sample] = maxf(float(_dy.get(_sample, 0.0)), absf(y - _cam_y))
+		if absf(y - _cam_y) > 0.08 and OS.get_cmdline_user_args().has("--debug-camera"):
+			print("[camera] saut %.1f cm segment %s · explorateur y %.3f · décalage modèle %.3f · caméra y %.3f · pas franchis %d" % [(y - _cam_y) * 100.0, _sample, ex.global_position.y, ex.model.position.y, y, ex.stepped])
+	_cam_y = y
+
 ## Marche vers un point (x, z) : renvoie le temps mis (s) ; signale les blocages (et les franchit pour continuer).
 func _walk_to(target: Vector2, tol := 0.8, label := "") -> float:
 	ex.auto_active = true
@@ -87,6 +104,7 @@ func _walk_to(target: Vector2, tol := 0.8, label := "") -> float:
 		await physics_frame
 		t += DT
 		check_t += DT
+		_sample_camera()
 		if int(scene.get("falls")) != falls0:
 			report["defauts"].append({"type": "chute", "etape": label, "vers": [target.x, target.y]})
 			ex.auto_dir = Vector2.ZERO
@@ -251,9 +269,12 @@ func _visit_house(pc: Vector2, pr: float) -> void:
 	t += await _walk_to(pc + (door - pc).normalized() * (pr - 0.6), 0.9, "Vers la maison")
 	t += await _walk_to(door + front * 2.0, 0.6, "Allée de la maison")
 	_capture("04_maison_visitable", door - front * 2.0, -0.12)
+	_sample = "porte"
+	_cam_y = NAN
 	t += await _walk_to(door + front * 0.3, 0.4, "Seuil")
 	var inside := door - front * 1.2
 	t += await _walk_to(inside, 0.4, "Entrée")
+	_sample = ""
 	var floor0 := float(house["floor0_y"])
 	res["entre"] = absf(ex.global_position.y - floor0) < 0.25 and bool(scene.call("_is_interior", ex.global_position))
 	res["camera_interieur"] = bool((scene.get("camrig") as ThirdPersonCamera).interior)
@@ -266,7 +287,10 @@ func _visit_house(pc: Vector2, pr: float) -> void:
 		for q: Vector2 in route:
 			t += await _walk_to(q, 0.35, "Rez-de-chaussée")
 		t += await _walk_to(foot, 0.35, "Pied de l'escalier")
+		_sample = "escalier"
+		_cam_y = NAN
 		t += await _walk_to(top, 0.4, "Escalier")
+		_sample = ""
 		var f1 := float(house["floor1_y"])
 		res["etage_atteint"] = ex.global_position.y > f1 - 0.15
 		res["hauteur_etage"] = snappedf(ex.global_position.y - floor0, 0.01)
@@ -281,6 +305,9 @@ func _visit_house(pc: Vector2, pr: float) -> void:
 		t += await _walk_to(door + front * 2.0, 0.6, "Sortie")
 		res["ressorti"] = not bool(scene.call("_is_interior", ex.global_position))
 	res["temps_visite_s"] = snappedf(t, 0.1)
+	res["camera_dy_max_cm_par_image"] = {}
+	for k in _dy:
+		res["camera_dy_max_cm_par_image"][k] = snappedf(float(_dy[k]) * 100.0, 0.1)
 	report["maison"] = res
 
 ## Chemin intérieur (grille de 20 cm, cases libres d'après les collisions réelles) de a vers b.
