@@ -1,0 +1,192 @@
+{
+	"controles": [
+		{
+			"controle": "atelier prêt, mode construction fermé au départ",
+			"ok": true
+		},
+		{
+			"controle": "B : le mode construction s'ouvre (panneau du labo masqué)",
+			"ok": true
+		},
+		{
+			"controle": "stock de démonstration : 200 unités",
+			"ok": true
+		},
+		{
+			"controle": "touche 1 : outil Sol",
+			"ok": true
+		},
+		{
+			"controle": "le réticule vise la case (0 ; 0) — lu : (0 ; 0), aimantation : grille",
+			"ok": true
+		},
+		{
+			"controle": "premier coin posé",
+			"ok": true
+		},
+		{
+			"controle": "second coin visé : l'aperçu annonce 3 unités (Sol 1,50 × 1,50 m · coût 3 unités)",
+			"ok": true
+		},
+		{
+			"controle": "clic : aperçu verrouillé, stock toujours à 200",
+			"ok": true
+		},
+		{
+			"controle": "X : aperçu annulé avant confirmation, rien n'est débité",
+			"ok": true
+		},
+		{
+			"controle": "le réticule vise la case (0 ; 0) — lu : (0 ; 0), aimantation : grille",
+			"ok": true
+		},
+		{
+			"controle": "le réticule vise la case (3 ; 3) — lu : (3 ; 3), aimantation : grille",
+			"ok": true
+		},
+		{
+			"controle": "Entrée : 3 unités débitées (stock 197)",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z : sol retiré, stock rendu (200)",
+			"ok": true
+		},
+		{
+			"controle": "le réticule vise la case (-6 ; -12) — lu : (-6 ; -12), aimantation : grille",
+			"ok": true
+		},
+		{
+			"controle": "le réticule vise la case (6 ; -12) — lu : (6 ; -12), aimantation : grille",
+			"ok": true
+		},
+		{
+			"controle": "mur : aperçu avec dimensions et coût (Mur 6,00 m × 2,5 m · coût 15 unités)",
+			"ok": true
+		},
+		{
+			"controle": "mur posé (15 unités, stock 185)",
+			"ok": true
+		},
+		{
+			"controle": "porte : aperçu de la découpe (Porte 1,0 × 2,0 m · coût 4 unités)",
+			"ok": true
+		},
+		{
+			"controle": "porte posée (4 unités, stock 181)",
+			"ok": true
+		},
+		{
+			"controle": "fenêtre posée (2 unités, stock 179)",
+			"ok": true
+		},
+		{
+			"controle": "collisions : mur arrêtant le joueur, passage de la porte libre",
+			"ok": true
+		},
+		{
+			"controle": "le joueur traverse réellement la porte (z = -7.65)",
+			"ok": true
+		},
+		{
+			"controle": "outil Modifier : mur choisi",
+			"ok": true
+		},
+		{
+			"controle": "J (raccourcir par le début) : refusé, construction intacte",
+			"ok": true
+		},
+		{
+			"controle": "K (prolonger de 0,5 m) : aperçu, 2 unités de différence (15 → 17)",
+			"ok": true
+		},
+		{
+			"controle": "différence payée seulement : stock 177",
+			"ok": true
+		},
+		{
+			"controle": "O : porte côté est",
+			"ok": true
+		},
+		{
+			"controle": "O (4 fois) : retour au sud",
+			"ok": true
+		},
+		{
+			"controle": "le réticule vise la case (-6 ; -2) — lu : (-6 ; -2), aimantation : grille",
+			"ok": true
+		},
+		{
+			"controle": "le réticule vise la case (6 ; 6) — lu : (6 ; 6), aimantation : grille",
+			"ok": true
+		},
+		{
+			"controle": "pièce 6 × 4 m : aperçu (Pièce 6,00 × 4,00 m, murs de 2,5 m · porte côté sud · coût 78 unités)",
+			"ok": true
+		},
+		{
+			"controle": "pièce posée : plancher + 4 murs",
+			"ok": true
+		},
+		{
+			"controle": "toit : aperçu ajusté à l'emprise (Toit à deux pans sur 6,00 × 4,00 m · coût 37 unités)",
+			"ok": true
+		},
+		{
+			"controle": "toit posé",
+			"ok": true
+		},
+		{
+			"controle": "le joueur entre dans la pièce par la porte (z = 1.51)",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z : toit retiré",
+			"ok": true
+		},
+		{
+			"controle": "PgUp : niveau 1",
+			"ok": true
+		},
+		{
+			"controle": "à l'étage, la visée suit le plan du niveau 1 (case -6 ; -2)",
+			"ok": true
+		},
+		{
+			"controle": "pièce d'étage posée (sans porte)",
+			"ok": true
+		},
+		{
+			"controle": "toit de l'étage : stock insuffisant, aperçu refusé et expliqué",
+			"ok": true
+		},
+		{
+			"controle": "clic sur un aperçu refusé : rien n'est posé, rien n'est débité",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Recharger le stock de démo » : 200 unités",
+			"ok": true
+		},
+		{
+			"controle": "toit posé sur l'étage (Toit à deux pans sur 6,00 × 4,00 m · coût 37 unités [\"Stock insuffisant : il manque 12 unités (stock 25, coût 37).\"] ; tool=toit level=1 pending=)",
+			"ok": true
+		},
+		{
+			"controle": "PgDn : retour au niveau 0",
+			"ok": true
+		},
+		{
+			"controle": "bouton Enregistrer : fichier écrit (/root/.local/share/godot/app_userdata/ÉCLATS/maisons/maison-de-latelier.eclats-maison.json)",
+			"ok": true
+		},
+		{
+			"controle": "B : sortie du mode construction, panneau du labo rétabli",
+			"ok": true
+		}
+	],
+	"duree_s": 83,
+	"echecs": 0,
+	"elements": 12,
+	"fichier": "/root/.local/share/godot/app_userdata/ÉCLATS/maisons/maison-de-latelier.eclats-maison.json"
+}

@@ -15,6 +15,7 @@ var recipe_label: Label
 var bar_open := false
 var player: Explorer
 var env_label := ""
+var suspended := false             # vrai pendant le mode construction : le panneau et les raccourcis du labo se taisent
 
 var _tool_btns: Array[Button] = []
 var _gen: OptionButton
@@ -305,6 +306,8 @@ func _process(delta: float) -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	var k := event as InputEventKey
 	if k == null or not k.pressed or k.echo or bar_open or App.paused_menu:
+		return
+	if suspended and k.keycode != KEY_TAB:
 		return
 	match k.keycode:
 		KEY_T:

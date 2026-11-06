@@ -14,6 +14,7 @@ var camrig: ThirdPersonCamera
 var sel: LabSelection
 var ctl: LabController
 var ui: LabUi
+var builder: BuildMode
 var env: EnvironmentManager
 var ready_to_play := false
 var falls := 0
@@ -93,6 +94,10 @@ func _build() -> void:
 	ui.player = explorer
 	add_child(ui)
 	ui.setup(ctl, sel)
+	builder = BuildMode.new()
+	builder.name = "Construction"
+	add_child(builder)
+	builder.setup(lab, camrig.cam, explorer, ui, sel)
 	_hud.get_node("Fond").queue_free()
 	_loading.queue_free()
 	load_ms = Time.get_ticks_msec() - t0
@@ -105,6 +110,18 @@ func _process(_delta: float) -> void:
 	if not ready_to_play:
 		return
 	explorer.cam_yaw = camrig.yaw
+
+## B : entrer / sortir du mode construction (atelier).
+func _unhandled_key_input(event: InputEvent) -> void:
+	var k := event as InputEventKey
+	if k == null or not k.pressed or k.echo or not ready_to_play or App.paused_menu or ui.bar_open:
+		return
+	if k.keycode == KEY_B and not k.ctrl_pressed:
+		if builder.active:
+			builder.leave()
+		else:
+			builder.enter()
+		get_viewport().set_input_as_handled()
 
 ## Salle : 4 murs, plafond (ni ombre ni exposition au ciel : la lumière du jour reste celle du jeu), collisions des murs.
 func _room_shell() -> void:
