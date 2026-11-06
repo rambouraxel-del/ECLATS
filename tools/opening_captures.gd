@@ -36,13 +36,14 @@ func _initialize() -> void:
 		await _shot("14_apres_relance")
 		quit()
 		return
+	var fin := args.has("--chute")
 	for c in caps:
-		if String(c["nom"]).begins_with("11_"):
+		if fin or String(c["nom"]).begins_with("11_"):
 			continue
 		await _place(c)
 		await _shot(String(c["nom"]))
 	# invite, activation, après activation
-	if by_name.has("11_invite_ancre"):
+	if by_name.has("11_invite_ancre") and not fin:
 		await _place(by_name["11_invite_ancre"])
 		await _shot("11_invite_ancre")
 		scene.call("activate_anchor")
@@ -60,13 +61,16 @@ func _initialize() -> void:
 	for p in map["paths"]:
 		if p["id"] == "sentier_des_falaises":
 			p1 = p["pts"]
-	var e := Vector2(float(p1[11][0]) - 9.0, float(p1[11][1]))
-	ex.teleport(Vector3(e.x, float(scene.call("ground_y_at", e.x + 9.0, e.y)) + 1.0, e.y), PI * 0.5)
+	var e := Vector2(float(p1[11][0]) - 16.0, float(p1[11][1]))
+	ex.teleport(Vector3(e.x, float(scene.call("ground_y_at", e.x + 16.0, e.y)) + 1.0, e.y), PI * 0.5)
 	cam.yaw = -PI * 0.5 + 0.6
 	cam.pitch = -0.45
 	cam.snap()
-	for i in 24:
+	for i in 30:
 		await physics_frame
+	cam.snap()
+	for i in 2:
+		await process_frame
 	await _shot("15_chute")
 	var t := 0
 	while int(scene.get("falls")) == 0 and t < 1200:

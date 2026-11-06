@@ -1,7 +1,7 @@
 # Île d'ouverture (Lot 5)
 
 Première île **jouable** d'ÉCLATS : une île **fixe**, dessinée à la main, beaucoup plus grande que l'île de test
-du Lot 4 (≈ 30 000 m² de terre contre ≈ 2 100 m²), parcourue par un explorateur à la troisième personne, du quai
+du Lot 4 (≈ 41 500 m² de terre contre ≈ 2 100 m²), parcourue par un explorateur à la troisième personne, du quai
 jusqu'au sanctuaire de l'Ancre.
 
 ![Plan de l'île](captures/lot5/00_plan.png)
@@ -42,8 +42,8 @@ La caméra se rapproche automatiquement dans les maisons. Une chute dans le vide
 | Pointe du Guet (point de vue) | éperon rocheux au-dessus du vide, à l'est | arche ouverte sur le vide, tor rocheux (Haytor), banc |
 | Sanctuaire de l'Ancre | sommet rond au nord, falaises | cercle de colonnes, arche, braseros, cristal de l'Ancre |
 
-Itinéraire principal ≈ 600 m, **≈ 4 min 30 de marche** (2,2 m/s) du quai au cristal, hors visite ;
-détour du verger ≈ 95 m.
+Itinéraire principal ≈ 570 m, **≈ 4 min de marche** (2,2 m/s ; 4,1 min mesurées par la recette jouée, qui marche en ligne droite entre les repères) du quai au cristal, hors visite ;
+détour du verger ≈ 95 m (≈ 30 s).
 
 ## Objectif et Ancre
 

@@ -6,12 +6,13 @@ graphique, une première île voxel générée par seed, et une bibliothèque de
 Pas de personnage, de quêtes, d'inventaire ni de combat dans ce lot.
 
 **Lot 5** : **île d'ouverture jouable** (scène de démarrage, touche **F10**) : une île **fixe** dessinée à la main
-(≈ 30 000 m², carte JSON éditable), un explorateur à cape bleu ardoise à la troisième personne (ZQSD / WASD, collisions,
-maison visitable avec étage), du quai au sanctuaire en ≈ 4 min 30 de marche, objectif « Rejoindre le sanctuaire »,
+(≈ 41 500 m², carte JSON éditable), un explorateur à cape bleu ardoise à la troisième personne (ZQSD / WASD, collisions,
+maison visitable avec étage), du quai au sanctuaire en ≈ 4 min de marche, objectif « Rejoindre le sanctuaire »,
 activation de l'Ancre (« E · Activer l'Ancre », pulsation cyan, « Île découverte ») et sauvegarde.
 Voir [docs/ILE_OUVERTURE.md](docs/ILE_OUVERTURE.md) et [docs/BILAN_LOT5.md](docs/BILAN_LOT5.md).
 
-![Plan de l'île d'ouverture](docs/captures/lot5/00_plan.png)
+![Montée du sanctuaire](docs/captures/lot5/10_montee_du_sanctuaire.jpg)
+![Activation de l'Ancre](docs/captures/lot5/12_pulsation_ile_decouverte.jpg)
 
 **Lot 4** : **refonte structurelle de la génération** (touche **F9**) : terrain hiérarchique par profils, système de
 placement universel (réservations, exceptions déclarées, refus explicites), colonie qui s'adapte au relief, bâtiments

@@ -1,6 +1,6 @@
 extends SceneTree
 ## Captures de l'île d'ouverture (Lot 5) depuis la caméra du joueur :
-##   godot --rendering-driver opengl3 -s tools/opening_shot.gd -- dossier "x,z,yaw_deg[,pitch][;…]"
+##   godot --rendering-driver opengl3 -s tools/opening_shot.gd -- dossier "x,z,yaw_deg[,pitch[,y_rayon]][;…]"
 ## Chaque point : l'explorateur est posé au sol en (x, z), tourné vers yaw, la caméra derrière lui.
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
@@ -20,7 +20,7 @@ func _initialize() -> void:
 		var yaw := deg_to_rad(float(v[2]))
 		for i in 2:
 			await physics_frame
-		var g: float = scene.call("ground_y_at", x, z)
+		var g: float = scene.call("ground_y_at", x, z, float(v[4]) if v.size() > 4 else 300.0)
 		var ex: Explorer = scene.get("explorer")
 		ex.teleport(Vector3(x, (0.0 if is_nan(g) else g) + 0.05, z), yaw + PI)
 		var cr: ThirdPersonCamera = scene.get("camrig")
@@ -28,6 +28,7 @@ func _initialize() -> void:
 		cr.pitch = float(v[3]) if v.size() > 3 else -0.25
 		for i in 20:
 			await physics_frame
+		cr.interior = bool(scene.call("_is_interior", ex.global_position))
 		cr.snap()
 		for i in 8:
 			await process_frame
