@@ -1,0 +1,94 @@
+{
+	"c_chemins": [
+		{
+			"id": "chemin_1",
+			"longueur_m": 17.3,
+			"marche_max_m": 0.2,
+			"ok": true,
+			"pente_max": 0.2
+		},
+		{
+			"id": "chemin_2",
+			"longueur_m": 19.3,
+			"marche_max_m": 0.2,
+			"ok": true,
+			"pente_max": 0.2
+		},
+		{
+			"id": "chemin_3",
+			"longueur_m": 15.3,
+			"marche_max_m": 0.2,
+			"ok": true,
+			"pente_max": 0.2
+		}
+	],
+	"controles": [
+		{
+			"controle": "chemins praticables sur les voxels (3 / 3)",
+			"ok": true
+		},
+		{
+			"controle": "départ sur du sol",
+			"ok": true
+		},
+		{
+			"controle": "reproductibilité : même graine, mêmes voxels (empreinte de surface 348888585, colonne de départ identique)",
+			"ok": true
+		},
+		{
+			"controle": "exploration en première personne : le chemin chemin_1 est parcouru de bout en bout (6.2 s, 0 chute)",
+			"ok": true
+		},
+		{
+			"controle": "exploration en première personne : le chemin chemin_2 est parcouru de bout en bout (6.5 s, 0 chute)",
+			"ok": true
+		},
+		{
+			"controle": "exploration en première personne : le chemin chemin_3 est parcouru de bout en bout (4.9 s, 0 chute)",
+			"ok": true
+		},
+		{
+			"controle": "retouche appliquée aux voxels (la colonne a changé)",
+			"ok": true
+		},
+		{
+			"controle": "retouche enregistrée dans la base Voxel Tools (428 ms)",
+			"ok": true
+		},
+		{
+			"controle": "base rouverte dans un nouveau VoxelTerrain : retouche retrouvée (sol 5.20 m)",
+			"ok": true
+		}
+	],
+	"exploration": [
+		{
+			"atteint": true,
+			"chutes": 0,
+			"distance_fin_m": 0.8,
+			"id": "chemin_1",
+			"temps_s": 6.2
+		},
+		{
+			"atteint": true,
+			"chutes": 0,
+			"distance_fin_m": 0.8,
+			"id": "chemin_2",
+			"temps_s": 6.5
+		},
+		{
+			"atteint": true,
+			"chutes": 0,
+			"distance_fin_m": 0.8,
+			"id": "chemin_3",
+			"temps_s": 4.9
+		}
+	],
+	"graine": 21,
+	"methode": "C",
+	"plan_structure_hash": 1202988792,
+	"retouche_c": {
+		"avant_sol_m": 5.2,
+		"enregistrement_ms": 428,
+		"octets_base": 49152
+	}
+}

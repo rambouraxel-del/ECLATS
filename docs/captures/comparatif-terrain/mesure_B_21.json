@@ -1,0 +1,37 @@
+{
+	"carte_m": [
+		56,
+		48
+	],
+	"coeurs": 4,
+	"deuxieme_chargement": {
+		"collisions_ms": 12.562,
+		"memoire_mo": 48.1,
+		"relief_ms": 1002,
+		"retouche_locale_ms": 998.497,
+		"retouche_maj_terrain_3d_ms": 978.473,
+		"retouche_pinceau_ms": 20.023,
+		"terrain_ms": 1708,
+		"total_ms": 6095,
+		"triangles_maillage": 176824,
+		"triangles_visibles_aerien": 176824
+	},
+	"godot": "4.3-stable (custom_build)",
+	"graine": 21,
+	"methode": "B",
+	"premier_chargement": {
+		"collisions_ms": 12.038,
+		"memoire_mo": 52.6,
+		"relief_ms": 911,
+		"retouche_locale_ms": 889.139,
+		"retouche_maj_terrain_3d_ms": 870.974,
+		"retouche_pinceau_ms": 18.164,
+		"terrain_ms": 1771,
+		"total_ms": 9696,
+		"triangles_maillage": 176824,
+		"triangles_visibles_aerien": 176824
+	},
+	"processeur": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+	"rendu": "llvmpipe (LLVM 20.1.2, 256 bits) / forward_plus",
+	"voxel_tools": true
+}

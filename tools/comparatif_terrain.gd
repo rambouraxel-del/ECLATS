@@ -513,7 +513,6 @@ func _mesure() -> void:
 					if int(vw.gen.call("height_at", bx + 8, bz + 8)) <= -1000000 and bx % 64 != 0:
 						continue
 					for by in range(int(bb.position.y), int(bb.end.y), 16):
-						buf.call("clear")
 						vw.gen.call("_generate_block", buf, Vector3i(bx, by, bz), 0)
 						blocks += 1
 			r["generation_seule_1_fil_ms"] = float(Time.get_ticks_usec() - t2) / 1000.0

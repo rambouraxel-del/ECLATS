@@ -1,0 +1,43 @@
+{
+	"carte_m": [
+		56,
+		48
+	],
+	"coeurs": 4,
+	"deuxieme_chargement": {
+		"blocs_generes_seuls": 1764,
+		"collisions_ms": "compris dans le maillage (tâches Voxel Tools)",
+		"generation_maillage_collisions_ms": 1749,
+		"generation_seule_1_fil_ms": 928.839,
+		"installation_ms": 25,
+		"memoire_mo": 111.7,
+		"relief_ms": 910,
+		"retouche_locale_dont_appels_ms": 7,
+		"retouche_locale_ms": 1097,
+		"squelette_ms": 910,
+		"terrain_ms": 1749,
+		"total_ms": 5918,
+		"triangles_visibles_aerien": 416372
+	},
+	"godot": "4.3-stable (custom_build)",
+	"graine": 21,
+	"methode": "C",
+	"premier_chargement": {
+		"blocs_generes_seuls": 1764,
+		"collisions_ms": "compris dans le maillage (tâches Voxel Tools)",
+		"generation_maillage_collisions_ms": 1838,
+		"generation_seule_1_fil_ms": 907.69,
+		"installation_ms": 49,
+		"memoire_mo": 119.2,
+		"relief_ms": 989,
+		"retouche_locale_dont_appels_ms": 6,
+		"retouche_locale_ms": 1067,
+		"squelette_ms": 989,
+		"terrain_ms": 1838,
+		"total_ms": 6183,
+		"triangles_visibles_aerien": 416372
+	},
+	"processeur": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+	"rendu": "llvmpipe (LLVM 20.1.2, 256 bits) / forward_plus",
+	"voxel_tools": true
+}

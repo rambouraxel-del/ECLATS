@@ -1,0 +1,90 @@
+{
+	"chemins_terrain": [
+		{
+			"id": "chemin_1",
+			"longueur_m": 17.3,
+			"ok": true,
+			"pente_max": 0.2
+		},
+		{
+			"id": "chemin_2",
+			"longueur_m": 19.3,
+			"ok": true,
+			"pente_max": 0.2
+		},
+		{
+			"id": "chemin_3",
+			"longueur_m": 15.3,
+			"ok": true,
+			"pente_max": 0.2
+		}
+	],
+	"controles": [
+		{
+			"controle": "reproductibilité : même graine, même terrain (empreinte 1406792288)",
+			"ok": true
+		},
+		{
+			"controle": "chemins praticables sur le terrain (3 / 3 : pente ≤ 30 %, aucune marche ≥ 40 cm)",
+			"ok": true
+		},
+		{
+			"controle": "départ sûr (sol plat, loin du bord)",
+			"ok": true
+		},
+		{
+			"controle": "exploration en première personne : le chemin chemin_1 est parcouru de bout en bout (6.3 s, 0 chute)",
+			"ok": true
+		},
+		{
+			"controle": "exploration en première personne : le chemin chemin_2 est parcouru de bout en bout (6.5 s, 0 chute)",
+			"ok": true
+		},
+		{
+			"controle": "exploration en première personne : le chemin chemin_3 est parcouru de bout en bout (4.9 s, 0 chute)",
+			"ok": true
+		},
+		{
+			"controle": "retouche appliquée (relief modifié)",
+			"ok": true
+		},
+		{
+			"controle": "retouche enregistrée dans la carte (v3)",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : relief et matières identiques colonne pour colonne",
+			"ok": true
+		},
+		{
+			"controle": "la méthode est conservée dans la carte (B)",
+			"ok": true
+		}
+	],
+	"exploration": [
+		{
+			"atteint": true,
+			"chutes": 0,
+			"distance_fin_m": 0.8,
+			"id": "chemin_1",
+			"temps_s": 6.3
+		},
+		{
+			"atteint": true,
+			"chutes": 0,
+			"distance_fin_m": 0.8,
+			"id": "chemin_2",
+			"temps_s": 6.5
+		},
+		{
+			"atteint": true,
+			"chutes": 0,
+			"distance_fin_m": 0.8,
+			"id": "chemin_3",
+			"temps_s": 4.9
+		}
+	],
+	"graine": 21,
+	"methode": "B",
+	"plan_structure_hash": 1202988792
+}

@@ -147,3 +147,7 @@ Diagnostic d'une génération (rapport lisible + JSON) :
 - [docs/BILAN_LOT2.md](docs/BILAN_LOT2.md) — vérifications, mesures, limites du Lot 2.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — organisation du code et choix techniques.
 - [docs/BILAN_LOT1.md](docs/BILAN_LOT1.md) — vérifications réalisées, limites, prochaines étapes.
+
+## Comparatif de génération du terrain (A · B · C)
+
+Voir `docs/COMPARATIF_TERRAIN.md` : trois méthodes (A actuel, B FastNoiseLite, C prototype Voxel Tools 1.3 compilé dans Godot 4.3), planches dans `docs/captures/comparatif-terrain/planches/`.
