@@ -22,7 +22,7 @@ La carte est retouchée par `tools/lot10_remodelage.py` à partir de la carte du
 |---|---|
 | `8c4a8a7` | Étape 1 : quai et hameau |
 | `0aa1bc7` | Étape 2 : crête, Pointe du Guet, sanctuaire, correction de la plateforme de l'Ancre |
-| `abd1303` | Captures, recette rejouée sur la carte finale, bilan |
+| dernier commit de la branche | Captures, recette rejouée sur la carte finale, bilan |
 
 ## Recette
 
