@@ -1,0 +1,176 @@
+{
+	"controles": [
+		{
+			"controle": "menu → Outils développeur → Éditeur de carte",
+			"ok": true
+		},
+		{
+			"controle": "l'éditeur s'ouvre sur un canevas vide",
+			"ok": true
+		},
+		{
+			"controle": "contour : 10 points posés (aperçu du tracé)",
+			"ok": true
+		},
+		{
+			"controle": "Entrée ferme le contour : l'île existe (949 m², 37 × 33 m)",
+			"ok": true
+		},
+		{
+			"controle": "l'éditeur passe à l'outil Zones",
+			"ok": true
+		},
+		{
+			"controle": "zones peintes à la souris : 8 disques (pelouse, bois, crique)",
+			"ok": true
+		},
+		{
+			"controle": "la crique peinte est plate (sol à 3.6 m)",
+			"ok": true
+		},
+		{
+			"controle": "réglage du relief naturel (×1,8) appliqué depuis le panneau",
+			"ok": true
+		},
+		{
+			"controle": "chemin tracé à la souris (4 points), relié aux zones : crique_8 → bois_7",
+			"ok": true
+		},
+		{
+			"controle": "repère posé (point de vue)",
+			"ok": true
+		},
+		{
+			"controle": "point du chemin déplacé à la souris : (2.0 ; 0.0) → (2.0 ; 8.0)",
+			"ok": true
+		},
+		{
+			"controle": "le chemin déplacé reste praticable (pente max 0 %)",
+			"ok": true
+		},
+		{
+			"controle": "pinceau « monter » à la souris : +3 cellules",
+			"ok": true
+		},
+		{
+			"controle": "chaque trait est une opération annulable (10 opérations)",
+			"ok": true
+		},
+		{
+			"controle": "masque posé sur la crique : 2076 colonnes",
+			"ok": true
+		},
+		{
+			"controle": "sélection tracée à la souris : 15.0 × 15.0 m",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Régénérer le relief dans la sélection »",
+			"ok": true
+		},
+		{
+			"controle": "le relief change dans la zone sélectionnée (1531 colonnes)",
+			"ok": true
+		},
+		{
+			"controle": "la crique protégée est restée intacte",
+			"ok": true
+		},
+		{
+			"controle": "les zones extérieures à la sélection n'ont pas bougé",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z restaure le relief d'avant la régénération (toutes les colonnes)",
+			"ok": true
+		},
+		{
+			"controle": "régénération relancée",
+			"ok": true
+		},
+		{
+			"controle": "relancer = variante suivante : un autre relief dans la même sélection",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Exporter la carte »",
+			"ok": true
+		},
+		{
+			"controle": "export : « Enregistrer »",
+			"ok": true
+		},
+		{
+			"controle": "fichier écrit : /root/.local/share/godot/app_userdata/ÉCLATS/cartes/essai_lot7.eclats-carte.json (3188 octets)",
+			"ok": true
+		},
+		{
+			"controle": "nouvelle session : éditeur vide, historique vide",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Ouvrir une carte »",
+			"ok": true
+		},
+		{
+			"controle": "la liste propose les cartes du dossier : cassee.json, essai_lot7.eclats-carte.json",
+			"ok": true
+		},
+		{
+			"controle": "ouverture de la carte exportée",
+			"ok": true
+		},
+		{
+			"controle": "plan rouvert identique (zones, chemins, repères, réglages)",
+			"ok": true
+		},
+		{
+			"controle": "retouches de relief, matières et masque conservés (2283 / 0 / 2076 colonnes)",
+			"ok": true
+		},
+		{
+			"controle": "terrain rouvert identique à celui exporté",
+			"ok": true
+		},
+		{
+			"controle": "chemin retouché retrouvé : point (2.0 ; 8.0)",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Ouvrir une carte » (île déjà ouverte)",
+			"ok": true
+		},
+		{
+			"controle": "ouverture du fichier corrompu demandée",
+			"ok": true
+		},
+		{
+			"controle": "erreur expliquée dans le dialogue : « Ouverture impossible : Fichier illisible : le contenu est abîmé ou incomplet (JSON invalide : Expected ']'). (cassee.json) »",
+			"ok": true
+		},
+		{
+			"controle": "l'île ouverte est conservée, intacte, après l'erreur",
+			"ok": true
+		},
+		{
+			"controle": "ouverture de la carte exportée (2e fois, après l'erreur)",
+			"ok": true
+		},
+		{
+			"controle": "après l'erreur, la carte s'ouvre normalement",
+			"ok": true
+		},
+		{
+			"controle": "bouton « Vérifier en 3D »",
+			"ok": true
+		},
+		{
+			"controle": "l'île éditée s'ouvre en 3D, première personne : Nouvelle île",
+			"ok": true
+		},
+		{
+			"controle": "F6 : retour à l'éditeur avec la même carte",
+			"ok": true
+		}
+	]
+}

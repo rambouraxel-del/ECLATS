@@ -16,7 +16,7 @@ const MAX_SIZE := 120.0
 ## hauteur par défaut (m, 0 = pas de contrainte) et part du rayon qui impose la hauteur.
 const KINDS := {
 	"arrivee": {"label": "Arrivée (en contrebas)", "color": Color("e3b24f"), "mat": "gravel", "flat": true, "amp": 0.05, "h": 2.4, "cr": 1.0},
-	"plateau": {"label": "Plateau habitable", "color": Color("94c96b"), "mat": "grass", "flat": true, "amp": 0.10, "h": 6.0, "cr": 1.0},
+	"plateau": {"label": "Plateau habitable", "color": Color("94c96b"), "mat": "grass_trim", "flat": true, "amp": 0.10, "h": 6.0, "cr": 1.0},
 	"bois": {"label": "Zone boisée", "color": Color("3f7d4a"), "mat": "grass_lush", "flat": false, "amp": 1.0, "h": 8.0, "cr": 0.5},
 	"sommet": {"label": "Point haut", "color": Color("b3aeb0"), "mat": "rock_grey", "flat": false, "amp": 0.6, "h": 11.0, "cr": 0.45},
 	"crique": {"label": "Crique", "color": Color("efe0a6"), "mat": "gravel", "flat": true, "amp": 0.05, "h": 1.6, "cr": 1.0},
@@ -256,7 +256,8 @@ static func from_json(text: String) -> Dictionary:
 	var json := JSON.new()
 	var err := json.parse(text)
 	if err != OK:
-		return {"ok": false, "error": "Fichier illisible : JSON invalide à la ligne %d (%s)." % [json.get_error_line(), json.get_error_message()]}
+		var where := " à la ligne %d" % json.get_error_line() if json.get_error_line() > 0 else ""
+		return {"ok": false, "error": "Fichier illisible : le contenu est abîmé ou incomplet (JSON invalide%s : %s)." % [where, json.get_error_message()]}
 	if typeof(json.data) != TYPE_DICTIONARY:
 		return {"ok": false, "error": "Ce fichier n'est pas une carte ÉCLATS (contenu inattendu)."}
 	return from_dict(json.data)

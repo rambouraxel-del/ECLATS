@@ -18,6 +18,7 @@ var show_legend := true
 var show_grid := true
 var show_labels := true
 var show_title := true
+var legend_scale := 1.0                  # 1 = légende complète ; 0,8 = compacte (éditeur)
 var interactive := false                 # molette = zoom, glisser (milieu) = déplacer
 var selected_path := ""
 var selected_landmark := ""
@@ -41,6 +42,10 @@ var _pan_from := Vector2.ZERO
 var _panning := false
 
 signal view_changed
+signal canvas_event(event: InputEvent)      # clics et mouvements non utilisés par le zoom / le déplacement (éditeur)
+
+var _lo := 0
+var _hi := 1
 
 # ------------------------------------------------------------------ repère écran ↔ monde
 
@@ -62,7 +67,7 @@ func fit(margin_m := 4.0) -> void:
 		hi = hi.max(p)
 	view_center = (lo + hi) * 0.5
 	var span := hi - lo + Vector2(margin_m, margin_m) * 2.0
-	var reserve := 282.0 if show_legend else 0.0        # la légende occupe la gauche : l'île est centrée dans le reste
+	var reserve := (282.0 * legend_scale) if show_legend else 0.0        # la légende occupe la gauche : l'île est centrée dans le reste
 	px_per_m = minf((size.x - reserve) / span.x, size.y / span.y)
 	view_center -= Vector2(reserve * 0.5 / px_per_m, 0.0)
 	view_changed.emit()
@@ -103,11 +108,13 @@ static func _shade_px(img: Image, f: TerrainField, pal: VoxelPalette, cx: int, c
 	if ts == TerrainField.NO_GROUND: ts = t
 	var shade := clampf(1.0 + 0.16 * float((te - tw) + (ts - tn)), 0.62, 1.30)
 	var alt := float(t - lo) / float(maxi(hi - lo, 1))
-	var col := Color(c.r * shade, c.g * shade, c.b * shade, 1.0).lerp(Color(1, 1, 1, 1), alt * 0.14)
+	# teinte d'altitude : bleuté en bas, doré en haut (lecture du relief) + ombrage + courbes de niveau
+	var tint := Color(0.16, 0.42, 0.82).lerp(Color(1.0, 0.86, 0.45), alt)
+	var col := Color(c.r * shade, c.g * shade, c.b * shade, 1.0).lerp(tint, 0.30)
 	# courbes de niveau tous les mètres
 	var k := floori(float(t + 1) * V)
 	if floori(float(tw + 1) * V) != k or floori(float(tn + 1) * V) != k:
-		col = col.darkened(0.18)
+		col = col.darkened(0.34)
 	img.set_pixel(cx, cz, col)
 
 func set_field(f: TerrainField) -> void:
@@ -116,6 +123,12 @@ func set_field(f: TerrainField) -> void:
 		_img = null
 		_tex = null
 		return
+	_lo = 1 << 30
+	_hi = -(1 << 30)
+	for t in f.top:
+		if t != TerrainField.NO_GROUND:
+			_lo = mini(_lo, t)
+			_hi = maxi(_hi, t)
 	_img = make_image(f, plan)
 	_tex = ImageTexture.create_from_image(_img)
 	queue_redraw()
@@ -126,16 +139,33 @@ func refresh_rect(r: Rect2i) -> void:
 		return
 	var g := r.grow(1).intersection(Rect2i(0, 0, field.n, field.n))
 	var pal := VoxelPalette.get_default()
-	var lo := 1 << 30
-	var hi := -(1 << 30)
-	for t in field.top:
-		if t != TerrainField.NO_GROUND:
-			lo = mini(lo, t)
-			hi = maxi(hi, t)
 	for cz in range(g.position.y, g.end.y):
 		for cx in range(g.position.x, g.end.x):
-			_shade_px(_img, field, pal, cx, cz, lo, hi)
+			var t := field.top[cx + cz * field.n]
+			if t != TerrainField.NO_GROUND:
+				_lo = mini(_lo, t)
+				_hi = maxi(_hi, t)
+	for cz in range(g.position.y, g.end.y):
+		for cx in range(g.position.x, g.end.x):
+			_shade_px(_img, field, pal, cx, cz, _lo, _hi)
 	_tex.update(_img)
+	queue_redraw()
+
+## Mise à jour partielle du masque (pendant un trait) : seules les colonnes du rectangle sont relues.
+func refresh_mask_rect(layers: PlanLayers, r: Rect2i) -> void:
+	if _mask_img == null:
+		refresh_mask(layers)
+		return
+	var g := r.grow(1).intersection(Rect2i(0, 0, field.n, field.n))
+	for cz in range(g.position.y, g.end.y):
+		for cx in range(g.position.x, g.end.x):
+			if layers.mask[cx + cz * field.n] != 0:
+				var stripe := ((cx + cz) / 3) % 2 == 0
+				_mask_img.set_pixel(cx, cz, Color(1.0, 0.18, 0.28, 0.62) if stripe else Color(1.0, 0.55, 0.60, 0.50))
+			else:
+				_mask_img.set_pixel(cx, cz, Color(0, 0, 0, 0))
+	_mask_tex.update(_mask_img)
+	_mask_count = maxi(_mask_count, 1)
 	queue_redraw()
 
 func refresh_mask(layers: PlanLayers) -> void:
@@ -187,6 +217,7 @@ func _draw() -> void:
 		draw_colored_polygon(poly, Color(0.30, 0.42, 0.30, 0.9))
 	# zones
 	var labelled := {}
+	var label_jobs: Array = []
 	for z in plan.zones:
 		var kd: Dictionary = IslandPlan.KINDS[z["kind"]]
 		var c := w2s(z["c"])
@@ -196,7 +227,7 @@ func _draw() -> void:
 		draw_arc(c, r, 0.0, TAU, 48, Color(col.r, col.g, col.b, 0.95), 2.5, true)
 		if show_labels and not labelled.has(z["kind"]):
 			labelled[z["kind"]] = true
-			_text(c + Vector2(-100.0, -r - 7.0), String(kd["label"]).get_slice(" (", 0), 15, col.lightened(0.4), HORIZONTAL_ALIGNMENT_CENTER, 200.0)
+			label_jobs.append([c + Vector2(-100.0, -r - 7.0), String(kd["label"]).get_slice(" (", 0), col.lightened(0.4)])
 	# contour
 	if plan.outline.size() >= 3:
 		var line := PackedVector2Array()
@@ -240,6 +271,8 @@ func _draw() -> void:
 			_marker_bad(w2s(q))
 		for q: Vector2 in rep["steep"]:
 			draw_circle(w2s(q), 4.0, Color(1.0, 0.35, 0.25, 0.9))
+	for j in label_jobs:
+		_text(j[0], j[1], 15, j[2], HORIZONTAL_ALIGNMENT_CENTER, 200.0)
 	# repères et départ
 	for l in plan.landmarks:
 		_draw_landmark(l)
@@ -247,7 +280,7 @@ func _draw() -> void:
 	# sélection
 	if sel_rect.size.x > 0.0 and sel_rect.size.y > 0.0:
 		var rr := Rect2(w2s(sel_rect.position), sel_rect.size * px_per_m)
-		draw_rect(rr, Color(sel_color.r, sel_color.g, sel_color.b, 0.18), true)
+		draw_rect(rr, Color(sel_color.r, sel_color.g, sel_color.b, 0.06), true)
 		draw_rect(rr, Color(sel_color.r, sel_color.g, sel_color.b, 1.0), false, 2.5)
 		_text(rr.position + Vector2(4, -6), "%.1f × %.1f m" % [sel_rect.size.x, sel_rect.size.y], 15, Color(0.7, 0.95, 1.0))
 	for q: Vector2 in sel_cells:
@@ -371,10 +404,13 @@ func _draw_legend() -> void:
 		if not seen.has(z["kind"]):
 			seen[z["kind"]] = true
 			rows.append(["zone", IslandPlan.KINDS[z["kind"]]["color"], String(IslandPlan.KINDS[z["kind"]]["label"])])
-	rows.append(["path", Color(0.93, 0.82, 0.60), "Chemin (largeur du plan)"])
 	if not plan.paths.is_empty():
+		rows.append(["path", Color(0.93, 0.82, 0.60), "Chemin (largeur du plan)"])
 		rows.append(["link", Color(1, 1, 1), "Liaison chemin ↔ zone"])
-	rows.append(["start", Color(0.35, 0.95, 0.45), "Point de départ"])
+	if plan.outline.size() >= 3:
+		rows.append(["start", Color(0.35, 0.95, 0.45), "Point de départ"])
+	if rows.is_empty():
+		return
 	var has := {}
 	for l in plan.landmarks:
 		has[l["kind"]] = true
@@ -390,16 +426,17 @@ func _draw_legend() -> void:
 			bad = true
 	if bad:
 		rows.append(["bad", Color(1, 0.15, 0.15), "Rupture de pente sur un chemin"])
-	var rh := 24.0
-	var w := 262.0
-	var h := rows.size() * rh + 36.0
+	var ls := legend_scale
+	var rh := 24.0 * ls
+	var w := 262.0 * ls
+	var h := rows.size() * rh + 36.0 * ls
 	var o := Vector2(12.0, size.y - h - 12.0)
 	draw_rect(Rect2(o, Vector2(w, h)), Color(0.05, 0.08, 0.12, 0.90), true)
 	draw_rect(Rect2(o, Vector2(w, h)), Color(0.35, 0.50, 0.65, 0.8), false, 1.5)
-	_text(o + Vector2(10, 21), "Légende", 16, Color(0.75, 0.9, 1.0))
-	var y := o.y + 36.0
+	_text(o + Vector2(10, 21 * ls), "Légende", int(16 * ls), Color(0.75, 0.9, 1.0))
+	var y := o.y + 36.0 * ls
 	for r in rows:
-		var sw := Vector2(o.x + 22.0, y + rh * 0.5 - 2.0)
+		var sw := Vector2(o.x + 22.0 * ls, y + rh * 0.5 - 2.0)
 		match r[0]:
 			"zone":
 				draw_circle(sw, 8.0, Color(r[1].r, r[1].g, r[1].b, 0.35))
@@ -420,7 +457,7 @@ func _draw_legend() -> void:
 				draw_rect(Rect2(sw - Vector2(8, 7), Vector2(16, 14)), Color(r[1].r, r[1].g, r[1].b, 0.7), true)
 			"bad":
 				draw_circle(sw, 7.0, r[1])
-		_text(Vector2(o.x + 40.0, y + rh * 0.5 + 3.0), String(r[2]), 15, Color(0.95, 0.97, 1.0))
+		_text(Vector2(o.x + 40.0 * ls, y + rh * 0.5 + 3.0), String(r[2]), int(15 * ls), Color(0.95, 0.97, 1.0))
 		y += rh
 
 # ------------------------------------------------------------------ navigation (zoom, déplacement)
@@ -428,6 +465,15 @@ func _draw_legend() -> void:
 func _gui_input(event: InputEvent) -> void:
 	if not interactive:
 		return
+	if event is InputEventMouseButton or event is InputEventMouseMotion:
+		var handled := false
+		if event is InputEventMouseButton:
+			var b := (event as InputEventMouseButton).button_index
+			handled = b == MOUSE_BUTTON_WHEEL_UP or b == MOUSE_BUTTON_WHEEL_DOWN or b == MOUSE_BUTTON_MIDDLE
+		elif _panning:
+			handled = true
+		if not handled:
+			canvas_event.emit(event)
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_WHEEL_UP and mb.pressed:

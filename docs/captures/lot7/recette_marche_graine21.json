@@ -1,0 +1,49 @@
+{
+	"arbres": 1,
+	"chargement_ms": 3104,
+	"chutes": 0,
+	"defauts": [],
+	"defauts_n": 0,
+	"depart_m": [
+		-8.47,
+		3.9
+	],
+	"depart_sur_le_plan": true,
+	"etapes": [
+		{
+			"altitude_m": 4.02,
+			"arrive_dans_la_zone": true,
+			"chemin": "chemin_1",
+			"duree_s": 6.3,
+			"longueur_m": 17.3,
+			"vers": "plateau"
+		},
+		{
+			"altitude_m": 6.02,
+			"arrive_dans_la_zone": true,
+			"chemin": "chemin_2",
+			"duree_s": 6.7,
+			"longueur_m": 19.3,
+			"vers": "bois"
+		},
+		{
+			"altitude_m": 7.82,
+			"arrive_dans_la_zone": true,
+			"chemin": "chemin_3",
+			"duree_s": 5.2,
+			"longueur_m": 15.3,
+			"vers": "sommet"
+		}
+	],
+	"plan": {
+		"graine": 21,
+		"largeur": 56,
+		"longueur": 48
+	},
+	"premiere_personne": true,
+	"reperes_atteints": [
+		"lieu_plateau",
+		"vue_sommet"
+	],
+	"saut_camera_max_cm": 4.5
+}

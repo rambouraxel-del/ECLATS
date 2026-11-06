@@ -1,0 +1,28 @@
+{
+	"controles": [
+		{
+			"controle": "même graine et mêmes dimensions : même plan",
+			"ok": true
+		},
+		{
+			"controle": "graine suivante : plan différent",
+			"ok": true
+		},
+		{
+			"controle": "l'île s'ouvre en 3D depuis le plan (2708 ms)",
+			"ok": true
+		},
+		{
+			"controle": "l'île 3D est construite depuis le même plan que l'aperçu",
+			"ok": true
+		},
+		{
+			"controle": "terrain 3D = terrain de base du plan (empreinte identique)",
+			"ok": true
+		},
+		{
+			"controle": "première personne par défaut",
+			"ok": true
+		}
+	]
+}
