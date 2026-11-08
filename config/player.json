@@ -1,0 +1,6 @@
+{
+	"_doc": "Échelle du personnage (essai du 8 nov.) : modifier hauteur_m puis relancer. La capsule de collision, la hauteur des yeux, la caméra 3e personne et le modèle suivent. Ancienne valeur : 1.70.",
+	"hauteur_m": 1.50,
+	"fov_depart": 76.0,
+	"fov_presets": [68.0, 76.0, 84.0]
+}

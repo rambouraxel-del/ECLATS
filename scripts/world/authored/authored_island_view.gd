@@ -75,7 +75,7 @@ static func create(world: WorldData, parent: Node3D) -> Dictionary:
 	root.add_child(nat)
 	for t in world.trees:
 		var n := VoxelObjectView.create_node("%s_%d" % [t["species"], t["seed"] % 10000], t["parts"], t["arrays"], [40.0, 110.0])
-		n.transform = Transform3D(Basis(Vector3.UP, t["rot"]), (t["pos"] as Vector3) + WorldView.DEZFIGHT)
+		n.transform = Transform3D(Basis(Vector3.UP, t["rot"]).scaled(Vector3.ONE * float(t.get("scale", 1.0))), (t["pos"] as Vector3) + WorldView.DEZFIGHT)
 		nat.add_child(n)
 	for r in world.rocks:
 		var n := VoxelObjectView.create_node("%s_%d" % [r["family"], r["seed"] % 10000], r["parts"], r["arrays"], [45.0, 130.0], true)
@@ -159,7 +159,8 @@ static func add_building(builds: StaticBody3D, b: Dictionary) -> void:
 
 static func add_tree(deco: StaticBody3D, t: Dictionary) -> void:
 	var pl: Dictionary = t["plan"]
-	var r: float = float(pl.get("trunk_r", 0.3))
+	var k := float(t.get("scale", 1.0))
+	var r: float = float(pl.get("trunk_r", 0.3)) * k
 	var cs2 := CollisionShape3D.new()
 	var cyl := CylinderShape3D.new()
 	cyl.radius = maxf(r * 0.9, 0.15)

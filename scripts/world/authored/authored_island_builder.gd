@@ -455,7 +455,7 @@ func _trees() -> void:
 				continue
 		var ground := TreeGenerator.ground_grid(field, res.pos, 2.0)
 		w.trees.append({"kind": "tree", "species": species, "seed": seed, "plan": pl, "res": res, "ground": ground,
-			"rot": float(seed % 628) * 0.01, "pos": res.pos, "item": res.item_index})
+			"rot": float(seed % 628) * 0.01, "pos": res.pos, "item": res.item_index, "scale": clampf(float(t.get("scale", 1.0)), 0.5, 2.0)})
 
 var _ng: NatureGenerator
 func _nature() -> NatureGenerator:

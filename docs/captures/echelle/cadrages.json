@@ -1,0 +1,41 @@
+[
+ {
+  "nom": "quai",
+  "mode": "fp",
+  "pos": [
+   -67.5,
+   123.2
+  ],
+  "look": [
+   -76.0,
+   95.0
+  ],
+  "pitch": -0.04
+ },
+ {
+  "nom": "maison_exterieur",
+  "mode": "fp",
+  "pos": [
+   -7.5,
+   -2.0
+  ],
+  "look": [
+   -7.5,
+   -20.0
+  ],
+  "pitch": -0.03
+ },
+ {
+  "nom": "maison_interieur",
+  "mode": "fp",
+  "pos": [
+   -7.5,
+   -15.0
+  ],
+  "look": [
+   -7.5,
+   -24.0
+  ],
+  "pitch": -0.02
+ }
+]

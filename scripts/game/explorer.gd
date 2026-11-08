@@ -12,8 +12,9 @@ signal fell
 @export var gravity := 18.0
 @export var jump_speed := 5.2
 const STEP_H := 0.36
-const RADIUS := 0.28
-const HEIGHT := 1.7
+## Échelle : voir PlayerConfig (config/player.json). Capsule = hauteur du personnage, rayon proportionnel.
+var radius := PlayerConfig.radius()
+var height := PlayerConfig.height
 
 var cam_yaw := 0.0
 var control_enabled := true
@@ -33,15 +34,19 @@ func _ready() -> void:
 	floor_snap_length = 0.4
 	floor_constant_speed = true
 	safe_margin = 0.02
+	PlayerConfig.ensure()
+	radius = PlayerConfig.radius()
+	height = PlayerConfig.height
 	var cs := CollisionShape3D.new()
 	var cap := CapsuleShape3D.new()
-	cap.radius = RADIUS
-	cap.height = HEIGHT
+	cap.radius = radius
+	cap.height = height
 	cs.shape = cap
-	cs.position = Vector3(0, HEIGHT * 0.5, 0)
+	cs.position = Vector3(0, height * 0.5, 0)
 	add_child(cs)
 	model = ExplorerModel.new()
 	model.name = "Model"
+	model.scale = Vector3.ONE * PlayerConfig.k()
 	add_child(model)
 
 func face(yaw_rad: float) -> void:
@@ -104,7 +109,7 @@ func _try_step(motion: Vector3) -> bool:
 	if test_move(xf, up):
 		return false
 	var raised := xf.translated(up)
-	var probe := dir * (RADIUS + 0.06)        # le centre doit passer au-dessus du nez de marche
+	var probe := dir * (radius + 0.06)        # le centre doit passer au-dessus du nez de marche
 	if test_move(raised, probe):
 		return false
 	var col := KinematicCollision3D.new()
