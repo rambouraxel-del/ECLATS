@@ -15,6 +15,7 @@ func check(cond: bool, label: String) -> void:
 
 func _initialize() -> void:
 	print("== Échelle et immersion ==")
+	GameInput.ensure()
 	PlayerConfig.ensure()
 	check(absf(PlayerConfig.height - 1.5) < 0.001, "hauteur du personnage : 1,50 m (config/player.json)")
 	check(absf(PlayerConfig.eye() - 1.6 * 1.5 / 1.7) < 0.001 and PlayerConfig.eye() < PlayerConfig.height, "yeux à %.2f m, sous le haut de la capsule" % PlayerConfig.eye())
