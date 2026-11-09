@@ -4,8 +4,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const $ = (id) => document.getElementById(id);
-const FAMILLES = { tous: 'Tous', precuit: 'Précuits', genere: 'Générés', exemple: 'Exemples', manuel: 'Manuels' };
-const FAMILLE_DE = { precuit: 'precuit', enregistre: 'precuit', genere: 'genere', exemple: 'exemple', manuel: 'manuel' };
+const FAMILLES = { tous: 'Tous', precuit: 'Précuits', genere: 'Générés', exemple: 'Exemples', manuel: 'Manuels', personnage: 'Personnages' };
+const FAMILLE_DE = { personnage: 'personnage', precuit: 'precuit', enregistre: 'precuit', genere: 'genere', exemple: 'exemple', manuel: 'manuel' };
 
 const etat = { catalogue: null, modeles: [], q: '', famille: 'tous', categorie: '', selection: null, chargements: 0, charges: [], erreur: '' };
 window.galerieEtat = etat; // lecture seule, utile aux tests automatiques
@@ -88,7 +88,38 @@ function recentrer(immediat = true) {
 	controls.update();
 }
 
+const horloge = new THREE.Clock();
+let mixeur = null, actions = new Map(), clipActif = '';
+
+function jouer(id) {
+	clipActif = id;
+	for (const [k, a] of actions) {
+		if (k === id) { a.reset().fadeIn(0.2).play(); } else a.fadeOut(0.2);
+	}
+	for (const b of $('anims').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.clip === id));
+	etat.clip = id;
+}
+
+function animations(m, racine, clips) {
+	mixeur?.stopAllAction(); mixeur = null; actions = new Map(); clipActif = '';
+	const zone = $('anims');
+	zone.replaceChildren();
+	const liste = m.animations || [];
+	zone.hidden = !liste.length;
+	if (!liste.length) return;
+	mixeur = new THREE.AnimationMixer(racine);
+	for (const a of liste) {
+		const clip = clips.find((c) => c.name === a.id);
+		if (!clip) continue;
+		actions.set(a.id, mixeur.clipAction(clip));
+		zone.append(el('button', { type: 'button', 'data-clip': a.id, 'aria-pressed': 'false', title: `${a.nom} (boucle de ${a.duree_s} s)`, onclick: () => jouer(a.id) }, a.nom));
+	}
+	zone.append(el('button', { type: 'button', 'data-clip': '', 'aria-pressed': 'false', title: 'Pose de repos', onclick: () => { mixeur.stopAllAction(); clipActif = ''; etat.clip = ''; for (const b of zone.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.clip === '')); } }, 'Repos'));
+	if (actions.has('idle')) jouer('idle'); else jouer(actions.keys().next().value);
+}
+
 function boucle() {
+	if (mixeur) mixeur.update(horloge.getDelta()); else horloge.getDelta();
 	controls.update();
 	renderer.render(scene, camera);
 	requestAnimationFrame(boucle);
@@ -177,6 +208,7 @@ async function afficher(m) {
 			} else tampon = await rep.arrayBuffer();
 			const gltf = await chargeur.parseAsync(tampon, '');
 			racine = gltf.scene;
+			racine.userData.clips = gltf.animations || [];
 			preparer(racine);
 			cache.set(m.id, racine);
 			etat.charges.push(m.id);
@@ -204,6 +236,7 @@ async function afficher(m) {
 	const centre = boite.getCenter(new THREE.Vector3());
 	racine.position.set(-centre.x, -boite.min.y, -centre.z);
 	scene.add(racine);
+	animations(m, racine, racine.userData.clips || []);
 	const taille = boite.getSize(new THREE.Vector3());
 	const diag = Math.max(taille.length(), 0.5);
 	const d = diag * 1.25;

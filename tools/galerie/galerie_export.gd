@@ -73,6 +73,8 @@ func _run() -> void:
 		_family_examples()
 	if _want("manuel"):
 		_family_manual()
+	if _want("personnage"):
+		_family_character()
 	if _only == "":
 		_detect_unexported()
 
@@ -382,6 +384,60 @@ func _family_manual() -> void:
 		var e := {"id": id, "nom": String(d.get("nom", id)), "categorie": String(d.get("categorie", "Divers")), "famille": "manuel", "generateur": "", "params": {}, "graine": null,
 				"dimensions_m": d.get("dimensions_m", null), "triangles": d.get("triangles", null), "fichier": "modeles/%s.glb" % id, "taille_ko": int(bytes.size() / 1024), "taille_brute_ko": int(bytes.size() / 1024), "source": "tools/galerie/manuels/" + f, "details": {}}
 		_entries.append(e)
+
+# --- personnage animé : hiérarchie de pivots + AnimationPlayer exportés tels quels (clips idle / walk / run / jump)
+func _family_character() -> void:
+	_registered_scripts["res://scripts/game/explorer_model.gd"] = "personnage"
+	var model := ExplorerModel.new()
+	model.build_now()
+	var tris := 0
+	var box := AABB()
+	var first := true
+	var stack: Array = [model]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		for c in n.get_children():
+			stack.append(c)
+		if n is MeshInstance3D:
+			var mi := n as MeshInstance3D
+			mi.mesh = _clean_mesh(mi.mesh, "props")
+			tris += _tri_count(mi.mesh)
+	# dimensions au repos
+	for n in model.parts:
+		var pv: Node3D = model.parts[n]
+		for c in pv.get_children():
+			if c is MeshInstance3D:
+				var xf := Transform3D.IDENTITY
+				var node: Node3D = c
+				while node != model:
+					xf = node.transform * xf
+					node = node.get_parent()
+				var bb: AABB = xf * (c as MeshInstance3D).mesh.get_aabb()
+				box = bb if first else box.merge(bb)
+				first = false
+	var id := "personnage_explorateur"
+	var path := _abs(_out + "/modeles/" + id + ".glb")
+	var doc := GLTFDocument.new()
+	var state := GLTFState.new()
+	var ok := doc.append_from_scene(model, state) == OK and doc.write_to_filesystem(state, path) == OK
+	var clips: Array = []
+	for c in ExplorerModel.CLIPS:
+		clips.append({"id": c, "nom": ExplorerModel.CLIPS[c][0], "duree_s": ExplorerModel.CLIPS[c][1]})
+	model.free()
+	if not ok:
+		_skipped.append({"nom": "Explorateur", "type": "personnage", "raison": "Échec de l'export glTF.", "comment": "Voir le journal de l'exporteur."})
+		return
+	var raw := FileAccess.get_file_as_bytes(path)
+	var gz := raw.compress(FileAccess.COMPRESSION_GZIP)
+	var fz := FileAccess.open(path + ".gz", FileAccess.WRITE)
+	fz.store_buffer(gz)
+	fz.close()
+	DirAccess.remove_absolute(path)
+	_entries.append({"id": id, "nom": "Explorateur (personnage jouable)", "categorie": "Personnages", "famille": "personnage", "generateur": "", "params": {}, "graine": null,
+			"dimensions_m": [snappedf(box.size.x, 0.01), snappedf(box.size.y, 0.01), snappedf(box.size.z, 0.01)], "triangles": tris, "fichier": "modeles/%s.glb.gz" % id,
+			"taille_ko": gz.size() / 1024, "taille_brute_ko": raw.size() / 1024, "source": "scripts/game/explorer_model.gd",
+			"details": {"hauteur_jeu_m": snappedf(PlayerConfig.height, 0.01), "pivots": 17}, "animations": clips})
+	print("  %-44s %7d tri  %5d Ko  (%d animations)" % [id, tris, gz.size() / 1024, clips.size()])
 
 # ------------------------------------------------------------------ détection des non exportés
 

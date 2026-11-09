@@ -118,6 +118,22 @@
 		{"key": "cloth_slate", "name": "Cape bleu ardoise", "color": "#5b6b7c", "variation": 0.04, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.35},
 		{"key": "cloth_slate_dark", "name": "Doublure ardoise", "color": "#3f4a57", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.35},
 		{"key": "skin", "name": "Peau", "color": "#c99a7c", "variation": 0.02, "roughness": 0.8, "emission": 0, "style": "default", "metallic": 0, "wear": 0.0},
-		{"key": "cloth_linen", "name": "Lin écru", "color": "#cbbf9f", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.3}
+		{"key": "cloth_linen", "name": "Lin écru", "color": "#cbbf9f", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.3},
+		{"key": "perso_cheveux", "name": "Cheveux bruns", "color": "#8a5d52", "variation": 0.03, "roughness": 0.9, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_cheveux_clair", "name": "Mèches châtain", "color": "#a87462", "variation": 0.03, "roughness": 0.9, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_peau", "name": "Peau chaude", "color": "#dcb59b", "variation": 0.03, "roughness": 0.8, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_peau_ombre", "name": "Peau ombrée", "color": "#c99a82", "variation": 0.03, "roughness": 0.8, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_barbe", "name": "Barbe courte", "color": "#9a6a58", "variation": 0.03, "roughness": 0.9, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_oeil", "name": "Œil", "color": "#3a2f3c", "variation": 0.03, "roughness": 0.5, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_cape", "name": "Cape bleu lavande", "color": "#8a90bd", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.2},
+		{"key": "perso_cape_ombre", "name": "Cape ombrée", "color": "#737aa8", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.2},
+		{"key": "perso_beige", "name": "Liseré sable", "color": "#d4c6a6", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.2},
+		{"key": "perso_tunique", "name": "Tunique crème", "color": "#ddd5c4", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.2},
+		{"key": "perso_pantalon", "name": "Pantalon kaki", "color": "#8d8f66", "variation": 0.03, "roughness": 1.0, "emission": 0, "style": "fabric", "metallic": 0, "wear": 0.2},
+		{"key": "perso_cuir", "name": "Cuir brun", "color": "#7d5546", "variation": 0.03, "roughness": 0.85, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_cuir_clair", "name": "Cuir clair", "color": "#9a6e56", "variation": 0.03, "roughness": 0.85, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_botte", "name": "Botte brune", "color": "#6f4a40", "variation": 0.03, "roughness": 0.85, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_verre", "name": "Verre de lunettes", "color": "#aebfcc", "variation": 0.03, "roughness": 0.25, "emission": 0, "style": "default", "metallic": 0, "wear": 0.2},
+		{"key": "perso_laiton", "name": "Laiton clair", "color": "#cdb67e", "variation": 0.03, "roughness": 0.5, "emission": 0, "style": "default", "metallic": 0.3, "wear": 0.2}
 	]
 }

@@ -33,6 +33,8 @@ echo "== Tests échelle et immersion =="
 timeout 300 "$GODOT_BIN" --headless -s tests/run_checks_echelle.gd
 echo "== Tests de l'éditeur d'îles créatif =="
 timeout 300 "$GODOT_BIN" --headless -s tests/run_checks_creatif.gd
+echo "== Tests du personnage articulé =="
+timeout 300 "$GODOT_BIN" --headless -s tests/run_checks_personnage.gd
 if [ "${ECLATS_MONDE:-0}" = "1" ]; then
 	echo "== Îles complètes : validation multi-graines et profils (ECLATS_MONDE=1) =="
 	timeout 900 "$GODOT_BIN" --headless -s tests/run_checks_lot4.gd -- --monde

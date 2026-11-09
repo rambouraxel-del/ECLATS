@@ -43,6 +43,9 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "== Tests de l'editeur d'iles creatif =="
 & $Godot --headless -s tests/run_checks_creatif.gd
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Write-Host "== Tests du personnage articule =="
+& $Godot --headless -s tests/run_checks_personnage.gd
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if ($Monde) {
     Write-Host "== Iles completes : validation multi-graines et profils =="
     & $Godot --headless -s tests/run_checks_lot4.gd -- --monde

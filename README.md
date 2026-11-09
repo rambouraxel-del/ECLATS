@@ -153,3 +153,6 @@ Modèles du projet consultables sur GitHub Pages : voir `docs/GALERIE_3D.md` (ac
 
 ## Éditeur d'îles créatif
 Menu principal → Outils développeur → **Éditeur d'îles créatif (3D)** : île vide, île générée d'une graine ou carte enregistrée ; inventaire, relief, matières, chemins, forêt et marché générés, maisons de l'atelier (avec escalier), historique Ctrl+Z / Ctrl+Y. Voir `docs/EDITEUR_CREATIF.md`.
+
+## Personnage articulé
+L'explorateur est un modèle voxel articulé (17 pivots) avec animations d'attente, de marche, de course et de saut : voir `docs/PERSONNAGE.md` et `docs/BILAN_PERSONNAGE.md`. Il apparaît aussi dans la galerie 3D (famille « Personnages », animations sélectionnables).

@@ -1,0 +1,17 @@
+# Recette jouée du personnage (tools/personnage_recette.gd), rendu logiciel Xvfb 1280x720, 30 images/s fixes
+  OK    modèle articulé présent (17 pivots, animations : ["idle", "jump", "run", "walk"])
+  OK    hauteur du modèle 1.53 m ≈ capsule 1.50 m (échelle conservée)
+  OK    à l'arrêt : animation d'attente (« idle »)
+  OK    en marche : animation de marche (« walk »)
+  OK    déplacement réel en marche : 5.7 m en 2,6 s (≈ 2,3 m/s)
+  OK    à la course : animation de course (« run »)
+  OK    déplacement réel à la course : 9.9 m en 2,2 s
+  OK    arrêt : retour à l'attente (« idle »)
+  OK    saut : animation en l'air (« jump »)
+  OK    1re personne : modèle masqué, caméra aux yeux (1.41 m du sol)
+  OK    1re personne : l'animation continue d'être jouée (« walk »)
+  OK    retour en 3e personne : modèle visible
+Recette personnage : 13 contrôles, 1 échecs
+# Relance de l'étape collision seule (PN_ONLY=collision), seuil corrigé de -0,15 à -0,6 m : le point « porte » est au milieu du mur, le soubassement de pierre arrête le personnage à ~0,4 m derrière ce point (voir jeu_collision_facade.jpg)
+  OK    modèle articulé présent (17 pivots, animations : ["idle", "jump", "run", "walk"])
+  ÉCHEC collision : arrêté par la façade (distance au mur -0.40 m, déplacement 2.4 m sur 2,5 m demandés)
