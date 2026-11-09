@@ -40,6 +40,9 @@ Write-Host "== Tests du Lot 11 (fiabilite : cartes, sauvegardes, maisons) =="
 Write-Host "== Tests échelle et immersion =="
 & $Godot --headless -s tests/run_checks_echelle.gd
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Write-Host "== Tests de l'editeur d'iles creatif =="
+& $Godot --headless -s tests/run_checks_creatif.gd
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if ($Monde) {
     Write-Host "== Iles completes : validation multi-graines et profils =="
     & $Godot --headless -s tests/run_checks_lot4.gd -- --monde

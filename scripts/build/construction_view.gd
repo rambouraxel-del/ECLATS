@@ -158,10 +158,25 @@ static func create(c: Construction, opts := {}) -> Node3D:
 		var y0 := c.level_y(lv)
 		match String(e["t"]):
 			"floor", "foundation":
-				var bx := c.slab_box(e)
-				bx.position.y += y0
-				_box(st, bx)
-				add_shape.call(bx)
+				for bx in c.slab_boxes(e):
+					var b3 := bx
+					b3.position.y += y0
+					_box(st, b3)
+					add_shape.call(b3)
+			"stairs":
+				for bx in c.stair_boxes(e):
+					var b4 := bx
+					b4.position.y += y0
+					_box(st, b4)
+				if body != null:
+					var rcs := CollisionShape3D.new()
+					var rsh := ConvexPolygonShape3D.new()
+					var rp := c.stair_ramp_points(e)
+					for i in rp.size():
+						rp[i].y += y0
+					rsh.points = rp
+					rcs.shape = rsh
+					body.add_child(rcs)
 			"wall":
 				for bx in c.wall_boxes(e):
 					var b2 := bx

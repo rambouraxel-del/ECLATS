@@ -12,6 +12,7 @@ const LAB_ROOM_SCENE := "res://scenes/lab/dev_lab_room.tscn"
 const LAB_ISLAND_SCENE := "res://scenes/lab/dev_lab_island.tscn"
 const MAP_ISLAND_SCENE := "res://scenes/map/map_island.tscn"      # île issue d'un plan (Lot 7)
 const MAP_EDITOR_SCENE := "res://scenes/map/map_editor.tscn"      # éditeur de carte (Lot 7)
+const CREATIVE_SCENE := "res://scenes/creative/creative_editor.tscn"  # éditeur d'îles créatif (3D)
 
 const SCENES := {
 	KEY_F1: "res://scenes/lab/graphics_lab.tscn",
@@ -76,7 +77,7 @@ func _ready() -> void:
 func open(path: String, params := {}) -> void:
 	# Lot 11 : une carte en cours d'édition n'est jamais perdue en silence (menu, autre scène…). L'éditeur et la vue 3D
 	# de la même session passent librement de l'un à l'autre.
-	if MapSession.current != null and path != MAP_EDITOR_SCENE and path != MAP_ISLAND_SCENE:
+	if MapSession.current != null and path != MAP_EDITOR_SCENE and path != MAP_ISLAND_SCENE and path != CREATIVE_SCENE and not params.has("session"):
 		if MapSession.current.is_dirty() and not bool(params.get("_quitter_ok", false)):
 			var p2 := params.duplicate()
 			p2["_quitter_ok"] = true

@@ -44,7 +44,7 @@ Tarif **1 unité / m²**, toujours **arrondi à l'unité supérieure**, uniqueme
 Une pose refusée, ou annulée avant confirmation, **ne débite rien**. Le stock de départ est de 200 unités (bouton « Recharger » pour les essais). Hors périmètre : prix des matériaux, récolte, progression.
 
 ## Étages et toits
-Un niveau = 3,0 m sol à sol. Un mur dont un sol est posé au-dessus monte jusqu'à ce sol. Un toit à deux pans se pose sur le dernier niveau, **ajusté au rectangle des murs** reliés (faîtage le long du grand côté). Pas d'escalier pour l'instant : l'étage se voit et se construit, il n'est pas encore accessible à pied.
+Un niveau = 3,0 m sol à sol. Un mur dont un sol est posé au-dessus monte jusqu'à ce sol. Un toit à deux pans se pose sur le dernier niveau, **ajusté au rectangle des murs** reliés (faîtage le long du grand côté). **Escalier** (Éditeur d'îles créatif) : outil 9, 12 marches de 25 cm (1 m × 4 m) du niveau courant au niveau supérieur ; le sol de l'étage est percé à l'emplacement de l'escalier et doit dépasser son sommet d'au moins 1 m (palier). Visuellement des marches pleines ; la collision est une rampe qui passe par le nez des marches (le joueur monte en douceur).
 
 ## Vérifié
 Voir `BILAN_LOT8_9.md`. Tests : `tests/run_checks_lot8.gd` (headless) ; essai joué : `tools/lot8_recette_atelier.gd`.

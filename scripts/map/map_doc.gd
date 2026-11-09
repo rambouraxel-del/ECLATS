@@ -17,6 +17,7 @@ var build: PlanTerrain.Build
 var field: TerrainField
 var path_reports: Array = []
 var undo_stack: Array[Dictionary] = []
+var redo_stack: Array[Dictionary] = []   # opérations annulées, rétablissables (vidée par toute nouvelle opération)
 var message := ""
 var rebuilds := 0
 var _snap: Dictionary = {}
@@ -178,6 +179,7 @@ func finish_op(do_rebuild := true) -> String:
 				last_conflict = "Modification refusée (« %s ») : elle casserait une maison posée. %s L'opération est annulée, rien n'a changé." % [snap2["label"], " ".join(PackedStringArray(cf))]
 				message = last_conflict
 				return message
+	redo_stack.clear()
 	undo_stack.append(_snap)
 	if undo_stack.size() > UNDO_MAX:
 		undo_stack.pop_front()
@@ -258,6 +260,7 @@ func undo() -> String:
 		return ""
 	var e: Dictionary = undo_stack.pop_back()
 	var structure_changed := (e["plan"] as IslandPlan).signature() != plan.signature()
+	redo_stack.append({"label": e["label"], "plan": plan, "rect": e.get("rect", Rect2i())})
 	plan = e["plan"]
 	var r_undo: Rect2i = e.get("rect", Rect2i())
 	if not structure_changed and build != null and field != null and r_undo.size != Vector2i.ZERO:
@@ -268,6 +271,116 @@ func undo() -> String:
 	serial += 1
 	message = "Annulé : %s" % e["label"]
 	return String(e["label"])
+
+func can_redo() -> bool:
+	return not redo_stack.is_empty()
+
+## Rétablit la dernière opération annulée (Ctrl+Y / Ctrl+Maj+Z) ; renvoie son libellé ("" si rien à rétablir).
+func redo() -> String:
+	if redo_stack.is_empty():
+		return ""
+	var e: Dictionary = redo_stack.pop_back()
+	var structure_changed := (e["plan"] as IslandPlan).signature() != plan.signature()
+	undo_stack.append({"label": e["label"], "plan": plan, "rect": e.get("rect", Rect2i())})
+	plan = e["plan"]
+	var r: Rect2i = e.get("rect", Rect2i())
+	if not structure_changed and build != null and field != null and r.size != Vector2i.ZERO:
+		PlanTerrain.apply_layers_rect(build, plan, r.grow(1))
+		path_reports = PlanTerrain.path_reports(plan, field)
+	else:
+		rebuild(structure_changed or build == null)
+	serial += 1
+	message = "Rétabli : %s" % e["label"]
+	return String(e["label"])
+
+# ------------------------------------------------------------------ objets posés (Éditeur créatif)
+
+func object_by_id(id: String) -> Dictionary:
+	for o in plan.objects:
+		if String(o["id"]) == id:
+			return o
+	return {}
+
+static func make_object(ref: String, pos: Vector2, yaw := 0.0, scl := 1.0, group := "manuel") -> Dictionary:
+	return {"id": "", "kind": "asset", "ref": ref, "pos": pos, "yaw": yaw, "scale": scl, "lift": 0.0, "locked": false, "group": group}
+
+## Pose un objet (une opération annulable). Renvoie son identifiant ("" si refus : hors de l'île).
+func add_object(ref: String, pos: Vector2, yaw := 0.0, scl := 1.0, group := "manuel") -> String:
+	if field == null or not field.has_ground(col_of(pos).x, col_of(pos).y):
+		return ""
+	var o := make_object(ref, pos, yaw, scl, group)
+	begin_op("Poser « %s »" % AssetLibrary.info(ref).get("name", ref))
+	o["id"] = plan.new_id("objet")
+	plan.objects.append(o)
+	finish_op(false)
+	return String(o["id"])
+
+## Modifie un objet : changes = {pos, yaw, scale, lift, locked}. Une opération annulable. Un objet verrouillé ne se déplace pas
+## (sauf pour le déverrouiller : changes = {locked: false}).
+func update_object(id: String, changes: Dictionary, label := "Modifier l'objet") -> bool:
+	var o := object_by_id(id)
+	if o.is_empty():
+		return false
+	if bool(o["locked"]) and not (changes.size() == 1 and changes.has("locked")):
+		message = "Objet verrouillé : déverrouillez-le (L) avant de le modifier."
+		return false
+	begin_op(label)
+	for k in changes:
+		o[k] = changes[k]
+	finish_op(false)
+	return true
+
+func delete_object(id: String) -> bool:
+	var o := object_by_id(id)
+	if o.is_empty():
+		return false
+	if bool(o["locked"]):
+		message = "Objet verrouillé : déverrouillez-le (L) avant de le supprimer."
+		return false
+	begin_op("Supprimer « %s »" % AssetLibrary.info(String(o["ref"])).get("name", o["ref"]))
+	plan.objects.erase(o)
+	finish_op(false)
+	return true
+
+## Copie d'un objet décalé de `offset` (une opération). Renvoie le nouvel identifiant.
+func duplicate_object(id: String, offset := Vector2(1.0, 1.0)) -> String:
+	var o := object_by_id(id)
+	if o.is_empty() or field == null:
+		return ""
+	var np: Vector2 = (o["pos"] as Vector2) + offset
+	var c := col_of(np)
+	if not field.has_ground(c.x, c.y):
+		return ""
+	begin_op("Dupliquer « %s »" % AssetLibrary.info(String(o["ref"])).get("name", o["ref"]))
+	var q: Dictionary = o.duplicate(true)
+	q["id"] = plan.new_id("objet")
+	q["pos"] = np
+	q["locked"] = false
+	plan.objects.append(q)
+	finish_op(false)
+	return String(q["id"])
+
+## Génère une composition (forêt, marché) dans le cercle (center, radius) : les objets d'une génération précédente non verrouillés et hors
+## zone protégée sont remplacés ; les objets verrouillés, ceux posés à la main et les colonnes protégées ne sont jamais touchés. Une opération.
+func compose(preset: String, center: Vector2, radius: float, seed: int, params := {}) -> Dictionary:
+	var res := Composer.plan_composition(self, preset, center, radius, seed, params)
+	if not bool(res["ok"]):
+		message = String(res["reasons"][0]) if not (res["reasons"] as Array).is_empty() else "Composition impossible."
+		return res
+	begin_op("Générer : %s" % Composer.PRESETS[preset])
+	for id in res["remove"]:
+		var o := object_by_id(String(id))
+		if not o.is_empty():
+			plan.objects.erase(o)
+	var ids: Array = []
+	for o in res["objects"]:
+		o["id"] = plan.new_id("objet")
+		plan.objects.append(o)
+		ids.append(String(o["id"]))
+	finish_op(false)
+	res["ids"] = ids
+	message = Composer.summary(preset, res["counts"])
+	return res
 
 # ------------------------------------------------------------------ édition structurelle (à appeler entre begin_op et finish_op)
 
@@ -881,6 +994,7 @@ func open_from(path: String) -> Dictionary:
 		return r
 	plan = r["plan"]
 	undo_stack.clear()
+	redo_stack.clear()
 	_snap = {}
 	build = null
 	field = null

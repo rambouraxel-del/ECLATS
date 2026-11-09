@@ -17,6 +17,7 @@ var ui: LabUi
 var builder: BuildMode
 var env: EnvironmentManager
 var ready_to_play := false
+var session: MapSession = null          # venant de l'éditeur créatif (atelier) : F6 y retourne, la carte est conservée
 var falls := 0
 var load_ms := 0
 var _loading: Label
@@ -105,6 +106,10 @@ func _build() -> void:
 	if DisplayServer.get_name() != "headless":
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	print("[laboratoire %s] prêt en %d ms" % [kind, load_ms])
+	if bool(App.launch.get("atelier", false)):
+		session = App.launch.get("session") as MapSession
+		builder.enter()
+		ctl.message.emit("Atelier : construisez, enregistrez la maison, puis F6 pour retourner à l'éditeur et la poser.", "info")
 
 func _process(_delta: float) -> void:
 	if not ready_to_play:
@@ -115,6 +120,10 @@ func _process(_delta: float) -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	var k := event as InputEventKey
 	if k == null or not k.pressed or k.echo or not ready_to_play or App.paused_menu or ui.bar_open:
+		return
+	if k.keycode == KEY_F6 and session != null:
+		App.open(App.CREATIVE_SCENE, {"session": session})
+		get_viewport().set_input_as_handled()
 		return
 	if k.keycode == KEY_B and not k.ctrl_pressed:
 		if builder.active:

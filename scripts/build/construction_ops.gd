@@ -75,6 +75,63 @@ static func add_slab(c: Construction, kind: String, lv: int, a: Vector2i, b: Vec
 	cand.elements.append(el)
 	return _ok(kind, cand, cost, [el], "%s · %s" % [text, cost_text(cost)])
 
+# ------------------------------------------------------------------ escalier
+
+static func _wall_hits_rect(w: Dictionary, r: Rect2i) -> bool:
+	var sp := Construction.wall_span(w)
+	var line := Construction.wall_line(w)
+	if Construction.wall_axis(w) == 0:
+		return line > r.position.y and line < r.end.y and sp.y > r.position.x and sp.x < r.end.x
+	return line > r.position.x and line < r.end.x and sp.y > r.position.y and sp.x < r.end.y
+
+static func _point_on_slab(c: Construction, lv: int, x: float, z: float) -> bool:
+	for f in c.slabs(lv):
+		if x > float(f["x0"]) and x < float(f["x1"]) and z > float(f["z0"]) and z < float(f["z1"]):
+			return true
+	return false
+
+## Escalier droit (12 marches, 1 m × 4 m) posé sur le niveau `lv`, case du bas en `a`, montant vers `dir` (S, E, N, W) jusqu'au niveau
+## au-dessus. Refus expliqués : sol dessous insuffisant, étage absent ou trop court (il faut un palier de 1 m), mur en travers, autre escalier.
+static func add_stairs(c: Construction, lv: int, a: Vector2i, dir: String, mat := "planches") -> Dictionary:
+	var r := Construction.stair_rect(a, dir)
+	var el := {"id": 0, "t": "stairs", "lv": lv, "x0": r.position.x, "z0": r.position.y, "x1": r.end.x, "z1": r.end.y, "dir": dir, "mat": mat}
+	var text := "Escalier vers le niveau %d · 1 m × 4 m" % (lv + 1)
+	var reasons: Array = []
+	if lv < 0 or lv >= C.MAX_LEVELS - 1:
+		reasons.append("Pas de niveau au-dessus : un escalier relie deux niveaux (3 niveaux au plus).")
+	else:
+		for k in [Vector2(0.25, 0.25), Vector2(0.75, 0.25), Vector2(0.25, 0.75), Vector2(0.75, 0.75)]:
+			if not _point_on_slab(c, lv, float(r.position.x) + float(r.size.x) * k.x, float(r.position.y) + float(r.size.y) * k.y):
+				reasons.append("L'escalier doit reposer entièrement sur un sol de ce niveau : posez d'abord le sol, ou visez plus à l'intérieur.")
+				break
+		if reasons.is_empty():
+			# palier : un mètre au-delà du haut de l'escalier, sur le sol de l'étage
+			var top_c := Vector2.ZERO
+			match dir:
+				"E": top_c = Vector2(float(r.end.x) + 2.0, float(r.position.y) + 1.0)
+				"W": top_c = Vector2(float(r.position.x) - 2.0, float(r.position.y) + 1.0)
+				"S": top_c = Vector2(float(r.position.x) + 1.0, float(r.end.y) + 2.0)
+				_: top_c = Vector2(float(r.position.x) + 1.0, float(r.position.y) - 2.0)
+			if c.slabs(lv + 1).is_empty():
+				reasons.append("Il faut d'abord un sol à l'étage au-dessus (niveau %d, PageUp) : l'escalier y débouche." % (lv + 1))
+			elif not _point_on_slab(c, lv + 1, top_c.x, top_c.y):
+				reasons.append("Le sol de l'étage doit dépasser le haut de l'escalier d'au moins 1 m (palier) : prolongez-le ou déplacez l'escalier.")
+		for w in c.of_type("wall", lv) + c.of_type("wall", lv + 1):
+			if _wall_hits_rect(w, r):
+				reasons.append("Un mur traverse l'escalier : déplacez l'escalier ou le mur.")
+				break
+		for s in c.of_type("stairs", lv):
+			if _inter_area(r, Construction.stair_el_rect(s)) > 0:
+				reasons.append("Un escalier occupe déjà cet endroit.")
+				break
+	var cost := C.STAIRS_COST
+	if not reasons.is_empty():
+		return _fail("stairs", reasons, [el], "%s · %s" % [text, cost_text(cost)])
+	var cand := c.copy()
+	el["id"] = cand.new_id()
+	cand.elements.append(el)
+	return _ok("stairs", cand, cost, [el], "%s · %s" % [text, cost_text(cost)])
+
 # ------------------------------------------------------------------ murs
 
 static func _align(a: Vector2i, b: Vector2i) -> Vector2i:
@@ -265,7 +322,7 @@ static func remove_element(c: Construction, id: int) -> Dictionary:
 	var refund := c.el_cost(e)
 	var cand := c.copy()
 	cand.elements.remove_at(cand.index_of(id))
-	var nm: String = {"floor": "Sol", "foundation": "Fondations", "wall": "Mur", "roof": "Toit"}[t]
+	var nm: String = {"floor": "Sol", "foundation": "Fondations", "wall": "Mur", "roof": "Toit", "stairs": "Escalier"}[t]
 	return _ok("remove", cand, -refund, [], "%s retiré · %s" % [nm, cost_text(-refund)])
 
 # ------------------------------------------------------------------ pièce rectangulaire

@@ -7,6 +7,7 @@ const PROFILES := [["settled", "Colonie (habitée)"], ["verdant", "Verdoyante"],
 ## Scènes de prototype accessibles depuis « Outils développeur » : [libellé, scène, raccourci, note].
 var DEV_SCENES := [
 	["Laboratoire développeur — salle grise", App.LAB_ROOM_SCENE, "F12", "sol plat · point, rectangle, pinceau"],
+	["Éditeur d'îles créatif (3D)", App.CREATIVE_SCENE, "", "construire et modifier une île en 3D : inventaire, relief, génération, maisons"],
 	["Éditeur de carte (plan, relief, masque)", App.MAP_EDITOR_SCENE, "", "dessiner une île, retoucher le relief, exporter / ouvrir une carte"],
 	["Laboratoire développeur — île vide", App.LAB_ISLAND_SCENE, "", "île vide avec une pente accessible"],
 	["Île générée (Lot 4)", App.GENERATED_SCENE, "F9", "génération structurelle, caméra libre"],

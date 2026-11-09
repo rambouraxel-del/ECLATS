@@ -8,7 +8,7 @@ extends RefCounted
 ## Format de fichier : JSON versionné « eclats-carte » (voir to_json / from_json).
 
 const FORMAT := "eclats-carte"
-const VERSION := 3                     # v2 : maisons posées ; v3 (Lot 11) : retouches de relief sur 16 bits (±400 m), maisons avec leur terrain. Les cartes v1 et v2 se relisent par migration.
+const VERSION := 4                     # v2 : maisons posées ; v3 (Lot 11) : retouches de relief sur 16 bits (±400 m), maisons avec leur terrain. Les cartes v1 et v2 se relisent par migration.
 const COORD_LIMIT := 5000.0            # |x|, |z| maximaux acceptés à l'import (m)
 const MAX_ITEMS := 5000                # zones, chemins, repères, maisons, points : garde-fou à l'import
 const MIN_SIZE := 32.0
@@ -47,6 +47,7 @@ var landmarks: Array[Dictionary] = []    # {id, kind, pos: Vector2, label}
 var start := Vector2.ZERO
 var layers: PlanLayers = null            # retouches (null = aucune)
 var houses: Array[Dictionary] = []      # maisons posées : {id, name, model (dict eclats-construction), pos: Vector2, yaw, ground_m, rect: [x0,z0,x1,z1] (m), door: Vector2}
+var objects: Array[Dictionary] = []     # objets posés (Éditeur créatif, v4) : {id, kind "asset", ref (id d'asset), pos: Vector2, yaw (degrés), scale, lift (m), locked, group}
 var generated := true                    # vrai tant que la carte vient du générateur sans canevas vide
 var _uid := 0
 
@@ -70,6 +71,8 @@ func copy() -> IslandPlan:
 		p.landmarks.append(l.duplicate(true))
 	for h in houses:
 		p.houses.append(h.duplicate(true))
+	for o in objects:
+		p.objects.append(o.duplicate(true))
 	p.start = start
 	p.layers = layers.copy() if layers != null else null
 	p.generated = generated
@@ -261,6 +264,13 @@ func to_dict() -> Dictionary:
 			if h.has("link"):
 				hs[hs.size() - 1]["link"] = {"to": _v(h["link"]["to"]), "path_id": String(h["link"]["path_id"])}
 		d["maisons"] = hs
+	if not objects.is_empty():
+		var os_: Array = []
+		for o in objects:
+			os_.append({"id": o["id"], "kind": o.get("kind", "asset"), "ref": o["ref"], "pos": _v(o["pos"]), "yaw": snappedf(float(o.get("yaw", 0.0)), 0.01),
+				"scale": snappedf(float(o.get("scale", 1.0)), 0.001), "lift": snappedf(float(o.get("lift", 0.0)), 0.001),
+				"locked": bool(o.get("locked", false)), "group": String(o.get("group", "manuel"))})
+		d["objets"] = os_
 	return d
 
 func to_json() -> String:
@@ -399,6 +409,22 @@ static func from_dict(d: Dictionary) -> Dictionary:
 					return {"ok": false, "error": "Carte invalide : terrain d'une maison — %s" % String(tr["error"])}
 				hr["terrain"] = tr["terrain"]
 			p.houses.append(hr)
+	if d.has("objets"):
+		if typeof(d["objets"]) != TYPE_ARRAY or (d["objets"] as Array).size() > MAX_ITEMS:
+			return {"ok": false, "error": "Carte invalide : la liste des objets est mal formée ou trop longue (au plus %d)." % MAX_ITEMS}
+		for o in d["objets"]:
+			if typeof(o) != TYPE_DICTIONARY or not o.has("ref") or not o.has("pos") or not _is_pt(o["pos"]) or typeof(o["ref"]) != TYPE_STRING or String(o["ref"]) == "":
+				return {"ok": false, "error": "Carte invalide : un objet est mal formé (modèle ou position manquants)."}
+			if String(o.get("kind", "asset")) != "asset":
+				return {"ok": false, "error": "Carte invalide : type d'objet inconnu (« %s »)." % str(o.get("kind"))}
+			if not _in(o.get("yaw", 0.0), -100000.0, 100000.0) or not _in(o.get("scale", 1.0), 0.1, 10.0) or not _in(o.get("lift", 0.0), -100.0, 500.0):
+				return {"ok": false, "error": "Carte invalide : orientation, échelle ou hauteur d'un objet hors limites."}
+			var oid := String(o.get("id", "objet"))
+			if ids.has("o" + oid):
+				return {"ok": false, "error": "Carte invalide : l'identifiant d'objet « %s » apparaît deux fois." % oid}
+			ids["o" + oid] = true
+			p.objects.append({"id": oid, "kind": "asset", "ref": String(o["ref"]), "pos": _p(o["pos"]), "yaw": float(o.get("yaw", 0.0)), "scale": float(o.get("scale", 1.0)),
+				"lift": float(o.get("lift", 0.0)), "locked": bool(o.get("locked", false)), "group": String(o.get("group", "manuel"))})
 	for h in p.houses:
 		if h.has("terrain"):
 			var t: Dictionary = h["terrain"]

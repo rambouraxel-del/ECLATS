@@ -11,6 +11,7 @@ extends RefCounted
 ##   sol / fondations {id, t:"floor"|"foundation", lv, x0,z0,x1,z1, mat}
 ##   mur              {id, t:"wall", lv, ax,az,bx,bz, h, mat, grp, ops:[{id, k:"door"|"window", at, w}]}   (`at` : abscisse u le long du mur)
 ##   toit             {id, t:"roof", lv, x0,z0,x1,z1, mat}                    (rectangle des lignes de murs)
+##   escalier         {id, t:"stairs", lv, x0,z0,x1,z1, dir:"S"|"E"|"N"|"W", mat}   (monte du niveau lv au niveau lv+1 vers `dir` ; 12 marches de 25 cm, 1 m × 4 m)
 ##
 ## COÛT (stock de démonstration, pas une économie) : 1 unité / m² (TARIFF), toujours arrondi à l'unité SUPÉRIEURE, par élément :
 ##   sol et fondations : surface · mur : longueur × hauteur (les ouvertures ne retirent rien) · toit : surface des deux pans
@@ -46,6 +47,10 @@ const MAX_SPAN := 60
 const ROOF_OVER := 0.3
 const ROOF_PITCH := 0.5
 const ROOF_T := 0.12
+const STAIR_RUN_U := 8               # longueur d'un escalier : 8 u = 4,0 m (12 marches de 25 cm de haut, 33 cm de profondeur)
+const STAIR_W_U := 2                 # largeur : 2 u = 1,0 m
+const STAIR_STEPS := 12
+const STAIRS_COST := 12
 
 ## Matières : étiquette, clé de la palette du jeu (mêmes couleurs que le monde), usage.
 const MATS := {
@@ -202,6 +207,86 @@ func slab_box(f: Dictionary) -> AABB:
 	var depth := FOUND_DEPTH if String(f["t"]) == "foundation" else SLAB_T
 	return AABB(Vector3(float(f["x0"]) * U, -depth, float(f["z0"]) * U), Vector3(float(int(f["x1"]) - int(f["x0"])) * U, depth, float(int(f["z1"]) - int(f["z0"])) * U))
 
+## Rectangle (u) d'un escalier posé en `base` (case du bas) montant vers `dir`.
+static func stair_rect(base: Vector2i, dir: String) -> Rect2i:
+	match dir:
+		"E": return Rect2i(base.x, base.y, STAIR_RUN_U, STAIR_W_U)
+		"W": return Rect2i(base.x - STAIR_RUN_U, base.y, STAIR_RUN_U, STAIR_W_U)
+		"S": return Rect2i(base.x, base.y, STAIR_W_U, STAIR_RUN_U)
+	return Rect2i(base.x, base.y - STAIR_RUN_U, STAIR_W_U, STAIR_RUN_U)       # "N"
+
+static func stair_el_rect(e: Dictionary) -> Rect2i:
+	return Rect2i(int(e["x0"]), int(e["z0"]), int(e["x1"]) - int(e["x0"]), int(e["z1"]) - int(e["z0"]))
+
+## Marches (boîtes pleines, y relatif à la surface du niveau de départ) : 12 blocs de 25 cm de haut en plus, du bas vers le haut.
+func stair_boxes(e: Dictionary) -> Array[AABB]:
+	var out: Array[AABB] = []
+	var dir := String(e.get("dir", "E"))
+	var r := stair_el_rect(e)
+	var step_h := LEVEL_H / float(STAIR_STEPS)
+	var run := float(STAIR_RUN_U) * U / float(STAIR_STEPS)
+	for i in STAIR_STEPS:
+		var h := step_h * float(i + 1)
+		var bx: AABB
+		match dir:
+			"E": bx = AABB(Vector3(float(r.position.x) * U + run * float(i), 0.0, float(r.position.y) * U), Vector3(run, h, float(r.size.y) * U))
+			"W": bx = AABB(Vector3(float(r.end.x) * U - run * float(i + 1), 0.0, float(r.position.y) * U), Vector3(run, h, float(r.size.y) * U))
+			"S": bx = AABB(Vector3(float(r.position.x) * U, 0.0, float(r.position.y) * U + run * float(i)), Vector3(float(r.size.x) * U, h, run))
+			_: bx = AABB(Vector3(float(r.position.x) * U, 0.0, float(r.end.y) * U - run * float(i + 1)), Vector3(float(r.size.x) * U, h, run))
+		out.append(bx)
+	return out
+
+## Profil de collision de l'escalier : une rampe qui passe par le nez de chaque marche (le joueur monte en douceur, comme sur la pente d'un
+## versant), puis le palier du haut. Convexe ; coordonnées relatives à la surface du niveau de départ.
+func stair_ramp_points(e: Dictionary) -> PackedVector3Array:
+	var r := stair_el_rect(e)
+	var dir := String(e.get("dir", "E"))
+	var run := float(STAIR_RUN_U) * U
+	var step_run := run / float(STAIR_STEPS)
+	var step_h := LEVEL_H / float(STAIR_STEPS)
+	# profil (d = distance depuis le bas, h = hauteur)
+	var prof: Array[Vector2] = [Vector2(0, 0), Vector2(0, step_h), Vector2(run - step_run, LEVEL_H), Vector2(run, LEVEL_H), Vector2(run, 0)]
+	var pts := PackedVector3Array()
+	for side in 2:
+		for q in prof:
+			var v := Vector3.ZERO
+			match dir:
+				"E": v = Vector3(float(r.position.x) * U + q.x, q.y, float(r.position.y) * U + float(side) * float(r.size.y) * U)
+				"W": v = Vector3(float(r.end.x) * U - q.x, q.y, float(r.position.y) * U + float(side) * float(r.size.y) * U)
+				"S": v = Vector3(float(r.position.x) * U + float(side) * float(r.size.x) * U, q.y, float(r.position.y) * U + q.x)
+				_: v = Vector3(float(r.position.x) * U + float(side) * float(r.size.x) * U, q.y, float(r.end.y) * U - q.x)
+			pts.append(v)
+	return pts
+
+## Boîtes d'un sol : le sol d'un étage est PERCÉ là où un escalier du niveau inférieur arrive (le trou = l'emprise de l'escalier).
+func slab_boxes(f: Dictionary) -> Array[AABB]:
+	var base := slab_box(f)
+	var lv := int(f["lv"])
+	if String(f["t"]) != "floor" or lv == 0:
+		return [base]
+	var rects: Array[Rect2i] = [Rect2i(int(f["x0"]), int(f["z0"]), int(f["x1"]) - int(f["x0"]), int(f["z1"]) - int(f["z0"]))]
+	for s in of_type("stairs", lv - 1):
+		var hole := stair_el_rect(s)
+		var nxt: Array[Rect2i] = []
+		for r in rects:
+			var i := r.intersection(hole)
+			if i.size.x <= 0 or i.size.y <= 0:
+				nxt.append(r)
+				continue
+			if i.position.y > r.position.y:
+				nxt.append(Rect2i(r.position.x, r.position.y, r.size.x, i.position.y - r.position.y))
+			if i.end.y < r.end.y:
+				nxt.append(Rect2i(r.position.x, i.end.y, r.size.x, r.end.y - i.end.y))
+			if i.position.x > r.position.x:
+				nxt.append(Rect2i(r.position.x, i.position.y, i.position.x - r.position.x, i.size.y))
+			if i.end.x < r.end.x:
+				nxt.append(Rect2i(i.end.x, i.position.y, r.end.x - i.end.x, i.size.y))
+		rects = nxt
+	var out: Array[AABB] = []
+	for r in rects:
+		out.append(AABB(Vector3(float(r.position.x) * U, base.position.y, float(r.position.y) * U), Vector3(float(r.size.x) * U, base.size.y, float(r.size.y) * U)))
+	return out
+
 ## Hauteur de la base d'un toit : sommet des murs du niveau qui touchent son rectangle.
 func roof_base(r: Dictionary) -> float:
 	var top := 0.0
@@ -259,6 +344,7 @@ func roof_cost(r: Dictionary) -> int:
 
 func el_cost(e: Dictionary) -> int:
 	match String(e["t"]):
+		"stairs": return STAIRS_COST
 		"floor", "foundation": return slab_cost(e)
 		"wall": return wall_cost(e)
 		"roof": return roof_cost(e)
@@ -403,7 +489,7 @@ func entrance() -> Dictionary:
 func translate_u(dx: int, dz: int) -> void:
 	for e in elements:
 		match String(e["t"]):
-			"floor", "foundation", "roof":
+			"floor", "foundation", "roof", "stairs":
 				e["x0"] = int(e["x0"]) + dx
 				e["x1"] = int(e["x1"]) + dx
 				e["z0"] = int(e["z0"]) + dz
@@ -491,7 +577,7 @@ static func from_dict(d: Dictionary) -> Dictionary:
 			return {"ok": false, "error": "Construction invalide : un élément est mal formé."}
 		var e: Dictionary = raw
 		var t := String(e.get("t", ""))
-		if not ["floor", "foundation", "wall", "roof"].has(t):
+		if not ["floor", "foundation", "wall", "roof", "stairs"].has(t):
 			return {"ok": false, "error": "Construction invalide : type d'élément inconnu (« %s »)." % t}
 		if not _int_keys(e, ["id", "lv"]) or int(e["lv"]) < 0 or int(e["lv"]) >= MAX_LEVELS:
 			return {"ok": false, "error": "Construction invalide : un élément a un niveau hors limites (0 à %d)." % (MAX_LEVELS - 1)}
@@ -537,6 +623,13 @@ static func from_dict(d: Dictionary) -> Dictionary:
 					return {"ok": false, "error": "Construction invalide : une coordonnée de sol ou de toit dépasse %d unités (%s m)." % [MAX_COORD, str(float(MAX_COORD) * 0.5)]}
 			if int(n["x1"]) <= int(n["x0"]) or int(n["z1"]) <= int(n["z0"]):
 				return {"ok": false, "error": "Construction invalide : un sol ou un toit a une surface nulle."}
+			if t == "stairs":
+				if not SIDES.has(String(e.get("dir", ""))) or int(n["lv"]) >= MAX_LEVELS - 1:
+					return {"ok": false, "error": "Construction invalide : un escalier a un sens ou un niveau impossible."}
+				var sr := Rect2i(int(n["x0"]), int(n["z0"]), int(n["x1"]) - int(n["x0"]), int(n["z1"]) - int(n["z0"]))
+				if not ((sr.size.x == STAIR_RUN_U and sr.size.y == STAIR_W_U) or (sr.size.x == STAIR_W_U and sr.size.y == STAIR_RUN_U)):
+					return {"ok": false, "error": "Construction invalide : les dimensions d'un escalier ne sont pas celles prévues (1 m × 4 m)."}
+				n["dir"] = String(e["dir"])
 		maxid = maxi(maxid, int(n["id"]))
 		c.elements.append(n)
 	c.next_id = maxi(int(d.get("next_id", 1)), maxid + 1)

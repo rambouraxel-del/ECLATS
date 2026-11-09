@@ -1,7 +1,7 @@
 class_name BuildMode
 extends Node
 ## MODE CONSTRUCTION EN PREMIÈRE PERSONNE (Lot 8) — dans le laboratoire (salle grise = atelier, île vide = pente).
-##   B : entrer / sortir · 1-8 : outils (sol, fondations, mur, porte, fenêtre, pièce, toit, modifier)
+##   B : entrer / sortir · 1-9 : outils (sol, fondations, mur, porte, fenêtre, pièce, toit, modifier, escalier : touche 9)
 ##   clic gauche : coin / cible · clic droit : revenir en arrière · Entrée : confirmer · X : annuler l'aperçu · Ctrl+Z : défaire
 ##   PageUp / PageDown : niveau · H : hauteur du mur · G : hauteur de la pièce · O : côté de la porte · M : matière
 ##   modifier : clic = choisir un mur / sol / toit · J raccourcir · K prolonger · Y changer d'extrémité · Suppr retirer
@@ -17,7 +17,7 @@ const DIR := "user://maisons/"
 const SNAP_EDGE_M := 0.3
 const REACH := 14.0
 const TOOLS := [["sol", "Sol"], ["fondations", "Fondations"], ["mur", "Mur"], ["porte", "Porte"], ["fenetre", "Fenêtre"],
-	["piece", "Pièce"], ["toit", "Toit"], ["modifier", "Modifier"]]
+	["piece", "Pièce"], ["toit", "Toit"], ["escalier", "Escalier"], ["modifier", "Modifier"]]
 const SIDE_LABELS := ["Sud", "Est", "Nord", "Ouest"]
 
 var lab: LabWorld
@@ -128,7 +128,7 @@ func enter() -> void:
 	set_process(true)
 	set_process_unhandled_input(true)
 	_refresh_ui()
-	_say("Mode construction · 1-8 outils · clic pour tracer · Entrée pour confirmer · B pour sortir", "info")
+	_say("Mode construction · 1-9 outils · clic pour tracer · Entrée pour confirmer · B pour sortir", "info")
 
 func leave() -> void:
 	if not active:
@@ -354,6 +354,8 @@ func _compute_live() -> Dictionary:
 			var p2 := pick()
 			if not p2.is_empty() and String(p2["kind"]) == "wall":
 				return ConstructionOps.add_roof(c, int(p2["id"]), roof_mat)
+		"escalier":
+			return ConstructionOps.add_stairs(_work(), level, aim_u, door_side, floor_mat)
 	return {}
 
 ## Un résultat « ok » mais hors budget devient un refus expliqué.
@@ -481,6 +483,7 @@ func _tool_hint() -> String:
 		"fenetre": return "Fenêtre : visez un mur ; l'aperçu montre la découpe."
 		"piece": return "Pièce : deux coins opposés → plancher + 4 murs. Porte côté %s (O), hauteur %s m (H)." % [C.SIDE_NAMES[door_side], C.fm(wall_h)]
 		"toit": return "Toit : visez un mur de la pièce à couvrir ; le toit s'ajuste à l'emprise des murs."
+		"escalier": return "Escalier : visez la case du bas ; il monte vers %s (O pour changer de sens). Il faut un sol à l'étage qui dépasse le haut (palier). Clic, puis Entrée." % C.SIDE_NAMES[door_side]
 		"modifier": return "Modifier : cliquez un mur (H hauteur · G pièce · J/K longueur · Y extrémité · Suppr retirer)." if sel_id < 0 else "Sélection : %s" % _sel_text()
 	return ""
 
@@ -519,6 +522,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_6: set_tool("piece")
 			KEY_7: set_tool("toit")
 			KEY_8: set_tool("modifier")
+			KEY_9: set_tool("escalier")
 			KEY_ENTER, KEY_KP_ENTER: confirm()
 			KEY_X, KEY_BACKSPACE: cancel_preview()
 			KEY_Z:
@@ -566,7 +570,7 @@ func click() -> void:
 					pending = op
 				else:
 					_refuse(op)
-		"porte", "fenetre", "toit":
+		"porte", "fenetre", "toit", "escalier":
 			var op2 := _afford(_compute_live())
 			if op2.is_empty():
 				_say("Visez un mur de ce niveau.", "erreur")
