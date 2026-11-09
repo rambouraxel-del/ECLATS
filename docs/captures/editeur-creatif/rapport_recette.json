@@ -1,6 +1,39 @@
 {
 	"captures": [
-		"05b_choix_carte_cartes_enregistrees",
+		"01_menu_principal",
+		"02_menu_outils_developpeur",
+		"02b_menu_choix_de_la_carte",
+		"03_ile_vide_vue_aerienne",
+		"04_choix_graine_generer",
+		"05_choix_carte_ouvrir",
+		"10_inventaire_categories",
+		"11_inventaire_categorie_arbres",
+		"12_inventaire_recherche_apercu_objet",
+		"13_inventaire_ruines_apercu",
+		"20_relief_avant",
+		"21_relief_apres_colline",
+		"22_relief_adouci",
+		"23_matiere_apres_roche",
+		"30_carte_zone_avant",
+		"31_zone_boisee_peinte",
+		"32_foret_generee",
+		"33_arbre_selectionne",
+		"34_arbre_en_deplacement",
+		"35_arbre_deplace",
+		"36_arbre_supprime",
+		"40_chemin_en_trace",
+		"41_chemin_termine_poignees",
+		"50_placement_apercu_aimant",
+		"51_placement_apercu_tourne",
+		"52_objets_poses",
+		"53_objet_tourne",
+		"54_objet_grab_deplacement",
+		"55_objet_duplique",
+		"60_marche_genere",
+		"61_marche_objet_deplace",
+		"70_atelier_construction_ouverte",
+		"71_maison_escalier_vu_du_pied",
+		"72_etage_accessible_a_pied",
 		"80_inventaire_mes_maisons_apercu",
 		"81_maison_apercu_implantation",
 		"82_maison_posee_plateau",
@@ -24,6 +57,130 @@
 		"112_zone_protegee_apres_vue_rapprochee"
 	],
 	"controles": [
+		{
+			"controle": "île vide ouverte depuis le menu développeur : contour + plateau, prête à sculpter",
+			"ok": true
+		},
+		{
+			"controle": "touche I : l'inventaire s'ouvre",
+			"ok": true
+		},
+		{
+			"controle": "recherche « chêne » : 3 résultats",
+			"ok": true
+		},
+		{
+			"controle": "catégorie « Marché et village » : 11 éléments",
+			"ok": true
+		},
+		{
+			"controle": "catégorie « Ruines et vestiges » : 6 éléments",
+			"ok": true
+		},
+		{
+			"controle": "catégorie « Mobilier » : 12 éléments",
+			"ok": true
+		},
+		{
+			"controle": "catégorie « Maisons » : 5 éléments",
+			"ok": true
+		},
+		{
+			"controle": "catégorie « Port et navires » : 3 éléments",
+			"ok": true
+		},
+		{
+			"controle": "catégorie « Rochers » : 5 éléments",
+			"ok": true
+		},
+		{
+			"controle": "touche 3 : outil Relief",
+			"ok": true
+		},
+		{
+			"controle": "clic maintenu et glisser : la colline monte de 2.8 m",
+			"ok": true
+		},
+		{
+			"controle": "chaque trait de pinceau est une opération annulable",
+			"ok": true
+		},
+		{
+			"controle": "matière peinte : roche grise au sommet",
+			"ok": true
+		},
+		{
+			"controle": "zone boisée peinte (4 zones)",
+			"ok": true
+		},
+		{
+			"controle": "clic : forêt générée (11 objets : Forêt : 11 arbre)",
+			"ok": true
+		},
+		{
+			"controle": "outil Sélection : clic sur un arbre généré → sélectionné",
+			"ok": true
+		},
+		{
+			"controle": "arbre déplacé à la souris (3.0 m)",
+			"ok": true
+		},
+		{
+			"controle": "touche Suppr : un autre arbre est supprimé",
+			"ok": true
+		},
+		{
+			"controle": "chemin tracé par clics, Entrée pour finir (4 points)",
+			"ok": true
+		},
+		{
+			"controle": "5 objets posés depuis l'inventaire (clic réel) : puits, colonne, banc, rocher, panneau",
+			"ok": true
+		},
+		{
+			"controle": "R : l'objet sélectionné tourne par pas de 15° (+45°)",
+			"ok": true
+		},
+		{
+			"controle": "G puis clic : objet déplacé",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+D : objet dupliqué",
+			"ok": true
+		},
+		{
+			"controle": "marché généré : Marché : 2 étal, 1 tonneaux, 1 caisses",
+			"ok": true
+		},
+		{
+			"controle": "un étal généré est déplacé et tourné individuellement",
+			"ok": true
+		},
+		{
+			"controle": "7 → l'atelier s'ouvre avec la session de la carte, mode construction actif",
+			"ok": true
+		},
+		{
+			"controle": "quatre murs d'étage posés",
+			"ok": true
+		},
+		{
+			"controle": "fondations, pièce, porte, étage et escalier acceptés par les mêmes règles que le mode construction (escalier : Escalier vers le niveau 1 · 1 m × 4 m · coût 12 unités)",
+			"ok": true
+		},
+		{
+			"controle": "maison : Maison à étage · 7,2 × 5,2 m · 2 niveau(x) · 8 mur(s), 3 ouverture(s) · coût total 275",
+			"ok": true
+		},
+		{
+			"controle": "on monte l'escalier à pied dans le vrai jeu : +3.02 m jusqu'à l'étage (x = 5.3 m)",
+			"ok": true
+		},
+		{
+			"controle": "la maison est enregistrée dans l'atelier (user://maisons/)",
+			"ok": true
+		},
 		{
 			"controle": "la maison enregistrée apparaît dans l'inventaire, catégorie « Mes maisons »",
 			"ok": true

@@ -133,12 +133,20 @@ func _build() -> void:
 		var b2 := _btn(m[1], func() -> void: ed.set_mode(mm), true, 0.0, TS)
 		_mode_btns[mm] = b2
 		row.add_child(b2)
-	_status = _lbl("", 17, MenuStyle.MUTED)
-	_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# état de la carte (nom, ● si modifiée, objets, maisons) : sous la barre, à droite
+	_status = _lbl("", 17, Color(1, 1, 1))
+	_status.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_status.offset_left = -520
+	_status.offset_right = -12
+	_status.offset_top = 62
+	_status.offset_bottom = 92
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_status.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_status.clip_text = true
-	row.add_child(_status)
+	_status.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.95))
+	_status.add_theme_constant_override("shadow_offset_x", 1)
+	_status.add_theme_constant_override("shadow_offset_y", 1)
+	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_status)
 	# --- panneau d'options (gauche)
 	_left = _panel()
 	_left.position = Vector2(8, 62)
@@ -402,6 +410,7 @@ func refresh() -> void:
 	get_node("Reticule").visible = ed.captured and ed.mode != "play"
 	_left.visible = ed.mode != "play"
 	_top.visible = ed.mode != "play"
+	_status.visible = ed.mode != "play"
 	_status.text = "%s%s · %d objets · %d maison(s)" % [ed.doc.plan.name, " ●" if ed.doc.is_dirty() else "", ed.doc.plan.objects.size(), ed.doc.plan.houses.size()]
 	if _hist.visible:
 		_fill_history()

@@ -1,0 +1,54 @@
+OK    île vide ouverte depuis le menu développeur : contour + plateau, prête à sculpter
+OK    touche I : l'inventaire s'ouvre
+OK    recherche « chêne » : 3 résultats
+OK    catégorie « Marché et village » : 11 éléments
+OK    catégorie « Ruines et vestiges » : 6 éléments
+OK    catégorie « Mobilier » : 12 éléments
+OK    catégorie « Maisons » : 5 éléments
+OK    catégorie « Port et navires » : 3 éléments
+OK    catégorie « Rochers » : 5 éléments
+OK    touche 3 : outil Relief
+OK    clic maintenu et glisser : la colline monte de 2.8 m
+OK    chaque trait de pinceau est une opération annulable
+OK    matière peinte : roche grise au sommet
+OK    zone boisée peinte (4 zones)
+OK    clic : forêt générée (11 objets : Forêt : 11 arbre)
+OK    outil Sélection : clic sur un arbre généré → sélectionné
+OK    arbre déplacé à la souris (3.0 m)
+OK    touche Suppr : un autre arbre est supprimé
+OK    chemin tracé par clics, Entrée pour finir (4 points)
+OK    5 objets posés depuis l'inventaire (clic réel) : puits, colonne, banc, rocher, panneau
+OK    R : l'objet sélectionné tourne par pas de 15° (+45°)
+OK    G puis clic : objet déplacé
+OK    Ctrl+D : objet dupliqué
+OK    marché généré : Marché : 2 étal, 1 tonneaux, 1 caisses
+OK    un étal généré est déplacé et tourné individuellement
+OK    7 → l'atelier s'ouvre avec la session de la carte, mode construction actif
+OK    quatre murs d'étage posés
+OK    fondations, pièce, porte, étage et escalier acceptés par les mêmes règles que le mode construction (escalier : Escalier vers le niveau 1 · 1 m × 4 m · coût 12 unités)
+OK    maison : Maison à étage · 7,2 × 5,2 m · 2 niveau(x) · 8 mur(s), 3 ouverture(s) · coût total 275
+OK    on monte l'escalier à pied dans le vrai jeu : +3.02 m jusqu'à l'étage (x = 5.3 m)
+OK    la maison est enregistrée dans l'atelier (user://maisons/)
+OK    la maison enregistrée apparaît dans l'inventaire, catégorie « Mes maisons »
+OK    une parcelle plate acceptée existe (dénivelé 0.0 m sur 6 m)
+OK    clic : première maison posée (Maison posée : Ma maison à étage)
+OK    une parcelle en pente acceptée existe (dénivelé 1.0 m sur 6 m)
+OK    l'aperçu explique l'implantation et le raccord (K : raccord au chemin, R : orientation)
+OK    deuxième maison posée sur la pente : plateforme et raccord au chemin créés (Maison posée : Ma maison à étage)
+OK    le terrain s'adapte sous la maison (1407 colonnes ajustées)
+OK    Ctrl+S sur une carte jamais enregistrée : dialogue « Enregistrer la carte »
+OK    carte enregistrée : ile_creative_demo.eclats-carte.json
+OK    enregistrement relu à part : relief identique (0 colonnes différentes (1073741824, 1073741824)–(-1, -1), tailles 61504 / 61504)
+OK    carte modifiée : une action qui la remplacerait ouvre « Modifications non enregistrées »
+OK    carte rouverte : 20 objets, 2 maison(s)
+OK    carte rouverte : relief et maisons identiques à l'enregistrement
+OK    première personne : objet posé en visant le sol (réticule au centre)
+OK    mode jeu : le personnage marche jusqu'à la maison et y entre (z = -10.2, maison en -10.0)
+OK    touche P : retour à l'éditeur depuis le mode jeu
+OK    Ctrl+Z : la pose de l'étal est annulée
+OK    Ctrl+Y : rétablie
+OK    forêt autour de la zone protégée : 16 objets
+OK    L : un arbre est verrouillé
+OK    zone protégée (1046 colonnes) : relief inchangé après régénération (relief : 1291 colonnes modifiées ailleurs)
+OK    objet verrouillé : toujours là, même position
+OK    la régénération a bien remplacé les autres objets générés (15 retirés)

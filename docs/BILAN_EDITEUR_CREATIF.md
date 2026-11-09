@@ -42,8 +42,11 @@ Zone protégée : [110 avant](captures/editeur-creatif/110_zone_protegee_avant_r
 **Contrôlé automatiquement, jamais joué** : tests ciblés `tests/run_checks_creatif.gd` (51 contrôles : catalogue, objets, annulation / rétablissement, génération reproductible, verrou, zone protégée, v3 → v4, escalier avec montée à pied sous physique réelle).
 **Jamais essayé** : le clavier réel en première personne (WASD, souris capturée, Tab), un vrai Mac, le rendu GPU.
 
-## Résultats
-Voir la section « Tests et recette » ci-dessous (mise à jour à la livraison).
+## Tests et recette
+- **Tests automatiques** (`tools/check.sh`, tous les lots) : 180, 121, 50, 39, 68, 104, 64, 30, 88, 14 contrôles des lots précédents, **tous en réussite** (aucune régression : la construction, les maisons, les cartes et le laboratoire sont intacts) ; nouveaux : **51 contrôles** de l'éditeur, 0 échec.
+- **Recette jouée** (`tools/creatif_recette.gd`) : **54 contrôles, 0 échec** sur le parcours complet ; journal dans [`captures/editeur-creatif/journal_recette.txt`](captures/editeur-creatif/journal_recette.txt) et rapport JSON. Le parcours a demandé plusieurs passes : les défauts trouvés (sélection dans une forêt dense, dépôt après G, maison sur un objet, contour non arrondi, maison trop grande pour la pente, escalier non montable) sont corrigés.
+- **Parcours demandé** : (1) petite île et colline +2,8 m ; (2) zone boisée, forêt de 11 arbres, un déplacé à la souris, un supprimé ; (3) chemin de 4 points et 5 objets de l'inventaire ; (4) maison à étage avec porte, fenêtres, escalier, montée à pied de +3,02 m ; (5) maison enregistrée, seconde posée sur un versant de 1,0 m sur 6 m avec plateforme et raccord au chemin ; (6) carte enregistrée (relief relu identique), rouverte, parcourue en vol puis en mode jeu avec entrée dans la maison ; (7) pose annulée (Ctrl+Z) et rétablie (Ctrl+Y), puis zone protégée (1 046 colonnes) inchangée et arbre verrouillé conservé après une régénération ciblée du relief et des objets (15 objets remplacés).
+- Les captures ont été prises avant un correctif d'affichage : l'état de la carte (nom, ●, nombre d'objets) est maintenant sous la barre à droite ([05b](captures/editeur-creatif/05b_choix_carte_cartes_enregistrees.jpg) le montre) ; les autres captures gardent un petit résidu « ;) » en haut à droite.
 
 ## Limites restantes et comment les reproduire
 1. **Contour** : on déplace, ajoute (double-clic) et retire des sommets, mais on ne dessine pas un contour neuf en 3D (l'île vide est un ovale fixe). Pour un tracé libre : Fichier → *Éditeur de carte 2D*.
