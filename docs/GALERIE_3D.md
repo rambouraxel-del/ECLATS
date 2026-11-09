@@ -47,7 +47,9 @@ La raison et la marche à suivre sont aussi affichées en bas de la liste.
 À chaque push sur `main` ou `claude/galerie-modeles-3d` (ou lancement manuel) : télécharge Godot 4.3, lance `tools/galerie.sh`, assemble `galerie/` et déploie sur Pages
 (`actions/deploy-pages`). Aucune autre publication Pages n'existait dans le dépôt (aucun workflow Pages, pas de branche `gh-pages`) : la galerie est donc
 publiée à la racine du site. Si un site existait déjà, il faudrait le copier dans `_site/` avant le déploiement, car un déploiement Actions remplace tout le site.
-Réglage à faire une fois : Settings → Pages → Source : **GitHub Actions**.
+Réglages à faire une fois (impossibles depuis le workflow) : Settings → Pages → Source : **GitHub Actions** ; puis Settings → Environments → `github-pages` →
+Deployment branches : autoriser `claude/galerie-modeles-3d` (ou fusionner dans la branche publiée). Sans cela l'étape `deploy` est refusée alors que `build` réussit
+(constaté au premier essai : export, vérification du catalogue et téléversement de l'artefact réussis, déploiement refusé avant démarrage).
 
 ## Limites
 Couleurs, rugosité, métal et émission du jeu ; pas les micro-textures de pixels de 2 cm du shader. Ni lumières, ni animations (tissus, cristaux), ni collisions.
