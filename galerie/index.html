@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ÉCLATS · Galerie 3D</title>
+<meta name="description" content="Galerie des modèles 3D du jeu ÉCLATS : arbres, rochers, bâtiments, objets, bateaux, habitations.">
+<link rel="icon" href="icone.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+	"three": "./vendor/three/build/three.module.min.js",
+	"three/addons/": "./vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header class="haut">
+	<h1>ÉCLATS <span>galerie 3D</span></h1>
+	<label class="recherche">
+		<span class="sr">Rechercher un modèle</span>
+		<input id="q" type="search" placeholder="Rechercher (nom, graine, catégorie…)" autocomplete="off" enterkeyhint="search">
+	</label>
+	<span id="compte" class="compte" aria-live="polite"></span>
+</header>
+
+<main class="cadre">
+	<section class="scene" aria-label="Vue 3D">
+		<div id="vue" class="vue">
+			<canvas id="toile" aria-label="Modèle 3D : glisser pour tourner, pincer ou molette pour zoomer"></canvas>
+			<div id="etat" class="etat" role="status">Choisissez un modèle dans la liste.</div>
+			<div class="outils">
+				<button id="recentrer" type="button" title="Recentrer la vue">Recentrer</button>
+				<button id="tourner" type="button" aria-pressed="false" title="Rotation automatique">Rotation</button>
+				<button id="grille" type="button" aria-pressed="true" title="Afficher le sol">Sol</button>
+			</div>
+		</div>
+		<article id="fiche" class="fiche" aria-live="polite"></article>
+	</section>
+
+	<aside class="liste" aria-label="Liste des modèles">
+		<div class="filtres">
+			<div id="familles" class="puces" role="group" aria-label="Type de modèle"></div>
+			<div id="categories" class="puces" role="group" aria-label="Catégorie"></div>
+		</div>
+		<ul id="items" class="items"></ul>
+		<details id="non-exportes" class="infos"></details>
+		<details id="limites" class="infos"></details>
+	</aside>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

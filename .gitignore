@@ -6,3 +6,6 @@ export/
 # OS
 .DS_Store
 Thumbs.db
+# Galerie 3D : produits par tools/galerie.sh (regénérés par GitHub Actions)
+galerie/modeles/
+galerie/catalogue.json

@@ -1,0 +1,64 @@
+name: Galerie 3D (GitHub Pages)
+
+# Regénère le catalogue et les exports glTF à chaque mise à jour d'une branche publiée, puis publie sur Pages.
+# Branches publiées : main et la branche de développement de la galerie. Ajouter une branche = l'ajouter ci-dessous.
+on:
+  push:
+    branches: [main, claude/galerie-modeles-3d]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: 4.3-stable
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Télécharger Godot
+        run: |
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -q godot.zip
+          echo "GODOT=$PWD/Godot_v${GODOT_VERSION}_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Actualiser la galerie (catalogue + exports glTF)
+        run: tools/galerie.sh
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+      - name: Vérifier le catalogue
+        run: |
+          python3 - <<'PY'
+          import json, os
+          d = json.load(open("galerie/catalogue.json"))
+          assert d["nombre"] >= 100, d["nombre"]
+          missing = [m["fichier"] for m in d["modeles"] if not os.path.exists("galerie/" + m["fichier"])]
+          assert not missing, missing
+          print(d["nombre"], "modèles,", len(d["non_exportes"]), "non exportés")
+          PY
+      - name: Assembler le site
+        run: |
+          mkdir -p _site
+          cp -r galerie/. _site/
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

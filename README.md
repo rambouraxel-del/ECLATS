@@ -147,3 +147,6 @@ Diagnostic d'une génération (rapport lisible + JSON) :
 - [docs/BILAN_LOT2.md](docs/BILAN_LOT2.md) — vérifications, mesures, limites du Lot 2.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — organisation du code et choix techniques.
 - [docs/BILAN_LOT1.md](docs/BILAN_LOT1.md) — vérifications réalisées, limites, prochaines étapes.
+
+## Galerie 3D
+Modèles du projet consultables sur GitHub Pages : voir `docs/GALERIE_3D.md` (actualisation : `tools/galerie.sh`).

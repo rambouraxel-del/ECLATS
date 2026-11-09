@@ -1,0 +1,121 @@
+{
+	"_aide": "Échantillons de graines et de paramètres de la galerie. Une entrée par générateur ; « axes » : chaque combinaison est exportée pour chaque graine. « auto » = valeurs détectées dans le code. Mettre « actif »: false pour ignorer un générateur.",
+	"generateurs": {
+		"asset_arbre": {
+			"nom": "Arbre (bibliothèque d'assets)",
+			"categorie": "Arbres",
+			"graines": [
+				7,
+				11
+			],
+			"axes": {
+				"species": "auto"
+			}
+		},
+		"asset_rocher": {
+			"nom": "Rocher (bibliothèque d'assets)",
+			"categorie": "Rochers et ruines",
+			"graines": [
+				5,
+				6
+			],
+			"axes": {
+				"size": [
+					16,
+					24
+				],
+				"warm": [
+					true,
+					false
+				]
+			}
+		},
+		"nature_arbre": {
+			"nom": "Arbre du monde",
+			"categorie": "Arbres",
+			"graines": [
+				1,
+				2,
+				3
+			],
+			"axes": {
+				"espece": "auto"
+			}
+		},
+		"nature_rocher": {
+			"nom": "Rocher du monde",
+			"categorie": "Rochers et ruines",
+			"graines": [
+				1,
+				2,
+				3
+			],
+			"axes": {
+				"famille": "auto"
+			}
+		},
+		"nature_ruine": {
+			"nom": "Vestige du monde",
+			"categorie": "Rochers et ruines",
+			"graines": [
+				1,
+				2
+			],
+			"axes": {
+				"sous_type": [
+					"column",
+					"arch",
+					"wall",
+					"slab"
+				]
+			}
+		},
+		"batiment": {
+			"nom": "Bâtiment généré",
+			"categorie": "Bâtiments",
+			"graines": [
+				1,
+				2,
+				3
+			],
+			"axes": {
+				"type": "auto"
+			}
+		},
+		"habitation": {
+			"nom": "Habitation du joueur",
+			"categorie": "Habitations",
+			"graines": [
+				1,
+				2,
+				3
+			],
+			"axes": {
+				"variante": "auto"
+			},
+			"emprise_m": [
+				9.0,
+				8.0
+			]
+		},
+		"bateau": {
+			"nom": "Bateau volant généré",
+			"categorie": "Port et navires",
+			"graines": [
+				1,
+				2,
+				3
+			],
+			"axes": {}
+		}
+	},
+	"non_exportes": {
+		"res://scripts/world/terrain_generator.gd": "Génère le relief d'une île entière (terrain et grille de hauteurs), pas un objet : à voir dans le jeu ou le laboratoire.",
+		"res://scripts/world/settlement/settlement_generator.gd": "Compose un hameau (plusieurs bâtiments, chemins) sur un terrain réel : dépend de l'île. Les bâtiments qu'il pose sont exportés par « Bâtiment généré ».",
+		"res://scripts/world/settlement/port_builder.gd": "Embarcadère posé sur la côte d'une île générée. L'embarcadère précuit « pier » est exporté.",
+		"res://scripts/world/nature/nature_generator.gd": "Dissémine arbres et rochers sur une île (placement). Les objets sont exportés par « Arbre du monde » et « Rocher du monde ».",
+		"res://scripts/world/world_builder.gd": "Assemble une île complète : trop grosse et liée au terrain pour un visualiseur d'objet.",
+		"res://scripts/world/authored/authored_island_builder.gd": "Construit l'île d'ouverture entière (config/islands/*.json) : c'est une carte, pas un modèle.",
+		"res://scripts/map/plan_terrain.gd": "Relief des plans d'île (méthodes A/B/C) : terrain, pas un objet."
+	}
+}
