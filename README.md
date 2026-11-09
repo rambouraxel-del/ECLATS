@@ -150,3 +150,6 @@ Diagnostic d'une génération (rapport lisible + JSON) :
 
 ## Galerie 3D
 Modèles du projet consultables sur GitHub Pages : voir `docs/GALERIE_3D.md` (actualisation : `tools/galerie.sh`).
+
+## Éditeur d'îles créatif
+Menu principal → Outils développeur → **Éditeur d'îles créatif (3D)** : île vide, île générée d'une graine ou carte enregistrée ; inventaire, relief, matières, chemins, forêt et marché générés, maisons de l'atelier (avec escalier), historique Ctrl+Z / Ctrl+Y. Voir `docs/EDITEUR_CREATIF.md`.

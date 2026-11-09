@@ -155,7 +155,7 @@ static func _empty_doc() -> MapDoc:
 	for k in 20:
 		var a := TAU * float(k) / 20.0
 		var rr := 1.0 + 0.10 * sin(3.0 * a + 0.6) + 0.06 * sin(5.0 * a + 1.3)
-		pts.append(Vector2(cos(a) * 20.0 * rr, sin(a) * 16.0 * rr))
+		pts.append(Vector2(snappedf(cos(a) * 20.0 * rr, 0.01), snappedf(sin(a) * 16.0 * rr, 0.01)))
 	p.outline = pts
 	p.start = Vector2(-6, 2)
 	p.zones.append({"id": p.new_id("zone"), "kind": "plateau", "c": Vector2(0, 0), "r": 11.0, "h": 4.0})
@@ -564,7 +564,9 @@ func aim2() -> Vector2:
 	return Vector2(a.x, a.z) if a != Vector3.INF else Vector2.INF
 
 func snap_point(p: Vector2) -> Vector2:
-	return Vector2(snappedf(p.x, SNAP_M), snappedf(p.y, SNAP_M)) if grid_snap else p
+	# sans aimantation, les coordonnées sont tout de même arrondies au centimètre : c'est la précision du fichier de carte (l'enregistrement
+	# arrondit ainsi ; un contour ou un chemin non arrondi ne se relirait pas à l'identique sur les colonnes de bord)
+	return Vector2(snappedf(p.x, SNAP_M), snappedf(p.y, SNAP_M)) if grid_snap else Vector2(snappedf(p.x, 0.01), snappedf(p.y, 0.01))
 
 ## Objet ou maison sous le curseur : "id" d'objet, "h:id" de maison, "" sinon.
 func pick_thing(o: Vector3, d: Vector3) -> String:
@@ -1421,16 +1423,23 @@ func _unhandled_input(event: InputEvent) -> void:
 		f_yaw -= mm.relative.x * 0.0028
 		f_pitch = clampf(f_pitch - mm.relative.y * 0.0028, -1.5, 1.5)
 		return
+	if mode != "play" and event is InputEventMouseButton:
+		_mouse_button(event as InputEventMouseButton)
+
+## Les touches passent par ici (avant l'autoload App : L ne change pas l'éclairage quand elle verrouille un objet).
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not ready_to_edit or App.paused_menu:
+		return
+	var k := event as InputEventKey
+	if k == null or not k.pressed or k.echo:
+		return
 	if mode == "play":
-		if event is InputEventKey and (event as InputEventKey).pressed and (event as InputEventKey).keycode == KEY_P and not (event as InputEventKey).echo:
+		if k.keycode == KEY_P:
 			set_mode(_before_play)
 			get_viewport().set_input_as_handled()
 		return
-	if event is InputEventMouseButton:
-		_mouse_button(event as InputEventMouseButton)
-	elif event is InputEventKey and (event as InputEventKey).pressed and not (event as InputEventKey).echo:
-		if _key(event as InputEventKey):
-			get_viewport().set_input_as_handled()
+	if _key(k):
+		get_viewport().set_input_as_handled()
 
 func _mouse_button(e: InputEventMouseButton) -> void:
 	if mode == "aerial":
@@ -1456,6 +1465,9 @@ func _mouse_button(e: InputEventMouseButton) -> void:
 func _left_down(dbl := false) -> void:
 	match tool:
 		"select":
+			if _grab:
+				end_grab(true)          # G puis clic : on dépose
+				return
 			if selected != "" and not selected.begins_with("h:"):
 				var r := pick_ray()
 				if pick_thing(r["o"], r["d"]) == selected:

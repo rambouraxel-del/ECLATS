@@ -100,6 +100,7 @@ func _build() -> void:
 	add_child(lab)
 	lab.setup_field(build.field, "plan", plan.seed, plan.start)
 	_spawn_houses()
+	_spawn_objects()
 	if env != null:
 		env.setup(plan.seed)
 	explorer = Explorer.new()
@@ -149,6 +150,16 @@ func _spawn_houses() -> void:
 		var c0 := lab.field.col_of_m(rm.position.x - 0.6, rm.position.y - 0.6)
 		var c1 := lab.field.col_of_m(rm.end.x + 0.6, rm.end.y + 0.6)
 		lab.occ.reserve(Rect2i(c0, c1 - c0 + Vector2i.ONE), PlacementSpec.TAG_PLOT, lab.occ.new_owner())
+
+## Objets posés dans l'éditeur créatif (plan.objects) : assets précuits posés sur le sol, avec leurs collisions.
+func _spawn_objects() -> void:
+	if plan.objects.is_empty():
+		return
+	var root := Node3D.new()
+	root.name = "ObjetsCrees"
+	lab.add_child(root)
+	for o in plan.objects:
+		root.add_child(CreativeObjects.make_node(o, build.field, true))
 
 func _lowest() -> float:
 	var lo := 1.0e9

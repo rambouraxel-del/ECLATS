@@ -151,7 +151,7 @@ func _build() -> void:
 	_build_inventory()
 	# --- historique
 	_hist = _panel()
-	_hist.position = Vector2(8, 380)
+	_hist.position = Vector2(8, 400)
 	_hist.custom_minimum_size = Vector2(PANEL_W, 0)
 	_hist.visible = false
 	add_child(_hist)
@@ -409,6 +409,7 @@ func refresh() -> void:
 
 func _fill_history() -> void:
 	for c in _hist_list.get_children():
+		_hist_list.remove_child(c)
 		c.queue_free()
 	_hist_list.add_child(_lbl("Historique (Ctrl+Z annule, Ctrl+Y rétablit)", 17, MenuStyle.ACCENT))
 	var st := ed.doc.undo_stack
@@ -419,6 +420,7 @@ func _fill_history() -> void:
 		_hist_list.add_child(_lbl("%d. %s" % [i + 1, st[i]["label"]], 17))
 	for j in range(ed.doc.redo_stack.size() - 1, maxi(ed.doc.redo_stack.size() - 4, -1), -1):
 		_hist_list.add_child(_lbl("↷ %s (annulée)" % ed.doc.redo_stack[j]["label"], 17, MenuStyle.MUTED))
+	_hist.set_deferred("size", Vector2.ZERO)
 
 func _hint_text() -> String:
 	var common := "V vue · P jouer · I inventaire · N aimantation · Ctrl+Z annuler · Ctrl+Y rétablir · Ctrl+S enregistrer"
@@ -470,6 +472,7 @@ func _selection_text() -> String:
 
 func _clear_left() -> void:
 	for c in _left_box.get_children():
+		_left_box.remove_child(c)
 		c.queue_free()
 	_dyn = null
 
@@ -590,7 +593,7 @@ func _build_options() -> void:
 			_dyn = _lbl("", 17)
 			_left_box.add_child(_dyn)
 			_left_box.add_child(_lbl("Les objets verrouillés (🔒), posés à la main ou en zone protégée sont conservés à chaque génération.", 16, MenuStyle.MUTED))
-	_left.reset_size()
+	_left.set_deferred("size", Vector2.ZERO)
 
 # ------------------------------------------------------------------ fichiers
 

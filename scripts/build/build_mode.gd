@@ -17,7 +17,7 @@ const DIR := "user://maisons/"
 const SNAP_EDGE_M := 0.3
 const REACH := 14.0
 const TOOLS := [["sol", "Sol"], ["fondations", "Fondations"], ["mur", "Mur"], ["porte", "Porte"], ["fenetre", "Fenêtre"],
-	["piece", "Pièce"], ["toit", "Toit"], ["escalier", "Escalier"], ["modifier", "Modifier"]]
+	["piece", "Pièce"], ["toit", "Toit"], ["modifier", "Modifier"], ["escalier", "Escalier"]]
 const SIDE_LABELS := ["Sud", "Est", "Nord", "Ouest"]
 
 var lab: LabWorld

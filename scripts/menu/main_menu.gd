@@ -58,6 +58,7 @@ func _ready() -> void:
 	_pages["main"] = _page_main()
 	_pages["generate"] = _page_generate()
 	_pages["dev"] = _page_dev()
+	_pages["creatif"] = _page_creatif()
 	for k in _pages:
 		add_child(_pages[k])
 	var foot := MenuStyle.note("Menu provisoire · Lot 7", 14)
@@ -235,12 +236,72 @@ func _page_dev() -> Control:
 		if first:
 			b.name = "Premier"
 			first = false
-		b.pressed.connect(App.open.bind(String(e[1])))
+		if String(e[1]) == App.CREATIVE_SCENE:
+			b.pressed.connect(show_page.bind("creatif"))        # page de choix : île vide, graine ou carte enregistrée
+		else:
+			b.pressed.connect(App.open.bind(String(e[1])))
 		box.add_child(b)
 	var back := MenuStyle.button("Retour")
 	back.pressed.connect(show_page.bind("main"))
 	box.add_child(back)
 	p.name = "PageDev"
+	return p
+
+## Éditeur d'îles créatif : trois façons de commencer — île vide, île générée d'une graine, carte enregistrée.
+func _page_creatif() -> Control:
+	var p := MenuStyle.panel(Vector2(900, 620))
+	p.position.y += 40
+	var box := p.get_child(0) as VBoxContainer
+	box.add_theme_constant_override("separation", 10)
+	box.add_child(MenuStyle.title("Éditeur d'îles créatif", 32))
+	box.add_child(MenuStyle.note("Construire et modifier une île en 3D : inventaire, relief, génération, maisons. Choisissez comment commencer."))
+	var b1 := MenuStyle.button("Île vide (ovale plat, prête à sculpter)")
+	b1.name = "Vide"
+	b1.pressed.connect(func() -> void: App.open(App.CREATIVE_SCENE, {"mode": "vide"}))
+	box.add_child(b1)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	box.add_child(row)
+	var l := Label.new()
+	l.text = "Générer à partir d'une graine :"
+	l.add_theme_font_size_override("font_size", 20)
+	row.add_child(l)
+	var sp := _spin_row(row, "Graine", 1, 999999, 1, 7)
+	var b2 := MenuStyle.button("Générer et ouvrir")
+	b2.name = "Graine"
+	b2.pressed.connect(func() -> void: App.open(App.CREATIVE_SCENE, {"mode": "graine", "seed": int(sp.value)}))
+	row.add_child(b2)
+	var l2 := Label.new()
+	l2.text = "Rouvrir une carte enregistrée :"
+	l2.add_theme_font_size_override("font_size", 20)
+	box.add_child(l2)
+	var il := ItemList.new()
+	il.name = "Cartes"
+	il.custom_minimum_size = Vector2(0, 150)
+	il.add_theme_font_size_override("font_size", 20)
+	var maps: Array[String] = []
+	for f in DirAccess.get_files_at("user://cartes/"):
+		if f.ends_with(".eclats-carte.json"):
+			maps.append("user://cartes/" + f)
+	maps.sort()
+	for m in maps:
+		il.add_item(m.get_file().replace(".eclats-carte.json", ""))
+	if maps.is_empty():
+		il.add_item("(aucune carte enregistrée : enregistrez-en une depuis l'éditeur)")
+		il.set_item_disabled(0, true)
+	box.add_child(il)
+	var b3 := MenuStyle.button("Ouvrir la carte choisie")
+	b3.name = "Ouvrir"
+	b3.pressed.connect(func() -> void:
+		var sel := il.get_selected_items()
+		if sel.is_empty():
+			return
+		App.open(App.CREATIVE_SCENE, {"mode": "ouvrir", "path": maps[sel[0]]}))
+	box.add_child(b3)
+	var back := MenuStyle.button("Retour")
+	back.pressed.connect(show_page.bind("dev"))
+	box.add_child(back)
+	p.name = "PageCreatif"
 	return p
 
 func play_opening() -> void:

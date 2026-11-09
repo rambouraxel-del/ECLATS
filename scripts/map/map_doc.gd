@@ -752,6 +752,10 @@ func house_ctx(need_link := true) -> Dictionary:
 	var avoid: Array = []
 	for h in plan.houses:
 		avoid.append(h["rect"])
+	for o in plan.objects:
+		# les objets posés (arbres, étals, rochers…) restent libres de toute maison : leur emprise au sol est évitée
+		var r := CreativeObjects.clear_radius(String(o["ref"])) * float(o.get("scale", 1.0)) + 0.2
+		avoid.append(Rect2((o["pos"] as Vector2) - Vector2(r, r), Vector2(r, r) * 2.0))
 	return {"mask": plan.layers.mask if plan.layers != null else PackedByteArray(), "paths": plan.paths, "avoid": avoid,
 		"path_cols": build.path_cols if build != null else PackedByteArray(), "keep_clear": [plan.start], "need_link": need_link and not plan.paths.is_empty()}
 

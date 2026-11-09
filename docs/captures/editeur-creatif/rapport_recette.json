@@ -1,0 +1,120 @@
+{
+	"captures": [
+		"05b_choix_carte_cartes_enregistrees",
+		"80_inventaire_mes_maisons_apercu",
+		"81_maison_apercu_implantation",
+		"82_maison_posee_plateau",
+		"82b_versant_sculpte_pour_la_maison",
+		"83_maison_pente_apercu",
+		"84_maison_pente_raccord_desactive",
+		"85_maison_pente_orientation_changee",
+		"86_maison_pente_posee",
+		"87_deux_maisons_vue_aerienne",
+		"90_dialogue_enregistrer",
+		"91_dialogue_modifications_non_enregistrees",
+		"92_carte_rouverte_vue_aerienne",
+		"93_carte_rouverte_premiere_personne_vol",
+		"93b_premiere_personne_poser_visee_centre",
+		"94_mode_jeu_devant_la_maison",
+		"95_mode_jeu_dans_la_maison",
+		"100_historique_avant_annulation",
+		"101_historique_apres_annulation_retablir",
+		"110_zone_protegee_avant_regeneration",
+		"111_zone_protegee_apres_regeneration",
+		"112_zone_protegee_apres_vue_rapprochee"
+	],
+	"controles": [
+		{
+			"controle": "la maison enregistrée apparaît dans l'inventaire, catégorie « Mes maisons »",
+			"ok": true
+		},
+		{
+			"controle": "une parcelle plate acceptée existe (dénivelé 0.0 m sur 6 m)",
+			"ok": true
+		},
+		{
+			"controle": "clic : première maison posée (Maison posée : Ma maison à étage)",
+			"ok": true
+		},
+		{
+			"controle": "une parcelle en pente acceptée existe (dénivelé 1.0 m sur 6 m)",
+			"ok": true
+		},
+		{
+			"controle": "l'aperçu explique l'implantation et le raccord (K : raccord au chemin, R : orientation)",
+			"ok": true
+		},
+		{
+			"controle": "deuxième maison posée sur la pente : plateforme et raccord au chemin créés (Maison posée : Ma maison à étage)",
+			"ok": true
+		},
+		{
+			"controle": "le terrain s'adapte sous la maison (1407 colonnes ajustées)",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+S sur une carte jamais enregistrée : dialogue « Enregistrer la carte »",
+			"ok": true
+		},
+		{
+			"controle": "carte enregistrée : ile_creative_demo.eclats-carte.json",
+			"ok": true
+		},
+		{
+			"controle": "enregistrement relu à part : relief identique (0 colonnes différentes (1073741824, 1073741824)–(-1, -1), tailles 61504 / 61504)",
+			"ok": true
+		},
+		{
+			"controle": "carte modifiée : une action qui la remplacerait ouvre « Modifications non enregistrées »",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : 20 objets, 2 maison(s)",
+			"ok": true
+		},
+		{
+			"controle": "carte rouverte : relief et maisons identiques à l'enregistrement",
+			"ok": true
+		},
+		{
+			"controle": "première personne : objet posé en visant le sol (réticule au centre)",
+			"ok": true
+		},
+		{
+			"controle": "mode jeu : le personnage marche jusqu'à la maison et y entre (z = -10.2, maison en -10.0)",
+			"ok": true
+		},
+		{
+			"controle": "touche P : retour à l'éditeur depuis le mode jeu",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Z : la pose de l'étal est annulée",
+			"ok": true
+		},
+		{
+			"controle": "Ctrl+Y : rétablie",
+			"ok": true
+		},
+		{
+			"controle": "forêt autour de la zone protégée : 16 objets",
+			"ok": true
+		},
+		{
+			"controle": "L : un arbre est verrouillé",
+			"ok": true
+		},
+		{
+			"controle": "zone protégée (1046 colonnes) : relief inchangé après régénération (relief : 1291 colonnes modifiées ailleurs)",
+			"ok": true
+		},
+		{
+			"controle": "objet verrouillé : toujours là, même position",
+			"ok": true
+		},
+		{
+			"controle": "la régénération a bien remplacé les autres objets générés (15 retirés)",
+			"ok": true
+		}
+	]
+}

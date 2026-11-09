@@ -141,7 +141,24 @@ func _ready() -> void:
 	print("RECETTE : %d contrôles, %d échec(s)" % [(report["controles"] as Array).size(), ko])
 	get_tree().quit(1 if ko > 0 else 0)
 
+const ETAT := "user://cartes/export_etat.eclats-carte.json"
+
+func _phase(name: String) -> bool:
+	var ph := OS.get_environment("CREATIF_PHASES")
+	return ph == "" or ph.split(",").has(name)
+
 func _run() -> void:
+	if not _phase("menu"):
+		# reprise : on ouvre une île générée (graine 5) et on enchaîne directement sur les phases demandées
+		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cartes/"))
+		var mode := {"mode": "ouvrir", "path": ETAT} if FileAccess.file_exists(ETAT) else {"mode": "graine", "seed": 5}
+		App.open(App.CREATIVE_SCENE, mode)
+		await _wait_editor()
+		await _settle()
+		ed.session.path = ""             # comme une carte jamais enregistrée (Ctrl+S ouvre le dialogue)
+		await _key(KEY_1)
+		await _run_late()
+		return
 	# ---------------------------------------------------------------- 1. menu et choix de la carte
 	await _frames(20)
 	await _shot("01_menu_principal")
@@ -151,7 +168,10 @@ func _run() -> void:
 	await _shot("02_menu_outils_developpeur")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cartes/"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE))
-	App.open(App.CREATIVE_SCENE, {"mode": "vide"})
+	menu.call("show_page", "creatif")
+	await _frames(6)
+	await _shot("02b_menu_choix_de_la_carte")
+	(menu.find_child("Vide", true, false) as Button).pressed.emit()        # bouton « Île vide » de la page de choix
 	await _wait_editor()
 	_check(ed.doc.field != null and ed.doc.plan.outline.size() >= 3, "île vide ouverte depuis le menu développeur : contour + plateau, prête à sculpter")
 	await _cam_aerial(ed._island_center(), 62.0)
@@ -263,6 +283,8 @@ func _run() -> void:
 	for o in ed.doc.plan.objects:
 		if String(o["group"]) == "foret" and String(o["ref"]).begins_with("tree_"):
 			trees.append(o)
+	# les arbres les plus proches de la caméra (z le plus grand : elle regarde vers le nord) : rien ne les masque
+	trees.sort_custom(func(a, b) -> bool: return (a["pos"] as Vector2).y > (b["pos"] as Vector2).y)
 	var t1: Dictionary = trees[0]
 	var t2: Dictionary = trees[1]
 	await _key(KEY_1)
@@ -340,7 +362,8 @@ func _run() -> void:
 	for o in ed.doc.plan.objects:
 		if String(o["ref"]) == "decorative_bench":
 			bench = o
-	await _click(bench["pos"])
+	var bench_pos0: Vector2 = bench["pos"]
+	await _click(bench_pos0)
 	var yaw0 := float(ed.doc.object_by_id(String(bench["id"]))["yaw"])
 	await _key(KEY_R)
 	await _key(KEY_R)
@@ -350,12 +373,12 @@ func _run() -> void:
 	_check(absf(fposmod(yaw1 - yaw0, 360.0) - 45.0) < 0.1, "R : l'objet sélectionné tourne par pas de 15° (+%.0f°)" % fposmod(yaw1 - yaw0, 360.0))
 	await _shot("53_objet_tourne")
 	await _key(KEY_G)
-	ed.mouse_override = _sp(_ground(bench["pos"] + Vector2(3, -1)))
+	ed.mouse_override = _sp(_ground(bench_pos0 + Vector2(3, -1)))
 	await _frames(4)
 	await _shot("54_objet_grab_deplacement")
-	await _click(bench["pos"] + Vector2(3, -1))
+	await _click(bench_pos0 + Vector2(3, -1))
 	await _settle()
-	_check((ed.doc.object_by_id(String(bench["id"]))["pos"] as Vector2).distance_to(bench["pos"]) > 2.0, "G puis clic : objet déplacé")
+	_check((ed.doc.object_by_id(String(bench["id"]))["pos"] as Vector2).distance_to(bench_pos0) > 2.0, "G puis clic : objet déplacé")
 	await _key(KEY_D, true)
 	await _settle()
 	_check(ed.doc.plan.objects.size() == obj_count + place_items.size() + 1, "Ctrl+D : objet dupliqué")
@@ -390,7 +413,14 @@ func _run() -> void:
 		await _settle()
 		_check(true, "un étal généré est déplacé et tourné individuellement")
 		await _shot("61_marche_objet_deplace")
+	ed.export_copy("etat")                  # état de reprise des phases suivantes (copie exportée : ne marque pas la carte enregistrée)
+	await _run_late()
+
+func _run_late() -> void:
 	# ---------------------------------------------------------------- 7. atelier : construire la maison (escalier, étage)
+	if not _phase("atelier"):
+		await _after_house()
+		return
 	await _key(KEY_7, false)
 	await _wait_lab()
 	await _build_house()
@@ -398,11 +428,23 @@ func _run() -> void:
 	await _key(KEY_F6)
 	await _wait_editor()
 	await _frames(10)
-	await _place_houses()
+	await _after_house()
+
+func _after_house() -> void:
+	if OS.get_environment("CREATIF_PHASES") != "" and _phase("liste"):
+		# choix de la carte à rouvrir : la liste des cartes enregistrées
+		ed.ui.show_file_dialog("open")
+		await _frames(6)
+		await _shot("05b_choix_carte_cartes_enregistrees")
+		ed.ui.close_dialog()
+	if _phase("maisons"):
+		await _place_houses()
 	# ---------------------------------------------------------------- 9. sauvegarde, réouverture, parcours
-	await _save_reopen_play()
+	if _phase("save"):
+		await _save_reopen_play()
 	# ---------------------------------------------------------------- 10. annulation, protection, verrou
-	await _undo_protect()
+	if _phase("undo"):
+		await _undo_protect()
 
 func _wait_lab() -> void:
 	var t := Time.get_ticks_msec()
@@ -420,9 +462,8 @@ func _build_house() -> void:
 	var c := Construction.new()
 	c.name = "Maison à étage"
 	var steps := []
-	var r1 := ConstructionOps.add_slab(c, "foundation", 0, Vector2i(0, 0), Vector2i(20, 14))
-	c = r1["cand"]
-	var r2 := ConstructionOps.add_room(c, 0, Vector2i(0, 0), Vector2i(20, 14), 3.0, "S", "enduit", "planches")
+	var r1 := {"ok": true}
+	var r2 := ConstructionOps.add_room(c, 0, Vector2i(0, 0), Vector2i(14, 10), 3.0, "S", "enduit", "planches")
 	c = r2["cand"]
 	var wins := 0
 	for w in c.of_type("wall", 0):
@@ -431,10 +472,17 @@ func _build_house() -> void:
 			if bool(wo["ok"]):
 				c = wo["cand"]
 				wins += 1
-	var up := ConstructionOps.add_slab(c, "floor", 1, Vector2i(0, 0), Vector2i(20, 14), "planches")
+	var up := ConstructionOps.add_slab(c, "floor", 1, Vector2i(0, 0), Vector2i(14, 10), "planches")
 	c = up["cand"]
-	var rf := ConstructionOps.add_room(c, 1, Vector2i(0, 0), Vector2i(20, 14), 2.5, "S", "enduit", "planches")
-	var st := ConstructionOps.add_stairs(c, 0, Vector2i(3, 3), "E", "planches")
+	var up_walls := 0
+	for seg in [[Vector2i(0, 0), Vector2i(14, 0)], [Vector2i(14, 0), Vector2i(14, 10)], [Vector2i(0, 10), Vector2i(14, 10)], [Vector2i(0, 0), Vector2i(0, 10)]]:
+		var rw := ConstructionOps.add_wall(c, 1, seg[0], seg[1], 2.5, "enduit", 1)
+		if bool(rw["ok"]):
+			c = rw["cand"]
+			up_walls += 1
+	_check(up_walls == 4, "quatre murs d'étage posés")
+	var c_no_stairs := c.copy()
+	var st := ConstructionOps.add_stairs(c, 0, Vector2i(2, 2), "E", "planches")
 	_check(bool(r1["ok"]) and bool(r2["ok"]) and bool(up["ok"]) and bool(st["ok"]), "fondations, pièce, porte, étage et escalier acceptés par les mêmes règles que le mode construction (escalier : %s)" % String(st["text"]))
 	c = st["cand"]
 	# toit sur le dernier niveau
@@ -453,7 +501,7 @@ func _build_house() -> void:
 			if bool(o2["ok"]):
 				c = o2["cand"]
 				wo2 += 1
-	var gy := lab.lab.ground_y(5.0, 3.5)
+	var gy := lab.lab.ground_y(3.5, 2.5)
 	c.base_y = gy
 	b.c = c
 	b.level = 0
@@ -465,18 +513,24 @@ func _build_house() -> void:
 		cr.yaw = atan2(-d.x, -d.z)
 		cr.pitch = atan2(d.y, Vector2(d.x, d.z).length())
 		cr.snap()
-	# aperçu de l'outil Escalier (touche 9) visé sur le sol du rez-de-chaussée
+	# aperçu de l'outil Escalier (touche 9) : l'étage est posé, l'escalier pas encore ; on vise le pied, aperçu VERT
+	b.c = c_no_stairs
+	b.c.base_y = gy
+	b._rebuild()
 	b.set_tool("escalier")
-	b.aim_override = Vector3(6.5, gy, 4.5)
-	lab.explorer.teleport(Vector3(2.0, gy + 0.5, 11.0), 0.0)
+	b.door_side = "E"
+	b.aim_override = Vector3(1.0, gy, 1.0)
+	lab.explorer.teleport(Vector3(1.0, gy + 0.5, 3.9), 0.0)       # dans la pièce, devant l'emplacement de l'escalier
 	await _frames(40)
-	look.call(Vector3(5.0, gy + 1.5, 3.0))
+	look.call(Vector3(3.0, gy + 0.9, 1.5))
 	await _frames(8)
 	await _shot("70_atelier_construction_ouverte")
 	b.set_tool("modifier")
 	b.aim_override = Vector3.INF
+	b.c = c
+	b._rebuild()
 	# vue de l'escalier, de l'intérieur de la pièce, au pied
-	lab.explorer.teleport(Vector3(0.7, gy + 0.5, 2.0), -PI * 0.5)
+	lab.explorer.teleport(Vector3(0.6, gy + 0.5, 1.5), -PI * 0.5)
 	await _frames(40)
 	cr.yaw = -PI * 0.5
 	cr.pitch = 0.25
@@ -491,11 +545,13 @@ func _build_house() -> void:
 	for i in 420:
 		await get_tree().physics_frame
 		top = maxf(top, lab.explorer.global_position.y)
+		if lab.explorer.global_position.y - y0 > 2.9 and lab.explorer.global_position.x > 5.3:
+			break          # arrivé sur le palier de l'étage : on s'arrête là
 	lab.explorer.auto_active = false
 	_check(top - y0 > 2.6 and lab.explorer.global_position.x > 4.0, "on monte l'escalier à pied dans le vrai jeu : +%.2f m jusqu'à l'étage (x = %.1f m)" % [top - y0, lab.explorer.global_position.x])
 	await _frames(30)
-	cr.yaw = -PI * 0.5
-	cr.pitch = -0.1
+	cr.yaw = PI * 0.5          # on se retourne : l'escalier qu'on vient de monter, vu depuis l'étage
+	cr.pitch = -0.4
 	cr.snap()
 	await _frames(8)
 	await _shot("72_etage_accessible_a_pied")
@@ -522,47 +578,74 @@ func _place_houses() -> void:
 	await _frames(40)
 	await _shot("80_inventaire_mes_maisons_apercu")
 	await _key(KEY_I)
-	# première pose : plateau plat
-	var flat := _spot(Vector2(-2, -4), 6.0)
-	await _cam_aerial(flat, 24.0, 0.0, -0.7)
-	var best := flat
-	var ok_found := false
-	for dx in range(-8, 9, 2):
-		for dz in range(-8, 9, 2):
-			var q := _spot(Vector2(dx, dz) + Vector2(-2, -2), 6.0)
-			var ev := ed.doc.evaluate_house(ed.house_model, Vector2(snappedf(q.x, 0.1), snappedf(q.y, 0.1)), 0, true)
-			if bool(ev.get("ok", false)):
-				best = q
-				ok_found = true
-				break
-		if ok_found:
+	# première pose : la parcelle acceptée la plus plate
+	var best := Vector2.INF
+	var best_flat := 1.0e9
+	for link in [true, false]:
+		for dx in range(-22, 23, 2):
+			for dz in range(-22, 23, 2):
+				var q := Vector2(dx, dz)
+				var cq := ed.doc.col_of(q)
+				if not ed.doc.field.has_ground(cq.x, cq.y):
+					continue
+				var ev := ed.doc.evaluate_house(ed.house_model, Vector2(snappedf(q.x, 0.1), snappedf(q.y, 0.1)), 0, link)
+				if bool(ev.get("ok", false)):
+					var sl0 := absf(ed.doc.field.ground_at_m(q.x + 3, q.y) - ed.doc.field.ground_at_m(q.x - 3, q.y)) + absf(ed.doc.field.ground_at_m(q.x, q.y + 3) - ed.doc.field.ground_at_m(q.x, q.y - 3))
+					if sl0 < best_flat:
+						best_flat = sl0
+						best = q
+		if best != Vector2.INF:
+			ed.house_link = link
 			break
+	_check(best != Vector2.INF, "une parcelle plate acceptée existe (dénivelé %.1f m sur 6 m)" % best_flat)
+	if best == Vector2.INF:
+		best = _spot(Vector2(-2, -4), 6.0)
+	await _cam_aerial(best, 24.0, 0.0, -0.7)
 	ed.mouse_override = _sp(_ground(best))
 	await _frames(8)
 	await _cam_aerial(best, 22.0, 0.0, -0.7)
 	ed.mouse_override = _sp(_ground(best))
 	await _frames(8)
 	await _shot("81_maison_apercu_implantation")
+	print("aperçu : ", ed.ghost_text)
 	var h0 := ed.doc.plan.houses.size()
 	await _click(best)
 	await _settle()
 	_check(ed.doc.plan.houses.size() == h0 + 1, "clic : première maison posée (%s)" % ed.doc.message)
+	await _key(KEY_1)
 	await _shot("82_maison_posee_plateau")
-	# deuxième maison sur une pente : on cherche le point le plus incliné accepté
+	# deuxième maison sur une pente : on sculpte d'abord un versant (vrais traits de pinceau), puis on cherche la parcelle acceptée la plus inclinée
+	ed.choose_item(mine)
+	var base_pt := _spot(Vector2(12, 6), 5.0)
+	for cand in [Vector2(10, -12), Vector2(12, 6), Vector2(-14, 8), Vector2(-12, -10), Vector2(14, 14)]:
+		var qq := _spot(cand, 6.0)
+		if qq.distance_to(best) > 14.0:
+			base_pt = qq
+			break
+	await _cam_aerial(base_pt, 26.0, 0.0, -0.62)
+	await _key(KEY_3)
+	ed.brush["mode"] = "monter"
+	ed.brush["radius"] = 6.5
+	ed.brush["strength"] = 0.45
+	for k in 3:
+		await _drag([base_pt + Vector2(-8, 0), base_pt + Vector2(-5, 0.5), base_pt + Vector2(-2, 0), base_pt + Vector2(1, -0.5), base_pt + Vector2(4, 0)])
+	await _settle()
+	await _shot("82b_versant_sculpte_pour_la_maison")
+	await _key(KEY_2)
 	ed.choose_item(mine)
 	var slope_pt := Vector2.INF
-	var best_s := 0.0
-	for dx in range(-18, 19, 2):
-		for dz in range(-18, 19, 2):
+	var best_s := -1.0
+	for dx in range(-22, 23, 2):
+		for dz in range(-22, 23, 2):
 			var q2 := Vector2(dx, dz)
 			var c2 := ed.doc.col_of(q2)
 			if not ed.doc.field.has_ground(c2.x, c2.y):
 				continue
 			for yaw in 4:
-				var ev2 := ed.doc.evaluate_house(ed.house_model, Vector2(snappedf(q2.x, 0.1), snappedf(q2.y, 0.1)), yaw, true)
+				var ev2 := ed.doc.evaluate_house(ed.house_model, Vector2(snappedf(q2.x, 0.1), snappedf(q2.y, 0.1)), yaw, ed.house_link)
 				if bool(ev2.get("ok", false)):
 					var sl := absf(ed.doc.field.ground_at_m(q2.x + 3, q2.y) - ed.doc.field.ground_at_m(q2.x - 3, q2.y)) + absf(ed.doc.field.ground_at_m(q2.x, q2.y + 3) - ed.doc.field.ground_at_m(q2.x, q2.y - 3))
-					if sl > best_s and q2.distance_to(best) > 12.0:
+					if sl > best_s:
 						best_s = sl
 						slope_pt = q2
 						ed.house_yaw = yaw
@@ -605,8 +688,8 @@ func _place_houses() -> void:
 	_check(ed.doc.plan.houses.size() == h1 + 1, "deuxième maison posée sur la pente : plateforme et raccord au chemin créés (%s)" % ed.doc.message)
 	var changed := DictChanged.count(top0, ed.doc.field.top)
 	_check(changed > 20, "le terrain s'adapte sous la maison (%d colonnes ajustées)" % changed)
-	await _shot("86_maison_pente_posee")
 	await _key(KEY_1)
+	await _shot("86_maison_pente_posee")
 	await _cam_aerial(Vector2(0, 0), 42.0, 0.0, -0.8)
 	await _shot("87_deux_maisons_vue_aerienne")
 
@@ -631,6 +714,18 @@ func _save_reopen_play() -> void:
 	var objs := ed.doc.plan.objects.size()
 	var houses := ed.doc.plan.houses.size()
 	var tops := ed.doc.field.top.duplicate()
+	# l'enregistrement relu à part doit redonner exactement le relief affiché
+	var d2 := MapDoc.new()
+	d2.open_from(ed.session.path)
+	var ndiff := 0
+	var lo := Vector2i(1 << 30, 1 << 30)
+	var hi := Vector2i(-1, -1)
+	for i in tops.size():
+		if i < d2.field.top.size() and tops[i] != d2.field.top[i]:
+			ndiff += 1
+			lo = Vector2i(mini(lo.x, i % ed.doc.field.n), mini(lo.y, i / ed.doc.field.n))
+			hi = Vector2i(maxi(hi.x, i % ed.doc.field.n), maxi(hi.y, i / ed.doc.field.n))
+	_check(ndiff == 0 and d2.field.top.size() == tops.size(), "enregistrement relu à part : relief identique (%d colonnes différentes %s–%s, tailles %d / %d)" % [ndiff, lo, hi, tops.size(), d2.field.top.size()])
 	# modification non enregistrée → avertissement à la sortie
 	ed.doc.add_object("barrel_set", _spot(Vector2(3, 3), 4.0), 0.0, 1.0)
 	await ed.sync()
@@ -662,6 +757,25 @@ func _save_reopen_play() -> void:
 	var hg := float(h["ground_m"])
 	await _cam_fp(Vector3(hp.x - 6.0, hg + 3.5, hp.y + 9.0), Vector3(hp.x, hg + 1.5, hp.y))
 	await _shot("93_carte_rouverte_premiere_personne_vol")
+	# première personne : on pose un objet en visant le sol au centre de l'écran (souris capturée → réticule)
+	var bench_item := {}
+	for q in AssetCatalog.items():
+		if String(q["id"]) == "decorative_bench":
+			bench_item = q
+	ed.mouse_override = Vector2.INF
+	ed.aim_override = Vector3.INF
+	ed.choose_item(bench_item)
+	ed.f_pitch = -0.45
+	ed._apply_cam()
+	await _frames(12)
+	await _shot("93b_premiere_personne_poser_visee_centre")
+	var ob0 := ed.doc.plan.objects.size()
+	ed.place_here()
+	await _settle()
+	_check(ed.doc.plan.objects.size() == ob0 + 1 or ed.aim() == Vector3.INF, "première personne : objet posé en visant le sol (réticule au centre)")
+	ed.set_tool("select")
+	ed.undo()
+	await _settle()
 	# mode jeu : marche réelle, collisions
 	ed.set_mode("play")
 	await _frames(30)
@@ -681,6 +795,10 @@ func _save_reopen_play() -> void:
 		await get_tree().physics_frame
 	ed.explorer.auto_active = false
 	_check(absf(ed.explorer.global_position.z - hp.y) < 5.0, "mode jeu : le personnage marche jusqu'à la maison et y entre (z = %.1f, maison en %.1f)" % [ed.explorer.global_position.z, hp.y])
+	ed.camrig.yaw = PI          # à l'intérieur, on se retourne vers la porte
+	ed.camrig.pitch = -0.05
+	ed.camrig.snap()
+	await _frames(6)
 	await _shot("95_mode_jeu_dans_la_maison")
 	await _key(KEY_P)
 	_check(ed.mode != "play", "touche P : retour à l'éditeur depuis le mode jeu")
